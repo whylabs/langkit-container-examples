@@ -40,6 +40,7 @@ def top_emotion_detector(col_name: str = "response") -> Callable[[Union[Dict[str
 
         # Get the most likely emotion for each result along with its probability
         top_emotions = [emotion[0][0] for emotion in emotions]
+        print(f'Top emotion {col_name}: {top_emotions}')
         return top_emotions
 
     return _emotion_detector

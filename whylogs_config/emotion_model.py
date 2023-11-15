@@ -55,7 +55,6 @@ def _map_probabilities_to_labels(probabilities: List[float]) -> List[Tuple[str, 
 
 
 def inference(input_text: pd.Series) -> List[List[Tuple[str, float]]]:
-    print(f'>>> running emotion inference on type "{type(input_text)}" "{input_text}"')
     if model is None or tokenizer is None:
         raise ValueError("Model not loaded. Please call load_model() first.")
 

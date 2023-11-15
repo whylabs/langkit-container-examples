@@ -1,6 +1,4 @@
-# FROM public.ecr.aws/whylabs-dev/whylabs-container:latest
-# For local dev, not published to docker atm
-FROM whylabs/whylogs:py-llm-latest  
+FROM whylabs/whylogs:py-llm-73d530f4db2b96591279956a2f83c71a35e8156b
 
 # Download our model in the container so we don't have to do it at launch
 COPY ./scripts /opt/whylogs-container/scripts
