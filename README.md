@@ -1,20 +1,21 @@
-# Custom Emotion UDF Example
+# Custom Langkit Container
 
-Sample project that demonstrates how to the whylogs container with custom whylogs configuration to enable features like embeddings.
+Sample project that demonstrates how to build a custom container based on Langkit that performs prompt/response validation and profiling
+with WhyLabs using a custom model as a User Defined Function (UDF). This example uses `SamLowe/roberta-base-go_emotions` from HuggingFace.
 
 ## Setup
 
 Make sure you have [poetry](https://python-poetry.org/) and docker installed. If you want to use your own model id in this demo then make
 sure to update `config.py` with your model id. It's using `model-111` by default.
 
-
 ```bash
-poetry install
+# If you're just running through the demo, you don't need the dev dependencies
+poetry install --without-dev --no-root
 ```
 
 ## Building
 
-Build the docker container by using make. This will create a container tagged `emotion-whylogs-container`.
+Build the docker container by using make. This will create a container tagged `custom-llm-container`.
 
 ```bash
 make
@@ -26,30 +27,56 @@ make
 make run
 ```
 
-With a `local.env` file with your whylabs credentials.
+With a `local.env` file with your WhyLabs credentials.
 
 ```
+# Generated at https://hub.whylabsapp.com/settings/access-tokens
 WHYLABS_API_KEY=<api key>
-WHYLABS_ORG_ID=<org id>
 CONTAINER_PASSWORD=password
 
-# Set based on your model type. Daily is the default.
+# Set based on your model type in WhyLabs. Daily is the default.
 DEFAULT_WHYLABS_DATASET_CADENCE=DAILY
 
 # Upload profiles every five minutes
 DEFAULT_WHYLABS_UPLOAD_CADENCE=M
 DEFAULT_WHYLABS_UPLOAD_INTERVAL=5
-
-# Make sure the container fails if the config isn't hooked up correctly
-FAIL_STARTUP_WITHOUT_CONFIG=True
 ```
 
 ## Making Requests
 
-There is a script set up to send requests to localhost in the correct format. Sub your openai api key in below.
+When the container is running, visit `http://localhost:8000/docs` (if you're running locally) for endpoint documentation and request
+snippets. The [llm validate](http://localhost:8000/docs#/default/validate_llm_validate_llm_post) endpoint is the one you probably want to
+use.
+
+Here's a curl snippet:
 
 ```bash
-source .venv/bin/activate
-OPENAI_API_KEY=sk-xxxxx python ./scripts/send_request.py model-123 "I'm angry"
+curl -X 'POST'     -H "X-API-Key: password"     -H "Content-Type: application/octet-stream"     'http://localhost:8000/validate/llm'     --data-raw '{
+    "datasetId": "model-62",
+    "prompt": "This is a test prompt",
+    "response": "This is a test response"
+}'
 ```
 
+And a Python `requests` snippet.
+
+```python
+import requests
+
+# This is for container requests, not the WhyLabs API key.
+container_password = "password"
+
+# API endpoint
+url = 'http://localhost:8000/validate/llm'
+
+# Sample data
+data = {
+    "datasetId": "model-62",  # TODO Your model here
+    "prompt": "This is a test prompt",
+    "response": "This is a test response"
+}
+
+# Make the POST request
+headers = {"X-API-Key": container_password, "Content-Type": "application/octet-stream"}
+response = requests.post(url, json=data, headers=headers)
+```
