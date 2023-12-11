@@ -9,13 +9,9 @@ packages = [{include = "python_container_example"}]
 [tool.poetry.dependencies]
 python = "^3.10"
 
-# This will get installed in the container. See the dockerfile
-transformers = "^4.35.0"
-typing-extensions = "^4.8.0"
-
-
 [tool.poetry.group.dev.dependencies]
 autoflake = "^2.0.1"
+typing-extensions = "^4.8.0"
 mypy = "^1.0.1"
 black = "^23.1.0"
 requests = "^2.28.2"

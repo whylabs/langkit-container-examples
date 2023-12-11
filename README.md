@@ -6,11 +6,14 @@ with WhyLabs.
 ## Setup
 
 Make sure you have [poetry](https://python-poetry.org/) and docker installed. If you want to use your own model id in this demo then make
-sure to update `config.py` with your model id. It's using `model-111` by default.
+sure to update `whylogs_config/config.yaml` with your model id.
 
 ```bash
-poetry install
+# If you're just running through the demo, you don't need the dev dependencies
+poetry install --without-dev --no-root
 ```
+
+
 
 ## Building
 
@@ -47,35 +50,52 @@ When the container is running, visit `http://localhost:8000/docs` (if you're run
 snippets. The [llm validate](http://localhost:8000/docs#/default/validate_llm_validate_llm_post) endpoint is the one you probably want to
 use.
 
-Here's a curl snippet:
+Here are some sample requests that will trigger the validation rules that the container is configured for. Requests will have a 200 response
+code when no validation are triggered, and a 400 when at least one is triggered. The response is a report of failed validations like the
+following.
+
+```json
+{
+  "failures": [
+    {
+      "prompt_id": "0085d3ff-8482-4e08-8e16-16dab8d5a2d1",
+      "validator_name": "textstat_validator",
+      "failed_metric": "textstat_prompt",
+      "value": "201",
+      "timestamp": null,
+      "is_valid": false
+    }
+  ]
+}
+```
+
+### Response Toxicity
 
 ```bash
 curl -X 'POST'     -H "X-API-Key: password"     -H "Content-Type: application/octet-stream"     'http://localhost:8000/validate/llm'     --data-raw '{
-    "datasetId": "model-62",
-    "prompt": "This is a test prompt",
-    "response": "This is a test response"
+    "datasetId": "model-124",
+    "prompt": "Hi there!",
+    "response": "Thats a stupid prompt."
 }'
 ```
 
-And a Python `requests` snippet.
+### Prompt Toxicity
 
-```python
-import requests
+```bash
+curl -X 'POST'     -H "X-API-Key: password"     -H "Content-Type: application/octet-stream"     'http://localhost:8000/validate/llm'     --data-raw '{
+    "datasetId": "model-124",
+    "prompt": "This chat sucks.",
+    "response": "Im sorry you feel that way."
+}'
+```
 
-# This is for container requests, not the WhyLabs API key.
-container_password = "password"
+### Character Count Exceeded
 
-# API endpoint
-url = 'http://localhost:8000/validate/llm'
+```bash
+curl -X 'POST'     -H "X-API-Key: password"     -H "Content-Type: application/octet-stream"     'http://localhost:8000/validate/llm'     --data-raw '{
+    "datasetId": "model-124",
+    "prompt": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "response": "Im sorry you feel that way."
+}'
 
-# Sample data
-data = {
-    "datasetId": "model-62",  # TODO Your model here
-    "prompt": "This is a test prompt",
-    "response": "This is a test response"
-}
-
-# Make the POST request
-headers = {"X-API-Key": container_password, "Content-Type": "application/octet-stream"}
-response = requests.post(url, json=data, headers=headers)
 ```

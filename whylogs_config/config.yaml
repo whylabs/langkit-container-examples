@@ -1,0 +1,26 @@
+whylabs_dataset_id: model-124
+policy: policy_name # Name/id will eventually be used in WhyLabs for managing policies.
+id: policy_id
+policy_version: "1"
+schema_version: 0.0.1
+
+profiling:
+  - all
+
+rules:
+  prompt:
+    # Don't allow toxic user prompts
+    - module: toxicity
+      upper_threshold: 0.5
+
+    # Limit the length of the user prompts.
+    - module: textstat
+      metric: character_count
+      upper_threshold: 200
+      lower_threshold: 1
+
+  response:
+    # Don't allow toxic responses
+    - module: toxicity
+      upper_threshold: 0.3
+
