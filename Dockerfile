@@ -8,6 +8,8 @@ RUN bash -c "source .venv/bin/activate; python ./scripts/download_model.py"
 COPY requirements.txt ./
 RUN .venv/bin/pip install -r requirements.txt
 
+# make sure we fail if we don't have a config file in the right place
+ENV FAIL_STARTUP_WITHOUT_CONFIG=True
 # Copy our custom config code
 COPY ./whylogs_config /opt/whylogs-container/whylogs_container/whylogs_config/
 
