@@ -1,4 +1,4 @@
-FROM whylabs/whylogs:py-llm-73d530f4db2b96591279956a2f83c71a35e8156b
+FROM whylabs/whylogs:py-llm-8ae8f6a8bde4f91663930f629fea32cbd68161e1
 
 # Download our model in the container so we don't have to do it at launch
 COPY ./scripts /opt/whylogs-container/scripts

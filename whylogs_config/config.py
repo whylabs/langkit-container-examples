@@ -1,6 +1,6 @@
 from typing import Any, Callable, Dict, List, Tuple, Union
 
-from whylabs_toolkit.container.config_types import DatasetCadence, DatasetOptions, DatasetUploadCadence, DatasetUploadCadenceGranularity
+from whylogs_container_types.config_types import DatasetCadence, DatasetOptions, DatasetUploadCadence, DatasetUploadCadenceGranularity
 
 # TODO this will be moved to the whylabs_toolkit package so IDE doesn't complain about it missing. It will work
 # in the container though
@@ -93,7 +93,7 @@ schema = udf_schema(validators=validators, default_config=condition_count_config
 
 # Export a dictionary of dataset id to DatasetSchemas for the container to use
 schemas: Dict[str, DatasetOptions] = {
-    "model-111": DatasetOptions(  # TODO specify your model id here
+    "model-124": DatasetOptions(  # TODO specify your model id here
         schema=schema,
         dataset_cadence=DatasetCadence.DAILY,
         whylabs_upload_cadence=DatasetUploadCadence(granularity=DatasetUploadCadenceGranularity.MINUTE, interval=5),
