@@ -1,4 +1,4 @@
-whylabs_dataset_id: model-124
+whylabs_dataset_id: model-62
 policy: my_new_policy
 id: 9294f3fa-4f4b-4363-9397-87d3499fce28
 policy_version: "1"
@@ -14,17 +14,14 @@ rules:
       metric: character_count
       upper_threshold: 200
       lower_threshold: 2
-      
+
     - module: toxicity
       upper_threshold: 0.7
-      
-    - module: regexes
-      config_path: "whylogs_config/path/to/regexes.json"
-    
+
   response:
     - module: toxicity
       upper_threshold: 0.9
-    
+
     - module: input_output
       upper_threshold: 0.5
 
