@@ -1,4 +1,4 @@
-name: Workflow
+name: configure-container example
 
 on:
   pull_request:
@@ -7,8 +7,11 @@ on:
 jobs:
   build:
     name: Build and run all tests and checks
-    timeout-minutes: 30
+    timeout-minutes: 60
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./examples/configure-container
 
     steps:
       - uses: actions/checkout@v3
@@ -24,32 +27,13 @@ jobs:
           poetry-version: 1.7.1
 
       - name: Install python dependencies
-        shell: bash
         run: make install
 
       - name: Check types
-        shell: bash
         run: make lint
 
       - name: Check formatting
-        shell: bash
         run: make format
-
-      # Complicted Docker logic to get around disk space issues on github builders
-      - name: Remove python dependencies to save space
-        if: ${{ inputs.type == 'llm' }}
-        shell: bash
-        run: |
-          rm -rf .venv/
-          poetry cache clear PyPI --all
-          poetry cache clear torch --all
-          echo "Available storage:"
-          sudo df -h
-          echo
-
-      - name: Create docker dirs
-        shell: bash
-        run: mkdir -p ${{ inputs.workdir }}/llm/ && mkdir -p ${{ inputs.workdir }}/main/
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
