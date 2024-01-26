@@ -1,13 +1,13 @@
-.PHONY: help requirements build run all clean lint lint-fix format format-fix fix test
+.PHONY: help build run all clean lint lint-fix format format-fix fix test pip-install-python-client
 
-CONTAINER_NAME = langkit_configuration_example
+CONTAINER_NAME = langkit_example_custom_model
 
 all: build
 
 install:
 	poetry install
 
-build:
+build: requirements.txt
 	docker build --platform=linux/amd64 . -t $(CONTAINER_NAME)
 
 test:
@@ -19,8 +19,11 @@ run:
 debug:
 	docker run -it --platform=linux/amd64 --entrypoint /bin/bash $(CONTAINER_NAME)
 
+requirements.txt: pyproject.toml
+	poetry export -f requirements.txt --without dev --output requirements.txt
+
 clean:
-	rm -rf requirements.txt
+	rm -rf requirements.txt dist
 
 lint: ## Check for type issues with pyright
 	@{ echo "Running pyright\n"; poetry run pyright; PYRIGHT_EXIT_CODE=$$?; } ; \
@@ -38,9 +41,14 @@ format-fix: ## Fix formatting issues
 
 fix: lint-fix format-fix ## Fix all linting and formatting issues
 
+pip-install-python-client:  ## Install the latest python client from the main project
+	poetry run pip uninstall whylogs-container-client -y || true
+	poetry run pip install ../../whylogs-container-client/dist/*.whl
+
 help: ## Show this help message.
 	@echo 'usage: make [target] ...'
 	@echo
 	@echo 'targets:'
 	@egrep '^(.+)\:(.*) ##\ (.+)' ${MAKEFILE_LIST} | sed -s 's/:\(.*\)##/: ##/' | column -t -c 2 -s ':#'
+
 

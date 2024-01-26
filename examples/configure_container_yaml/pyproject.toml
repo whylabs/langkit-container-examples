@@ -1,5 +1,5 @@
 [tool.poetry]
-name =  "python_container_example"
+name =  "configure_container_yaml"
 version = "0.1.0"
 description = ""
 authors = ["Anthony Naddeo <anthony@whylabs.ai>"]
@@ -8,25 +8,18 @@ packages = [{include = "whylogs_config"}]
 
 [tool.poetry.dependencies]
 python = "^3.10"
+whylogs-container-client = "1.0.2.dev0"
 
 [tool.poetry.group.dev.dependencies]
 # These are all dev dependencies. They're already included in the container and we don't want to
 # overwrite those versions, we just want types and auto completion in this project.
 whylogs-container-types = "^0.4.0"
 pandas = "1.3.5"
-whylogs = {version = "1.3.20", extras = ["proc"]}
-# torch = {version = "2.0.1", source = "torch"}  # Don't need these in this example
-# torchvision = {version = "0.15.2", source = "torch"}
+
 pyright = "^1.1.347"
 ruff = "^0.1.13"
 pytest = "^7.4.4"
-whylogs-container-client = "^1.0.1"
-
-[[tool.poetry.source]]
-name = "torch"
-url = "https://download.pytorch.org/whl/cpu"
-priority = "explicit"
-
+whylogs-container-client = "*"
 
 [build-system]
 requires = ["poetry-core"]

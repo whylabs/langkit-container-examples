@@ -8,7 +8,7 @@ import pytest
 import whylogs_container_client.api.manage.health as Health
 from whylogs_container_client import AuthenticatedClient
 
-image_name = "langkit_example_configure_container_python"  # from the makefile, run `make build` to build the image
+image_name = "langkit_example_configure_container_yaml"  # from the makefile, run `make build` to build the image
 
 T = TypeVar("T")
 

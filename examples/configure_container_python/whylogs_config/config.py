@@ -43,15 +43,14 @@ def lower_case_char_count(input_name: str) -> MetricCreator:
 langkit_config: Dict[str, LangkitOptions] = {
     "model-131": LangkitOptions(
         metrics=[
-            lib.text_stat.prompt(),
-            lib.text_stat.response(),
+            lib.toxicity.prompt(),
+            lib.toxicity.response(),
             upper_case_char_count("prompt"),
             upper_case_char_count("response"),
         ],
         validators=[
-            create_validator("prompt.char_count", lower_threshold=10, upper_threshold=100),
-            create_validator("response.char_count", lower_threshold=10),
-            create_validator("prompt.upper_case_char_count", lower_threshold=10),
+            create_validator("response.toxicity", upper_threshold=0.4),
+            create_validator("prompt.upper_case_char_count", lower_threshold=1),
         ],
     ),
     "model-133": LangkitOptions(
@@ -63,8 +62,7 @@ langkit_config: Dict[str, LangkitOptions] = {
         ],
         validators=[
             create_validator("prompt.sentiment_polarity", lower_threshold=0),
-            create_validator("response.sentiment_polarity", lower_threshold=0),
-            create_validator("prompt.lower_case_char_count", lower_threshold=10),
+            create_validator("response.lower_case_char_count", lower_threshold=10),
         ],
     ),
 }

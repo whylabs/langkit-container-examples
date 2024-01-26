@@ -8,7 +8,7 @@ import pytest
 import whylogs_container_client.api.manage.health as Health
 from whylogs_container_client import AuthenticatedClient
 
-image_name = "langkit_configuration_example"  # from the makefile, run `make build` to build the image
+image_name = "langkit_example_custom_model"  # from the makefile, run `make build` to build the image
 
 T = TypeVar("T")
 
@@ -52,10 +52,6 @@ class ServerCommands:
             "DEFAULT_WHYLABS_UPLOAD_CADENCE=M",
             "--env",
             "DEFAULT_WHYLABS_UPLOAD_INTERVAL=5",
-            "--env",
-            "FAIL_STARTUP_WITHOUT_CONFIG=False",
-            "--env",
-            f"PORT={port}",
             image_name,
         ]
 

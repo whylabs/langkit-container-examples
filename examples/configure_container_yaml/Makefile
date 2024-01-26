@@ -1,6 +1,6 @@
 .PHONY: help requirements build run all clean lint lint-fix format format-fix fix test pip-install-python-client
 
-CONTAINER_NAME = langkit_example_configure_container_python
+CONTAINER_NAME = langkit_example_configure_container_yaml
 
 all: build
 
@@ -47,5 +47,4 @@ help: ## Show this help message.
 	@echo
 	@echo 'targets:'
 	@egrep '^(.+)\:(.*) ##\ (.+)' ${MAKEFILE_LIST} | sed -s 's/:\(.*\)##/: ##/' | column -t -c 2 -s ':#'
-
 
