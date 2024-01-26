@@ -4,9 +4,7 @@ This repo has various examples for configuring and using the WhyLabs langkit con
 different use case and contains a `test` directory with working Python code that demonstrates how to use it. Browse that folder if you're
 looking for a specific example. Each example either configures or calls a deployed instance of the container.
 
-## Links
-
-- [Docker](https://hub.docker.com/repository/docker/whylabs/whylogs/general)
+The rest of this README will go over the process of customizing the langkit container in general.
 
 # Configuration Steps
 
@@ -19,9 +17,7 @@ a Dockerfile that extends our image and copies certain files into a certain spot
 You'll want to either use `py-llm-latest` or browse the [docker tags][docker_tags] for a version to use instead if you don't want to risk
 breaking changes.
 
-## Step 2: Create a Configuration Files
-
-<!-- TODO maybe change the name from whylogs_config to something more generic. This will be a breaking change. -->
+## Step 2: Create a Configuration File
 
 Depending on whether you're using Python, Yaml, or both, you'll be creating different files. Yaml is the easiest way to configure the
 container but sometimes you need more control. If you're going to be deploying custom models, for example, then you'll need to use Python
@@ -45,8 +41,7 @@ This is what your project will look like.
 These files will be included by your Dockerfile in the section below. The container is hard coded to search  
 `/opt/whylogs-container/whylogs_container/whylogs_config/` for yaml files that it understands at startup.
 
-- See [configure-container][configure_container] for an example that demonstrates using Python to configure the container.
-<!-- - See [the yaml schema documentation][yaml_schema] to see what you can put in there. -->
+See [configure_container_yaml][configure_container_yaml] to see what you can put in there.
 
 ### Step 2.2: Custom Python Configuration
 
@@ -66,7 +61,7 @@ The container is hard coded to import whatever is at `/opt/whylogs-container/why
 mechanism by which the custom configuration code is evaluated. If you need to deploy and reference other python files then you can tag them
 along as well and use relative imports and that will work out at runtime.
 
-<!-- See [configure-container-python][configure_container_python] for an example that demonstrates using Python to configure the container. -->
+See [configure_container_python][configure_container_python] for an example that demonstrates using Python to configure the container.
 
 ## Step 3: Create a Dockerfile
 
@@ -94,16 +89,16 @@ you can find the dependencies it was bundled with. You can get this from the ima
 
 ```
 # Get the declared dependnecies
-docker run --platform=linux/amd64 --rm --entrypoint /bin/bash whylabs/whylogs:py-llm-latest -c 'cat pyproject.toml'
+docker run --platform=linux/amd64 --rm --entrypoint /bin/bash whylabs/whylogs:py-llm-1.0.2.dev0 -c 'cat pyproject.toml'
 
 # Or start an interactive Python shell and test imports
-docker run -it --platform=linux/amd64 --rm --entrypoint /bin/bash whylabs/whylogs:py-llm-latest -c "source .venv/bin/activate; python3.10"
+docker run -it --platform=linux/amd64 --rm --entrypoint /bin/bash whylabs/whylogs:py-llm-1.0.2.dev0 -c "source .venv/bin/activate; python3.10"
 ```
 
 In general, you can expect `pandas`, `whylogs`, `langkit`, and `torch/torchvision==2.0.0` to be present, as well as whatever dependencies
 they pull in.
 
-<!-- See the [configure_dependencies][configure_dependencies] for a complete example. -->
+See the [custom_model][custom_model] for a complete example that packages extra dependencies.
 
 ## Step 4: Build the Image
 
@@ -114,6 +109,8 @@ very fast, while installing dependencies can be very slow.
 docker build . -t my_llm_container
 ```
 
+Each of the examples do this with `make build`
+
 ## Step 5: Deploy a Container
 
 This will depend heavily on your infrastructure. The simplest deployment method is Docker of course.
@@ -122,24 +119,22 @@ This will depend heavily on your infrastructure. The simplest deployment method 
 docker run -it --rm -p 127.0.0.1:8000:8000 --env-file local.env my_llm_container
 ```
 
-<!-- See [deploy_k8][deploy_k8] for an example of deploying and calling the image with Kubernetes. -->
+Each of the examples do this with `make run`
+
+See [our sample Helm file][helm_llm_file] for an example of deploying via Helm.
 
 ## Step 6: Call the Container
 
-The container has a client that you can use to call it, [python-container-client][python-container-client]. See the README in that project
-or any of the example's `test` folders for examples.
+The container has a client that you can use to call it, [python-container-client][python-container-client]. If you prefer using other
+languages, curl, or generic http then see the [api docs][api_docs] for request formats.
 
 <!-- Links -->
 
-[configure_container]: https://github.com/whylabs/langkit-container-examples/tree/master/examples/configure-container
+[configure_container_python]: https://github.com/whylabs/langkit-container-examples/tree/master/examples/configure_container_python
+[configure_container_yaml]: https://github.com/whylabs/langkit-container-examples/tree/master/examples/configure_container_yaml
 [docker_tags]: https://hub.docker.com/repository/docker/whylabs/whylogs/tags?page=1&ordering=last_updated&name=llm
 [python-container-client]: https://pypi.org/project/whylogs-container-client/
-
-<!-- [custom_model]: TODO -->
-<!---->
-<!-- [yaml_schema]: TODO -->
-<!-- [k8_config]: TODO host it somewhere -->
-<!---->
-<!-- [configure_container_python]: TODO make this example -->
-<!-- [configure_dependencies]: TODO make this example. This one should talk about the dependencies that are included by default. -->
-<!-- [deploy_k8]: TODO make an example that uses k8 to do the integ test -->
+[custom_model]: https://github.com/whylabs/langkit-container-examples/tree/master/examples/custom_model
+[helm_repo]: https://github.com/whylabs/charts
+[helm_llm_file]: https://github.com/whylabs/charts/tree/mainline/charts/langkit
+[api_docs]: https://whylabs.github.io/langkit-container-examples/api.html
