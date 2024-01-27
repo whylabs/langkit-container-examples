@@ -21,7 +21,7 @@ breaking changes.
 
 Depending on whether you're using Python, Yaml, or both, you'll be creating different files. Yaml is the easiest way to configure the
 container but sometimes you need more control. If you're going to be deploying custom models, for example, then you'll need to use Python
-most likly since you'll probably have to reference libraries like `torch` and execute some setup code.
+most likely since you'll probably have to reference libraries like `torch` and execute some setup code.
 
 ### Step 2.1: Custom Yaml Configuration
 

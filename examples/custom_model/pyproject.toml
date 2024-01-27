@@ -21,7 +21,7 @@ whylogs-container-client = "1.0.2.dev0"
 # These are all dev dependencies. They're already included in the container and we don't want to
 # overwrite those versions, we just want types and auto completion in this project.
 # whylogs-container-types = "^0.4.0"
-langkit = {url = "https://whypy.s3.us-west-2.amazonaws.com/langkit-0.0.39-py3-none-any.whl", extras = ["all"]}
+langkit = {url = "https://whypy.s3.us-west-2.amazonaws.com/langkit-0.0.40-py3-none-any.whl", extras = ["all"]}
 whylogs-container-types = {url = "https://whypy.s3.us-west-2.amazonaws.com/whylogs_container_types-0.4.8-py3-none-any.whl"}
 pandas = "1.3.5"
 

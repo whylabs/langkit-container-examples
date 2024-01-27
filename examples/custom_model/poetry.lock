@@ -1064,12 +1064,12 @@ data = ["language-data (>=1.1,<2.0)"]
 
 [[package]]
 name = "langkit"
-version = "0.0.39"
+version = "0.0.40"
 description = "A language toolkit for monitoring LLM interactions"
 optional = false
 python-versions = ">=3.8,<4"
 files = [
-    {file = "langkit-0.0.39-py3-none-any.whl", hash = "sha256:6dc89b65b98139de6d4f06f180d9d2e8a5b66452069d984e2d10d79b014f3f68"},
+    {file = "langkit-0.0.40-py3-none-any.whl", hash = "sha256:4ec246e25fdd2eff49e06a7e4541219bd000e88413991075829ce64ce7b718ab"},
 ]
 
 [package.dependencies]
@@ -1092,7 +1092,7 @@ all = ["datasets (>=2.12.0,<3.0.0)", "evaluate (>=0.4.0,<0.5.0)", "faiss-cpu (>=
 
 [package.source]
 type = "url"
-url = "https://whypy.s3.us-west-2.amazonaws.com/langkit-0.0.39-py3-none-any.whl"
+url = "https://whypy.s3.us-west-2.amazonaws.com/langkit-0.0.40-py3-none-any.whl"
 
 [[package]]
 name = "lit"
@@ -3965,4 +3965,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "384953622fdae3183572e2115062efde2e1f8cedf3e194cc2a63a80d776c6a91"
+content-hash = "341e6befcbc5b0321978e35c8ca8cc9da3261f3a9c0162f82abaf0585de303d8"
