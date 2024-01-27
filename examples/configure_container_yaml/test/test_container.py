@@ -35,6 +35,36 @@ def test_prompt_char_count_134(client: AuthenticatedClient):
     assert actual == expected
 
 
+def test_prompt_char_count_139(client: AuthenticatedClient):
+    request = LLMValidateRequest(
+        prompt="?",
+        response="I'm sorry you feel that way.",
+        dataset_id="model-139",
+    )
+
+    response = ValidateLLM.sync_detailed(client=client, body=request)
+
+    if not isinstance(response.parsed, ValidationResult):
+        raise Exception(f"Failed to validate data. Status code: {response.status_code}. {response.parsed}")
+
+    actual: ValidationResult = response.parsed
+
+    expected = ValidationResult(
+        report=[
+            ValidationFailure(
+                id=0,
+                metric="prompt.char_count",
+                details="Value 1 is below threshold 2.0",
+                value=1,
+                upper_threshold=None,
+                lower_threshold=2.0,
+            )
+        ],
+    )
+
+    assert actual == expected
+
+
 def test_prompt_sentiment_134(client: AuthenticatedClient):
     request = LLMValidateRequest(
         prompt="This prompt sucks, and this llm sucks, and everything sucks.",
