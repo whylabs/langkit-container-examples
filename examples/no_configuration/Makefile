@@ -6,7 +6,7 @@ DOCKER_IMAGE = whylabs/whylogs:py-llm-1.0.2.dev0
 all: build
 
 install:
-	poetry install
+	poetry install --no-root
 
 build:
 	docker pull $(DOCKER_IMAGE)
