@@ -4,7 +4,8 @@ This repo has various examples for configuring and using the WhyLabs langkit con
 different use case and contains a `test` directory with working Python code that demonstrates how to use it. Browse that folder if you're
 looking for a specific example. Each example either configures or calls a deployed instance of the container.
 
-The rest of this README will go over the process of customizing the langkit container in general.
+The rest of this README will go over the process of customizing the langkit container in general. If you want to use the container only for
+logging (no validation) then you can jump directly to testing it out with the [no configuration][no_config] example.
 
 # Configuration Steps
 
@@ -132,9 +133,11 @@ languages, curl, or generic http then see the [api docs][api_docs] for request f
 
 [configure_container_python]: https://github.com/whylabs/langkit-container-examples/tree/master/examples/configure_container_python
 [configure_container_yaml]: https://github.com/whylabs/langkit-container-examples/tree/master/examples/configure_container_yaml
+[custom_model]: https://github.com/whylabs/langkit-container-examples/tree/master/examples/custom_model
+[no_config]: https://github.com/whylabs/langkit-container-examples/tree/master/examples/no_configuration
+[api_docs]: https://whylabs.github.io/langkit-container-examples/api.html
 [docker_tags]: https://hub.docker.com/repository/docker/whylabs/whylogs/tags?page=1&ordering=last_updated&name=llm
 [python-container-client]: https://pypi.org/project/whylogs-container-client/
-[custom_model]: https://github.com/whylabs/langkit-container-examples/tree/master/examples/custom_model
 [helm_repo]: https://github.com/whylabs/charts
 [helm_llm_file]: https://github.com/whylabs/charts/tree/mainline/charts/langkit
-[api_docs]: https://whylabs.github.io/langkit-container-examples/api.html
+
