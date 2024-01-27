@@ -41,6 +41,8 @@ generic http then see the [api docs](https://whylabs.github.io/langkit-container
 
 The metrics and validation is driven by the yaml files in `whylogs_config/`. By default, if you don't specify any configuration options then
 you'll get all of the langkit metrics when you use the log api, but the validation api won't work because no thresholds have been set for
-anything. The `model-139-everything.yaml` file shows what a yaml configuration would look like it if manuallys specified every metric and
-selectively specified some thresholds. That's a good starting point if you want to either pair down the metric (for better performance) or
-specify some numeric upper/lower bounds.
+anything. The `model-139-everything.yaml` file shows what a yaml configuration would look like if it manually specified every metric and
+selectively specified some thresholds. That's a good starting point if you want to either pare down the metric load (for better performance)
+or specify some numeric upper/lower bounds.
+
+
