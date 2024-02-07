@@ -1,8 +1,9 @@
-# Custom Langkit Model (Presidio) Example
+# Zero-Configuration langkit Metrics
 
-Sample project that demonstrates how to use the langkit container without any custom configuration. You'll be using the `log api` (below) to
-track metrics and have them sent to WhyLabs. Validation doesn't work here because there are no thresholds defined, but you will get all of
-the langkit metrics by default.
+This sample project shows how you use the langkit contianer without doing any custom configuration. Out of the box, you'll get metrics
+calculated for your prompts and responses for all of the langkit metrics, which will be uploaded to WhyLabs every 5 minutes. You'll be using
+the `log api` in the Marking Requests section. The container is capable of validating prompts and responses as well, but that requires
+custom configuration (see the other examples).
 
 ## Setup
 
@@ -22,7 +23,7 @@ DEFAULT_WHYLABS_DATASET_CADENCE=DAILY
 FAIL_STARTUP_WITHOUT_CONFIG=False
 ```
 
-Now you can build the custom container and send validation requests to it.
+Now you can run standard langkit container and send requests to it.
 
 ```
 make install build test
@@ -34,6 +35,8 @@ Or just run the container locally to manually test and send ad hoc requests.
 make install build run
 ```
 
+The `make run` command will use Docker to launch an instance of the langkit container with your `local.env` config on `localhost:8000`.
+
 ## Making Requests
 
 Check out the `tests` folder for a full example that uses the python client to make requests. If you prefer using other languages, curl, or
@@ -42,5 +45,3 @@ generic http then see the [api docs](https://whylabs.github.io/langkit-container
 - [validate api](https://whylabs.github.io/langkit-container-examples/api.html#tag/llm/operation/validate_llm)
 - [log api](https://whylabs.github.io/langkit-container-examples/api.html#tag/llm/operation/log_llm)
 - [bulk log api](https://whylabs.github.io/langkit-container-examples/api.html#tag/profile/operation/log)
-
-
