@@ -1,0 +1,73 @@
+# Custom Langkit Python Config Example
+
+Sample project that demonstrates how to build a custom container based on Langkit that performs prompt/response validation and profiling
+with WhyLabs. Configuration is done primarily in the `whylogs_config/config.py` file. You'll also find a `model-131.yaml` file in there to
+highlight that this configuration method can be used along side the yaml based configuration method as well. See the
+`configure_container_yaml` example for details on yaml.
+
+## Setup
+
+Make sure you have [poetry](https://python-poetry.org/) and docker installed. Create a `local.env` file with your WhyLabs credentials.
+
+```
+# Generated at https://hub.whylabsapp.com/settings/access-tokens
+WHYLABS_API_KEY=<api key>
+CONTAINER_PASSWORD=password
+
+# Set based on your model type in WhyLabs. Daily is the default.
+DEFAULT_WHYLABS_DATASET_CADENCE=DAILY
+```
+
+Now you can build the custom container and send validation requests to it.
+
+```
+make install build test
+```
+
+Or just run the container locally to manually test and send ad hoc requests.
+
+```
+make install build run
+```
+
+## Making Requests
+
+Check out the `tests` folder for a full example that uses the python client to make requests. If you prefer using other languages, curl, or
+generic http then see the [api docs](https://whylabs.github.io/langkit-container-examples/api.html) for request formats.
+
+- [validate api](https://whylabs.github.io/langkit-container-examples/api.html#tag/llm/operation/validate_llm)
+- [log api](https://whylabs.github.io/langkit-container-examples/api.html#tag/llm/operation/log_llm)
+- [bulk log api](https://whylabs.github.io/langkit-container-examples/api.html#tag/profile/operation/log)
+
+## Customizing
+
+All of the imporant constructs for customizing the container are in the example `whylogs_config/config.py` file: hooks, validators, and
+metrics. Anything that you put into the `whylogs_config/` folder will end up in the container that is built with `make build`, so you can
+package model artifacts in there for custom models if you'd like.
+
+### Metric Names
+
+The validator api does require some knowledge of the metric names right now.
+
+```python
+create_validator("prompt.upper_case_char_count", lower_threshold=1),
+```
+
+If you don't know the name of the metric you want to validate against then you can use any string for the metric name and launch the
+container with `make build run` and you'll see an error telling you that the name you picked isn't valid, along with the names of all of the
+metrics that you have loaded. So, make your validator
+
+```python
+create_validator("fake_name", lower_threshold=1),
+```
+
+Then run the container with `make build run` and you'll see an error message like
+
+```
+ValueError: Validator <langkit.core.validation.create_validator.<locals>._Validator object at 0x7f392fb68bb0> has target metric names (['fake_name']) that are not in the list of metrics: {'response.upper_case_char_count', 'prompt.upper_case_char_count', 'response.toxicity', 'prompt.toxicity', 'response.flesch_reading_ease'}
+```
+
+Metric names from langkit generally match the names you would use for them in the yaml file. See the `configure_python_yaml` example for a
+list of metric names built into langkit. You'll choose metric names for your own custom metrics, like this example shows in the
+`whylogs_config/config.py` file, so you'll know those.
+

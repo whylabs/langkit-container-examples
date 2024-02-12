@@ -1,0 +1,25 @@
+id: 9294f3fa-4f4b-4363-9397-87d3499fce28
+policy_version: 1
+schema_version: 0.0.1
+whylabs_dataset_id: model-150
+
+metrics:
+  - metric: prompt.sentiment_polarity
+    validation:
+      lower_threshold: 0.0
+
+  - metric: prompt.char_count
+    validation:
+      upper_threshold: 200
+      lower_threshold: 2
+
+  - metric: response.sentiment_polarity
+    validation:
+      lower_threshold: 0.8
+
+callbacks:
+  - callback: static_bearer_auth_validation_failure 
+    options: 
+      url: http://host.docker.internal:8001/failures
+      auth_token: password
+      include_input: true
