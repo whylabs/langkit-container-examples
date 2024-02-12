@@ -41,7 +41,12 @@ metrics:
   - metric: response.sentiment_polarity
   - metric: prompt.toxicity
   - metric: response.toxicity
+  - metric: prompt.injections
+  - metric: prompt.jailbreak_similarity
+  - metric: response.refusal_similarity
 
   # Doesn't have validation options yet
   - metric: prompt.topic
   - metric: response.topic
+
+
