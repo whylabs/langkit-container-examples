@@ -40,7 +40,7 @@ fix: lint-fix format-fix ## Fix all linting and formatting issues
 
 pip-install-python-client:  ## Install the latest python client from the main project
 	poetry run pip uninstall whylogs-container-client -y || true
-	poetry run pip install ../../whylogs-container-client/dist/*.whl
+	poetry run pip install ../../../whylogs-container-client/dist/*.whl
 
 help: ## Show this help message.
 	@echo 'usage: make [target] ...'

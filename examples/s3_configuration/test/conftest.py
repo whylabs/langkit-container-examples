@@ -1,3 +1,4 @@
+import os
 import random
 import signal
 import subprocess
@@ -8,12 +9,12 @@ import pytest
 import whylogs_container_client.api.manage.health as Health
 from whylogs_container_client import AuthenticatedClient
 
-image_name = "langkit_example_configure_container_yaml"  # from the makefile, run `make build` to build the image
+image_name = "langkit_example_s3_sync_configure"  # from the makefile, run `make build` to build the image
 
 T = TypeVar("T")
 
 
-def retry(func: Callable[[], T], max_retries=40, interval=2) -> T:
+def retry(func: Callable[[], T], max_retries=40, interval=1) -> T:
     """
     Retry a function until it succeeds or the max_retries is reached.
     """
@@ -34,6 +35,16 @@ _fake_key = "xxxxxxxxxx.xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx:xx
 class ServerCommands:
     @staticmethod
     def docker(port: str) -> List[str]:
+        # Catch empty string mistakes in config
+        if not os.environ.get("AWS_ACCESS_KEY_ID"):
+            raise Exception("AWS_ACCESS_KEY_ID not set")
+        if not os.environ.get("AWS_SECRET_ACCESS_KEY"):
+            raise Exception("AWS_SECRET_ACCESS_KEY not set")
+        if not os.environ.get("S3_CONFIG_BUCKET_NAME"):
+            raise Exception("S3_CONFIG_BUCKET_NAME not set")
+        if not os.environ.get("S3_CONFIG_PREFIX"):
+            raise Exception("S3_CONFIG_PREFIX not set")
+
         return [
             "docker",
             "run",
@@ -52,6 +63,20 @@ class ServerCommands:
             "DEFAULT_WHYLABS_UPLOAD_CADENCE=M",
             "--env",
             "DEFAULT_WHYLABS_UPLOAD_INTERVAL=5",
+            "--env",
+            f"AWS_ACCESS_KEY_ID={os.environ['AWS_ACCESS_KEY_ID']}",
+            "--env",
+            f"AWS_SECRET_ACCESS_KEY={os.environ['AWS_SECRET_ACCESS_KEY']}",
+            "--env",
+            "S3_CONFIG_SYNC=True",
+            "--env",
+            f"S3_CONFIG_BUCKET_NAME={os.environ['S3_CONFIG_BUCKET_NAME']}",
+            "--env",
+            f"S3_CONFIG_PREFIX={os.environ['S3_CONFIG_PREFIX']}",
+            "--env",
+            "S3_CONFIG_SYNC_CADENCE=M",
+            "--env",
+            "S3_CONFIG_SYNC_INTERVAL=15",
             image_name,
         ]
 

@@ -1,7 +1,8 @@
 # Custom Langkit Model (Presidio) Example
 
-Sample project that demonstrates how to build a custom container based on Langkit that performs prompt/response validation and profiling
-with WhyLabs.
+Sample project that demonstrates how to use the langkit container without any custom configuration. You'll be using the `log api` (below) to
+track metrics and have them sent to WhyLabs. Validation doesn't work here because there are no thresholds defined, but you will get all of
+the langkit metrics by default.
 
 ## Setup
 
@@ -14,6 +15,11 @@ CONTAINER_PASSWORD=password
 
 # Set based on your model type in WhyLabs. Daily is the default.
 DEFAULT_WHYLABS_DATASET_CADENCE=DAILY
+
+# IMPORTANT
+# Usually the container fails without custom config because that's the primary use case, but
+# this example shows how it works without custom config.
+FAIL_STARTUP_WITHOUT_CONFIG=False
 ```
 
 Now you can build the custom container and send validation requests to it.
@@ -36,4 +42,6 @@ generic http then see the [api docs](https://whylabs.github.io/langkit-container
 - [validate api](https://whylabs.github.io/langkit-container-examples/api.html#tag/llm/operation/validate_llm)
 - [log api](https://whylabs.github.io/langkit-container-examples/api.html#tag/llm/operation/log_llm)
 - [bulk log api](https://whylabs.github.io/langkit-container-examples/api.html#tag/profile/operation/log)
+
+
 
