@@ -22,7 +22,7 @@ def test_toxic_response_131(client: AuthenticatedClient):
     expected = ValidationResult(
         report=[
             ValidationFailure(
-                id=0,
+                id="0",
                 metric="response.toxicity",
                 details="Value 0.9642418622970581 is above threshold 0.4",
                 value=0.9642418622970581,
@@ -52,7 +52,7 @@ def test_upper_case_letters_prompt_131(client: AuthenticatedClient):
     expected = ValidationResult(
         report=[
             ValidationFailure(
-                id=0,
+                id="0",
                 metric="prompt.upper_case_char_count",
                 details="Value 0 is below threshold 1",
                 value=0,
@@ -94,7 +94,7 @@ def test_upper_case_letters_prompt_reading_ease_response_131(client: Authenticat
     expected = ValidationResult(
         report=[
             ValidationFailure(
-                id=0,
+                id="0",
                 metric="prompt.upper_case_char_count",
                 details="Value 0 is below threshold 1",
                 value=0,
@@ -102,7 +102,7 @@ def test_upper_case_letters_prompt_reading_ease_response_131(client: Authenticat
                 lower_threshold=1.0,
             ),
             ValidationFailure(
-                id=0,
+                id="0",
                 metric="response.flesch_reading_ease",
                 details="Value 52.23 is below threshold 70.0",
                 value=52.23,
@@ -120,6 +120,7 @@ def test_prompt_sentiment_133(client: AuthenticatedClient):
         prompt="Ugh, this is way too hard...",
         response="I'm sorry you feel that way.",
         dataset_id="model-133",
+        id="myid",
     )
 
     response = ValidateLLM.sync_detailed(client=client, body=request)
@@ -132,7 +133,7 @@ def test_prompt_sentiment_133(client: AuthenticatedClient):
     expected = ValidationResult(
         report=[
             ValidationFailure(
-                id=0,
+                id="myid",
                 metric="prompt.sentiment_polarity",
                 details="Value -0.4215 is below threshold 0",
                 value=-0.4215,
@@ -150,6 +151,7 @@ def test_response_lower_case_133(client: AuthenticatedClient):
         prompt="Hello!",
         response="I'M SORRY YOU FEEL THAT WAY.",
         dataset_id="model-133",
+        id="myid",
     )
 
     response = ValidateLLM.sync_detailed(client=client, body=request)
@@ -162,7 +164,7 @@ def test_response_lower_case_133(client: AuthenticatedClient):
     expected = ValidationResult(
         report=[
             ValidationFailure(
-                id=0,
+                id="myid",
                 metric="response.lower_case_char_count",
                 details="Value 0 is below threshold 10",
                 value=0,
@@ -173,3 +175,4 @@ def test_response_lower_case_133(client: AuthenticatedClient):
     )
 
     assert actual == expected
+

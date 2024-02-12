@@ -1,7 +1,7 @@
 .PHONY: help requirements build run all clean lint lint-fix format format-fix fix test pip-install-python-client
 
 CONTAINER_NAME = langkit_example_s3_sync_configure
-DOCKER_IMAGE = whylabs/whylogs:py-llm-1.0.2.dev3
+DOCKER_IMAGE = whylabs/whylogs:py-llm-1.0.2.dev4
 
 
 all: build

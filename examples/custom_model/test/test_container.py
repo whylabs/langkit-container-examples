@@ -10,6 +10,7 @@ def test_pii_failures(client: AuthenticatedClient):
         prompt="Hey! Here is my phone number: 555-555-5555, and my email is foo@whylabs.ai. And my friend's email is bar@whylabs.ai",
         response="That's a cool phone number!",
         dataset_id="model-131",
+        id="user-123",
     )
 
     response = ValidateLLM.sync_detailed(client=client, body=request)
@@ -22,7 +23,7 @@ def test_pii_failures(client: AuthenticatedClient):
     expected = ValidationResult(
         report=[
             ValidationFailure(
-                id=0,
+                id="user-123",
                 metric="prompt.pii.phone_number",
                 details="Value 1 is above threshold 0",
                 value=1,
@@ -30,7 +31,7 @@ def test_pii_failures(client: AuthenticatedClient):
                 lower_threshold=None,
             ),
             ValidationFailure(
-                id=0,
+                id="user-123",
                 metric="prompt.pii.email_address",
                 details="Value 2 is above threshold 0",
                 value=2,
@@ -41,3 +42,4 @@ def test_pii_failures(client: AuthenticatedClient):
     )
 
     assert actual == expected
+

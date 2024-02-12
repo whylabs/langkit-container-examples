@@ -32,6 +32,7 @@ def test_multiple_failures_135(client: AuthenticatedClient):
         prompt="...",
         response="This is a great chat, and everything is fantastic, including you!!",
         dataset_id="model-135",
+        id="myid",
     )
 
     response = ValidateLLM.sync_detailed(client=client, body=request)
@@ -44,7 +45,7 @@ def test_multiple_failures_135(client: AuthenticatedClient):
     expected = ValidationResult(
         report=[
             ValidationFailure(
-                id=0,
+                id="myid",
                 metric="prompt.char_count",
                 details="Value 3 is below threshold 10.0",
                 value=3,
@@ -52,7 +53,7 @@ def test_multiple_failures_135(client: AuthenticatedClient):
                 lower_threshold=10.0,
             ),
             ValidationFailure(
-                id=0,
+                id="myid",
                 metric="response.sentiment_polarity",
                 details="Value 0.8513 is above threshold 0.8",
                 value=0.8513,
@@ -63,3 +64,4 @@ def test_multiple_failures_135(client: AuthenticatedClient):
     )
 
     assert actual == expected
+

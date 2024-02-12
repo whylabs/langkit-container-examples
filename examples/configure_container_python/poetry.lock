@@ -3719,13 +3719,13 @@ url = "https://whypy.s3.us-west-2.amazonaws.com/whylogs-1.3.23.dev1-py3-none-any
 
 [[package]]
 name = "whylogs-container-client"
-version = "1.0.2.dev0"
+version = "1.0.2.dev2"
 description = "A client library for accessing the whylogs python container"
 optional = false
 python-versions = ">=3.8,<4.0"
 files = [
-    {file = "whylogs_container_client-1.0.2.dev0-py3-none-any.whl", hash = "sha256:5bee8c06de84abd5ba75b5aaa25a9cc6e6f458ead8b5768b4e4abd7d46883e3e"},
-    {file = "whylogs_container_client-1.0.2.dev0.tar.gz", hash = "sha256:96c729c517afef331a9e4e1ff973615c76239edaa9c33014244892a8f1ba9dbd"},
+    {file = "whylogs_container_client-1.0.2.dev2-py3-none-any.whl", hash = "sha256:5efe3c2f1bf30631dbbcb563a608cc1fd4d3ab3b32f589a22c08315d4f444557"},
+    {file = "whylogs_container_client-1.0.2.dev2.tar.gz", hash = "sha256:5037db110ddabd179e2835f7dadd28b2a4660a2dd260cceefc4d098a4c66c307"},
 ]
 
 [package.dependencies]
@@ -3735,23 +3735,23 @@ python-dateutil = ">=2.8.0,<3.0.0"
 
 [[package]]
 name = "whylogs-container-types"
-version = "0.4.10"
+version = "0.4.11"
 description = ""
 optional = false
 python-versions = ">=3.8,<4.0"
 files = [
-    {file = "whylogs_container_types-0.4.10-py3-none-any.whl", hash = "sha256:518e12fcdb8863449a70d58c2ecc99e8ba04932fd409af4982956fefccf69f13"},
+    {file = "whylogs_container_types-0.4.11-py3-none-any.whl", hash = "sha256:d2e107015b24426263c8ad366c5614d2b53344b7eacb9d374dbef9b8226434ac"},
 ]
 
 [package.dependencies]
 whylogs = "*"
 
 [package.extras]
-llm = ["langkit[all] @ https://whypy.s3.us-west-2.amazonaws.com/langkit-0.0.43-py3-none-any.whl"]
+llm = ["langkit[all] @ https://whypy.s3.us-west-2.amazonaws.com/langkit-0.0.47-py3-none-any.whl"]
 
 [package.source]
 type = "url"
-url = "https://whypy.s3.us-west-2.amazonaws.com/whylogs_container_types-0.4.10-py3-none-any.whl"
+url = "https://whypy.s3.us-west-2.amazonaws.com/whylogs_container_types-0.4.11-py3-none-any.whl"
 
 [[package]]
 name = "whylogs-sketching"
@@ -4049,4 +4049,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "e24c3a1bf83712b42e4eeb8300f02f3b337a8e4e43c10a0fa9c07eb77da15b8a"
+content-hash = "750ea450eaf5da984ceaddab2531af113491687ca66102f2122ca02c41b3bce5"

@@ -13,7 +13,7 @@ image_name = "langkit_example_configure_container_yaml"  # from the makefile, ru
 T = TypeVar("T")
 
 
-def retry(func: Callable[[], T], max_retries=40, interval=1) -> T:
+def retry(func: Callable[[], T], max_retries=40, interval=2) -> T:
     """
     Retry a function until it succeeds or the max_retries is reached.
     """
