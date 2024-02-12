@@ -9,7 +9,7 @@ from whylogs_container_types import ContainerConfiguration, LangkitOptions
 
 from langkit.core.metric import MetricCreator, MetricResult, MultiMetric, MultiMetricResult
 from langkit.core.validation import ValidationResult, create_validator
-from langkit.core.workflow import EvaluationWorkflow, Hook
+from langkit.core.workflow import Callback, EvaluationWorkflow
 from langkit.metrics.library import lib
 
 
@@ -86,7 +86,7 @@ def custom_presidio_metric(input_name: str) -> MetricCreator:
     return lambda: MultiMetric(names=metric_names, input_name=input_name, evaluate=udf, init=init)
 
 
-class MyHook(Hook):
+class MyCallback(Callback):
     def post_evaluation(self, metric_results: Mapping[str, MetricResult]) -> None:
         """
         This method is called right after all of the metrics run.
@@ -94,12 +94,16 @@ class MyHook(Hook):
         pass
 
     def post_validation(
-        self, metric_results: Mapping[str, MetricResult], results: pd.DataFrame, validation_results: List[ValidationResult]
+        self,
+        df: pd.DataFrame,
+        metric_results: Mapping[str, MetricResult],
+        results: pd.DataFrame,
+        validation_results: List[ValidationResult],
     ) -> None:
         """
         This method is called right after all of the validation runs.
 
-        Can use hooks to relay data to other services, do special logging, etc. Anything that doesn't mutate the inputs.
+        Can use callbacks to relay data to other services, do special logging, etc. Anything that doesn't mutate the inputs.
         """
         pd.set_option("display.max_rows", None)
 
@@ -119,7 +123,7 @@ langkit_config: Dict[str, LangkitOptions] = {
             create_validator("prompt.pii.email_address", upper_threshold=0),
             create_validator("prompt.pii.credit_card", upper_threshold=0),
         ],
-        hooks=[MyHook()],
+        callbacks=[MyCallback()],
     ),
 }
 

@@ -3024,13 +3024,13 @@ viz = ["Pillow (>=9.2.0,<10.0.0)", "ipython", "numpy", "numpy (>=1.23.2)", "pyba
 
 [[package]]
 name = "whylogs-container-client"
-version = "1.0.2.dev0"
+version = "1.0.2.dev1"
 description = "A client library for accessing the whylogs python container"
 optional = false
 python-versions = ">=3.8,<4.0"
 files = [
-    {file = "whylogs_container_client-1.0.2.dev0-py3-none-any.whl", hash = "sha256:5bee8c06de84abd5ba75b5aaa25a9cc6e6f458ead8b5768b4e4abd7d46883e3e"},
-    {file = "whylogs_container_client-1.0.2.dev0.tar.gz", hash = "sha256:96c729c517afef331a9e4e1ff973615c76239edaa9c33014244892a8f1ba9dbd"},
+    {file = "whylogs_container_client-1.0.2.dev1-py3-none-any.whl", hash = "sha256:37d4a07b908313e51a7d223d2cf41d582abc901e72091d93bb26dd5ddad2a30f"},
+    {file = "whylogs_container_client-1.0.2.dev1.tar.gz", hash = "sha256:1bae33423af6df48283c06b0c0962b1325c6f35868687d7ee70d26bc81476629"},
 ]
 
 [package.dependencies]
@@ -3352,4 +3352,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "987f3c4a6dd639a6ed9fcfd0a80fb25a7dc0d0189a55553646dd21ac6ccad2e0"
+content-hash = "8c35c6d1e3a01674d294f8de73da9494dbbb75bb2c9a98cc9b23c6adb70a39a6"

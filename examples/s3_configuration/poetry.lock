@@ -1035,12 +1035,12 @@ data = ["language-data (>=1.1,<2.0)"]
 
 [[package]]
 name = "langkit"
-version = "0.0.49"
+version = "0.0.47"
 description = "A language toolkit for monitoring LLM interactions"
 optional = false
 python-versions = ">=3.8,<4"
 files = [
-    {file = "langkit-0.0.49-py3-none-any.whl", hash = "sha256:55700e59c700b8df64ab4b029d54db9a6be53407572127edf438e53026dd7015"},
+    {file = "langkit-0.0.47-py3-none-any.whl", hash = "sha256:972738770dffc02785cdb3b5febb8e3f7fb25bb0b6fc1b304348288db324821a"},
 ]
 
 [package.dependencies]
@@ -1065,7 +1065,7 @@ all = ["datasets (>=2.12.0,<3.0.0)", "evaluate (>=0.4.0,<0.5.0)", "faiss-cpu (>=
 
 [package.source]
 type = "url"
-url = "https://whypy.s3.us-west-2.amazonaws.com/langkit-0.0.49-py3-none-any.whl"
+url = "https://whypy.s3.us-west-2.amazonaws.com/langkit-0.0.47-py3-none-any.whl"
 
 [[package]]
 name = "markupsafe"
@@ -1565,13 +1565,13 @@ files = [
 
 [[package]]
 name = "openai"
-version = "1.9.0"
+version = "1.10.0"
 description = "The official Python library for the openai API"
 optional = false
 python-versions = ">=3.7.1"
 files = [
-    {file = "openai-1.9.0-py3-none-any.whl", hash = "sha256:5774a0582ed82f6de92200ed5024e03e272b93e04e9d31caeda5fb80f63df50d"},
-    {file = "openai-1.9.0.tar.gz", hash = "sha256:3e9947a544556c051fa138a4def5bd8b468364ec52803c6628532ab949ddce55"},
+    {file = "openai-1.10.0-py3-none-any.whl", hash = "sha256:aa69e97d0223ace9835fbf9c997abe9ee95318f684fd2de6d02c870700c71ebc"},
+    {file = "openai-1.10.0.tar.gz", hash = "sha256:208886cb501b930dc63f48d51db9c15e5380380f80516d07332adad67c9f1053"},
 ]
 
 [package.dependencies]
@@ -3578,13 +3578,13 @@ test = ["black (>=22.3.0,<23.0.0)", "coverage (>=6.2,<7.0)", "isort (>=5.0.6,<6.
 
 [[package]]
 name = "types-requests"
-version = "2.31.0.20240106"
+version = "2.31.0.20240125"
 description = "Typing stubs for requests"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "types-requests-2.31.0.20240106.tar.gz", hash = "sha256:0e1c731c17f33618ec58e022b614a1a2ecc25f7dc86800b36ef341380402c612"},
-    {file = "types_requests-2.31.0.20240106-py3-none-any.whl", hash = "sha256:da997b3b6a72cc08d09f4dba9802fdbabc89104b35fe24ee588e674037689354"},
+    {file = "types-requests-2.31.0.20240125.tar.gz", hash = "sha256:03a28ce1d7cd54199148e043b2079cdded22d6795d19a2c2a6791a4b2b5e2eb5"},
+    {file = "types_requests-2.31.0.20240125-py3-none-any.whl", hash = "sha256:9592a9a4cb92d6d75d9b491a41477272b710e021011a2a3061157e2fb1f1a5d1"},
 ]
 
 [package.dependencies]
@@ -3735,23 +3735,23 @@ python-dateutil = ">=2.8.0,<3.0.0"
 
 [[package]]
 name = "whylogs-container-types"
-version = "0.4.10"
+version = "0.4.11"
 description = ""
 optional = false
 python-versions = ">=3.8,<4.0"
 files = [
-    {file = "whylogs_container_types-0.4.10-py3-none-any.whl", hash = "sha256:518e12fcdb8863449a70d58c2ecc99e8ba04932fd409af4982956fefccf69f13"},
+    {file = "whylogs_container_types-0.4.11-py3-none-any.whl", hash = "sha256:d2e107015b24426263c8ad366c5614d2b53344b7eacb9d374dbef9b8226434ac"},
 ]
 
 [package.dependencies]
 whylogs = "*"
 
 [package.extras]
-llm = ["langkit[all] @ https://whypy.s3.us-west-2.amazonaws.com/langkit-0.0.43-py3-none-any.whl"]
+llm = ["langkit[all] @ https://whypy.s3.us-west-2.amazonaws.com/langkit-0.0.47-py3-none-any.whl"]
 
 [package.source]
 type = "url"
-url = "https://whypy.s3.us-west-2.amazonaws.com/whylogs_container_types-0.4.10-py3-none-any.whl"
+url = "https://whypy.s3.us-west-2.amazonaws.com/whylogs_container_types-0.4.11-py3-none-any.whl"
 
 [[package]]
 name = "whylogs-sketching"
@@ -4049,4 +4049,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "e24c3a1bf83712b42e4eeb8300f02f3b337a8e4e43c10a0fa9c07eb77da15b8a"
+content-hash = "5b723837865346e0a1f349bb121d027c5cd77784b02eeae44725198bb9984142"
