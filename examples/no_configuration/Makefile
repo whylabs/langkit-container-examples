@@ -1,15 +1,18 @@
-.PHONY: help requirements build run all clean lint lint-fix format format-fix fix test pip-install-python-client
+.PHONY: help requirements build run all clean lint lint-fix format format-fix fix test pip-install-python-client pull install
 
 CONTAINER_NAME = langkit_example_configure_container_python
-DOCKER_IMAGE = whylabs/whylogs:py-llm-1.0.2.dev4
+DOCKER_IMAGE = whylabs/whylogs:py-llm-1.0.3
+
 
 all: build
+
+pull:
+	docker pull $(DOCKER_IMAGE)
 
 install:
 	poetry install --no-root
 
 build:
-	docker pull $(DOCKER_IMAGE)
 	docker tag $(DOCKER_IMAGE) $(CONTAINER_NAME)
 
 test:
@@ -42,7 +45,7 @@ fix: lint-fix format-fix ## Fix all linting and formatting issues
 
 pip-install-python-client:  ## Install the latest python client from the main project
 	poetry run pip uninstall whylogs-container-client -y || true
-	poetry run pip install ../../whylogs-container-client/dist/*.whl
+	poetry run pip install ../../../whylogs-container-client/dist/*.whl
 
 help: ## Show this help message.
 	@echo 'usage: make [target] ...'

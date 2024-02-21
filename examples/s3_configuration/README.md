@@ -47,17 +47,13 @@ AWS_SESSION_TOKEN=...
 Now you can run standard langkit container and send requests to it.
 
 ```
-make install build test
+make pull install build test
 ```
 
 Or just run the container locally to manually test and send ad hoc requests.
 
 ```
-# To use the local.env file for everything
-make install build run
-
-# If you have your AWS credentials in your environment
-make install build run-env
+make pull install build run
 ```
 
 The `make run` command will use Docker to launch an instance of the langkit container with your `local.env` config on `localhost:8000`.

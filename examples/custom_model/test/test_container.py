@@ -42,4 +42,3 @@ def test_pii_failures(client: AuthenticatedClient):
     )
 
     assert actual == expected
-

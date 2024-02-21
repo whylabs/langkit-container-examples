@@ -26,13 +26,13 @@ FAIL_STARTUP_WITHOUT_CONFIG=False
 Now you can run standard langkit container and send requests to it.
 
 ```
-make install build test
+make pull install build test
 ```
 
 Or just run the container locally to manually test and send ad hoc requests.
 
 ```
-make install build run
+make pull install build run
 ```
 
 The `make run` command will use Docker to launch an instance of the langkit container with your `local.env` config on `localhost:8000`.
@@ -45,3 +45,4 @@ generic http then see the [api docs](https://whylabs.github.io/langkit-container
 - [validate api](https://whylabs.github.io/langkit-container-examples/api.html#tag/llm/operation/validate_llm)
 - [log api](https://whylabs.github.io/langkit-container-examples/api.html#tag/llm/operation/log_llm)
 - [bulk log api](https://whylabs.github.io/langkit-container-examples/api.html#tag/profile/operation/log)
+

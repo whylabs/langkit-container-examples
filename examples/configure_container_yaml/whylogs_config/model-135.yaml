@@ -10,7 +10,7 @@ metrics:
 
   - metric: prompt.char_count
     validation:
-      upper_threshold: 300
+      upper_threshold: 50
       lower_threshold: 10
 
   - metric: response.sentiment_polarity

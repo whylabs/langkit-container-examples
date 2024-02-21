@@ -103,7 +103,7 @@ class MyCallback(Callback):
         """
         This method is called right after all of the validation runs.
 
-        Can use callbacks to relay data to other services, do special logging, etc. Anything that doesn't mutate the inputs.
+        Can use hooks to relay data to other services, do special logging, etc. Anything that doesn't mutate the inputs.
         """
         pd.set_option("display.max_rows", None)
 

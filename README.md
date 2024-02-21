@@ -140,4 +140,3 @@ languages, curl, or generic http then see the [api docs][api_docs] for request f
 [python-container-client]: https://pypi.org/project/whylogs-container-client/
 [helm_repo]: https://github.com/whylabs/charts
 [helm_llm_file]: https://github.com/whylabs/charts/tree/mainline/charts/langkit
-

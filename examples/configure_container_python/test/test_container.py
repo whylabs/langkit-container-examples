@@ -175,4 +175,3 @@ def test_response_lower_case_133(client: AuthenticatedClient):
     )
 
     assert actual == expected
-

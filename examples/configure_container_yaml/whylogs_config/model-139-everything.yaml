@@ -45,8 +45,8 @@ metrics:
   - metric: prompt.jailbreak_similarity
   - metric: response.refusal_similarity
 
-  # Doesn't have validation options yet
-  - metric: prompt.topic
-  - metric: response.topic
 
+  # no validation options for these yet
+  - metric: prompt.pii_presidio
+  - metric: response.pii_presidio
 

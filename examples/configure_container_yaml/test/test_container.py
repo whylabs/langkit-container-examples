@@ -154,4 +154,3 @@ def test_no_errors_134(client: AuthenticatedClient):
     expected = ValidationResult(report=[])
 
     assert actual == expected
-

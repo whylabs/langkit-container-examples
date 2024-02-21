@@ -1,6 +1,6 @@
 id: 9294f3fa-4f4b-4363-9397-87d3499fce28
 policy_version: 1
-schema_version: 1
+schema_version: 0.0.1
 whylabs_dataset_id: model-150
 
 metrics:
@@ -23,4 +23,3 @@ callbacks:
       url: http://host.docker.internal:8001/failures
       auth_token: password
       include_input: true
-

@@ -44,5 +44,3 @@ you'll get all of the langkit metrics when you use the log api, but the validati
 anything. The `model-139-everything.yaml` file shows what a yaml configuration would look like if it manually specified every metric and
 selectively specified some thresholds. That's a good starting point if you want to either pare down the metric load (for better performance)
 or specify some numeric upper/lower bounds.
-
-

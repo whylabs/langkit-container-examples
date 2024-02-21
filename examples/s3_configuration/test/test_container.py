@@ -64,4 +64,3 @@ def test_multiple_failures_135(client: AuthenticatedClient):
     )
 
     assert actual == expected
-
