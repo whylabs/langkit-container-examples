@@ -1,7 +1,7 @@
 .PHONY: help requirements build run all clean lint lint-fix format format-fix fix test pip-install-python-client pull install
 
 CONTAINER_NAME = langkit_example_configure_container_python
-DOCKER_IMAGE = whylabs/whylogs:py-llm-1.0.4
+DOCKER_IMAGE = whylabs/whylogs:py-llm-1.0.5
 
 
 all: build

@@ -435,13 +435,13 @@ files = [
 
 [[package]]
 name = "whylogs-container-client"
-version = "1.0.4"
+version = "1.0.5"
 description = "A client library for accessing the whylogs python container"
 optional = false
 python-versions = ">=3.8,<4.0"
 files = [
-    {file = "whylogs_container_client-1.0.4-py3-none-any.whl", hash = "sha256:376eedbe96b966c0bc534c96baa7d05669c382a1e1987029e5ee13ee4f43b708"},
-    {file = "whylogs_container_client-1.0.4.tar.gz", hash = "sha256:e8cd23036ed6fbefc8edeb46188c355b5919abe5df9332fd029c6aae30b9153e"},
+    {file = "whylogs_container_client-1.0.5-py3-none-any.whl", hash = "sha256:4ea4ef407d5411d07694055a3ea628cb9cea71981dbf56780b9790a37fc736ba"},
+    {file = "whylogs_container_client-1.0.5.tar.gz", hash = "sha256:b36700eb34d28469b7324a2af5ffd2243244c6f3691b8f837e2f5c6e49adc84e"},
 ]
 
 [package.dependencies]
@@ -452,4 +452,4 @@ python-dateutil = ">=2.8.0,<3.0.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "24c4ff2b36450bfc5d821ca63d841f6351b058cbc0dfbe4ca60ce55caa7d6dbb"
+content-hash = "7af7b3d9a0b09d46f990de8cc96ad79c73d2eef9ec2f8a7134a57a76f9dc160f"
