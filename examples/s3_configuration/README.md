@@ -29,19 +29,21 @@ DEFAULT_WHYLABS_DATASET_CADENCE=DAILY
 # this example shows how it works without custom config at startup time.
 FAIL_STARTUP_WITHOUT_CONFIG=False
 
-
 # These are the s3 related variables
 S3_CONFIG_SYNC=True
 S3_CONFIG_BUCKET_NAME=<bucket-name>
 S3_CONFIG_PREFIX=bucket/prefix/path/
 S3_CONFIG_SYNC_CADENCE=M
-S3_CONFIG_SYNC_INTERVAL=10  # How often to check for new policies. 15 minutes by default if you omit this
+# How often to check for new policies. 15 minutes by default if you omit this
+S3_CONFIG_SYNC_INTERVAL=10
 
 # We use the AWS Python SDK (boto3) to access s3. It checks the environment for certain
 # AWS variables to determine auth. These have to be available in the container.
 AWS_ACCESS_KEY_ID=....
 AWS_SECRET_ACCESS_KEY=....
 AWS_SESSION_TOKEN=...
+# Or use roles
+S3_CONFIG_SYNC_ROLE_ARN=
 ```
 
 Now you can run standard langkit container and send requests to it.

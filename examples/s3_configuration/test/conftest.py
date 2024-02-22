@@ -45,12 +45,7 @@ class ServerCommands:
         if not os.environ.get("S3_CONFIG_PREFIX"):
             raise Exception("S3_CONFIG_PREFIX not set")
 
-        return [
-            "docker",
-            "run",
-            "--rm",
-            "-p",
-            f"127.0.0.1:{port}:8000",
+        envs = [
             "--env",
             f"WHYLABS_API_KEY={_fake_key}",  # Not uploading anything for these tests, doesn't matter
             "--env",
@@ -77,6 +72,18 @@ class ServerCommands:
             "S3_CONFIG_SYNC_CADENCE=M",
             "--env",
             "S3_CONFIG_SYNC_INTERVAL=15",
+        ]
+
+        if "AWS_SESSION_TOKEN" in os.environ:
+            envs += ["--env", f"AWS_SESSION_TOKEN={os.environ['AWS_SESSION_TOKEN']}"]
+
+        return [
+            "docker",
+            "run",
+            "--rm",
+            "-p",
+            f"127.0.0.1:{port}:8000",
+            *envs,
             image_name,
         ]
 

@@ -1,9 +1,9 @@
+from functools import cache
 from typing import Any, Dict, List, Mapping, Optional
 
 import pandas as pd
 import spacy
 from presidio_analyzer import AnalyzerEngine, RecognizerResult
-from presidio_analyzer.nlp_engine import TransformersNlpEngine
 from presidio_anonymizer import AnonymizerEngine
 from whylogs_container_types import ContainerConfiguration, LangkitOptions
 
@@ -13,25 +13,27 @@ from langkit.core.workflow import Callback, EvaluationWorkflow
 from langkit.metrics.library import lib
 
 
+@cache
+def get_analyzer() -> AnalyzerEngine:
+    return AnalyzerEngine()
+
+
+@cache
+def get_anonymizer() -> AnonymizerEngine:
+    return AnonymizerEngine()
+
+
 def custom_presidio_metric(input_name: str) -> MetricCreator:
-    # Define which transformers model to use
-    model_config = [
-        {
-            "lang_code": "en",
-            "model_name": {
-                "spacy": "en_core_web_sm",  # use a small spaCy model for lemmas, tokens etc.
-                "transformers": "dslim/bert-base-NER",
-            },
-        }
-    ]
-    nlp_engine = TransformersNlpEngine(models=model_config)
-    analyzer = AnalyzerEngine(nlp_engine=nlp_engine)
-    anonymizer = AnonymizerEngine()
+    def cache_assets():
+        spacy.load("en_core_web_lg")
 
     def init():
-        spacy.load("en_core_web_sm")
+        get_analyzer()
+        get_anonymizer()
 
     def udf(text: pd.DataFrame) -> MultiMetricResult:
+        analyzer = get_analyzer()
+        anonymizer = get_anonymizer()
         entity_types = {
             "PHONE_NUMBER": f"{input_name}.pii.phone_number",
             "EMAIL_ADDRESS": f"{input_name}.pii.email_address",
@@ -83,16 +85,10 @@ def custom_presidio_metric(input_name: str) -> MetricCreator:
         f"{input_name}.pii.credit_card",
         f"{input_name}.pii.anonymized",
     ]
-    return lambda: MultiMetric(names=metric_names, input_name=input_name, evaluate=udf, init=init)
+    return lambda: MultiMetric(names=metric_names, input_name=input_name, evaluate=udf, init=init, cache_assets=cache_assets)
 
 
 class MyCallback(Callback):
-    def post_evaluation(self, metric_results: Mapping[str, MetricResult]) -> None:
-        """
-        This method is called right after all of the metrics run.
-        """
-        pass
-
     def post_validation(
         self,
         df: pd.DataFrame,
@@ -142,14 +138,14 @@ if __name__ == "__main__":
     wf = EvaluationWorkflow(metrics=[custom_presidio_metric("prompt")])
 
     # If you want, you can run this file directly to see the output of the workflow
-    # df = pd.DataFrame(
-    #     {
-    #         "prompt": [
-    #             "Hey! Here is my phone number: 555-555-5555, and my email is foo@whylabs.ai. And my friend's email is bar@whylabs.ai",
-    #             "no pii here",
-    #         ],
-    #         "response": ["YOINK", "good job"],
-    #     }
-    # )
-    # result = wf.evaluate(df)
-    # print(result.features.transpose())
+    df = pd.DataFrame(
+        {
+            "prompt": [
+                "Hey! Here is my phone number: 555-555-5555, and my email is foo@whylabs.ai. And my friend's email is bar@whylabs.ai",
+                "no pii here",
+            ],
+            "response": ["YOINK", "good job"],
+        }
+    )
+    result = wf.run(df)
+    print(result.metrics.transpose())  # type: ignore
