@@ -4,8 +4,8 @@ import pandas as pd
 from whylogs_container_types import ContainerConfiguration, LangkitOptions
 
 from langkit.core.metric import MetricCreator, SingleMetric, SingleMetricResult
-from langkit.core.validation import create_validator
 from langkit.metrics.library import lib
+from langkit.validators.library import lib as validators_lib
 
 
 def upper_case_char_count(input_name: str) -> MetricCreator:
@@ -49,8 +49,8 @@ langkit_config: Dict[str, LangkitOptions] = {
             upper_case_char_count("response"),
         ],
         validators=[
-            create_validator("response.toxicity", upper_threshold=0.4),
-            create_validator("prompt.upper_case_char_count", lower_threshold=1),
+            validators_lib.constraint("response.toxicity", upper_threshold=0.4),
+            validators_lib.constraint("prompt.upper_case_char_count", lower_threshold=1),
         ],
     ),
     "model-133": LangkitOptions(
@@ -61,8 +61,8 @@ langkit_config: Dict[str, LangkitOptions] = {
             lower_case_char_count("response"),
         ],
         validators=[
-            create_validator("prompt.sentiment_polarity", lower_threshold=0),
-            create_validator("response.lower_case_char_count", lower_threshold=10),
+            validators_lib.constraint("prompt.sentiment_polarity", lower_threshold=0),
+            validators_lib.constraint("response.lower_case_char_count", lower_threshold=10),
         ],
     ),
 }

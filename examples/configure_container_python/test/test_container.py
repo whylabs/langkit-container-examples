@@ -28,6 +28,10 @@ def test_toxic_response_131(client: AuthenticatedClient):
                 value=0.9642418622970581,
                 upper_threshold=0.4,
                 lower_threshold=None,
+                allowed_values=None,
+                disallowed_values=None,
+                must_be_none=None,
+                must_be_non_none=None,
             )
         ],
     )
@@ -58,6 +62,10 @@ def test_upper_case_letters_prompt_131(client: AuthenticatedClient):
                 value=0,
                 upper_threshold=None,
                 lower_threshold=1.0,
+                allowed_values=None,
+                disallowed_values=None,
+                must_be_none=None,
+                must_be_non_none=None,
             )
         ],
     )
@@ -100,6 +108,10 @@ def test_upper_case_letters_prompt_reading_ease_response_131(client: Authenticat
                 value=0,
                 upper_threshold=None,
                 lower_threshold=1.0,
+                allowed_values=None,
+                disallowed_values=None,
+                must_be_none=None,
+                must_be_non_none=None,
             ),
             ValidationFailure(
                 id="0",
@@ -108,6 +120,10 @@ def test_upper_case_letters_prompt_reading_ease_response_131(client: Authenticat
                 value=52.23,
                 upper_threshold=None,
                 lower_threshold=70.0,
+                allowed_values=None,
+                disallowed_values=None,
+                must_be_none=None,
+                must_be_non_none=None,
             ),
         ],
     )
@@ -139,6 +155,10 @@ def test_prompt_sentiment_133(client: AuthenticatedClient):
                 value=-0.4215,
                 upper_threshold=None,
                 lower_threshold=0.0,
+                allowed_values=None,
+                disallowed_values=None,
+                must_be_none=None,
+                must_be_non_none=None,
             )
         ],
     )
@@ -170,6 +190,10 @@ def test_response_lower_case_133(client: AuthenticatedClient):
                 value=0,
                 upper_threshold=None,
                 lower_threshold=10.0,
+                allowed_values=None,
+                disallowed_values=None,
+                must_be_none=None,
+                must_be_non_none=None,
             )
         ],
     )

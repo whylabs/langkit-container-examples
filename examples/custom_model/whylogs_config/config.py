@@ -8,9 +8,10 @@ from presidio_anonymizer import AnonymizerEngine
 from whylogs_container_types import ContainerConfiguration, LangkitOptions
 
 from langkit.core.metric import MetricCreator, MetricResult, MultiMetric, MultiMetricResult
-from langkit.core.validation import ValidationResult, create_validator
+from langkit.core.validation import ValidationResult
 from langkit.core.workflow import Callback, EvaluationWorkflow
 from langkit.metrics.library import lib
+from langkit.validators.library import lib as validators_lib
 
 
 @cache
@@ -115,9 +116,9 @@ langkit_config: Dict[str, LangkitOptions] = {
             custom_presidio_metric("prompt"),
         ],
         validators=[
-            create_validator("prompt.pii.phone_number", upper_threshold=0),
-            create_validator("prompt.pii.email_address", upper_threshold=0),
-            create_validator("prompt.pii.credit_card", upper_threshold=0),
+            validators_lib.constraint("prompt.pii.phone_number", upper_threshold=0),
+            validators_lib.constraint("prompt.pii.email_address", upper_threshold=0),
+            validators_lib.constraint("prompt.pii.credit_card", upper_threshold=0),
         ],
         callbacks=[MyCallback()],
     ),

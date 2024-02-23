@@ -29,6 +29,10 @@ def test_pii_failures(client: AuthenticatedClient):
                 value=1,
                 upper_threshold=0.0,
                 lower_threshold=None,
+                must_be_none=None,
+                must_be_non_none=None,
+                disallowed_values=None,
+                allowed_values=None,
             ),
             ValidationFailure(
                 id="user-123",
@@ -37,6 +41,10 @@ def test_pii_failures(client: AuthenticatedClient):
                 value=2,
                 upper_threshold=0.0,
                 lower_threshold=None,
+                must_be_none=None,
+                must_be_non_none=None,
+                disallowed_values=None,
+                allowed_values=None,
             ),
         ],
     )

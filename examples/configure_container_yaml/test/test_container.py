@@ -29,6 +29,10 @@ def test_prompt_char_count_134(client: AuthenticatedClient):
                 value=1,
                 upper_threshold=None,
                 lower_threshold=2.0,
+                must_be_none=None,
+                must_be_non_none=None,
+                disallowed_values=None,
+                allowed_values=None,
             )
         ],
     )
@@ -60,6 +64,10 @@ def test_prompt_char_count_139(client: AuthenticatedClient):
                 value=1,
                 upper_threshold=None,
                 lower_threshold=2.0,
+                must_be_none=None,
+                must_be_non_none=None,
+                disallowed_values=None,
+                allowed_values=None,
             )
         ],
     )
@@ -91,6 +99,10 @@ def test_prompt_sentiment_134(client: AuthenticatedClient):
                 value=-0.7579,
                 upper_threshold=None,
                 lower_threshold=0.0,
+                must_be_none=None,
+                must_be_non_none=None,
+                disallowed_values=None,
+                allowed_values=None,
             )
         ],
     )
@@ -100,8 +112,8 @@ def test_prompt_sentiment_134(client: AuthenticatedClient):
 
 def test_multiple_failures_135(client: AuthenticatedClient):
     request = LLMValidateRequest(
-        prompt="...",
-        response="This is a great chat, and everything is fantastic, including you!!",
+        prompt="My email address is foo@gmail.com and my credit card is 3704 4673 5765 635",
+        response="foo@gmail.com, nice!",
         dataset_id="model-135",
         id="myid",
     )
@@ -117,19 +129,51 @@ def test_multiple_failures_135(client: AuthenticatedClient):
         report=[
             ValidationFailure(
                 id="myid",
-                metric="prompt.char_count",
-                details="Value 3 is below threshold 10.0",
-                value=3,
-                upper_threshold=None,
-                lower_threshold=10.0,
+                metric="prompt.pii.email_address",
+                details="Value 1 is above threshold 0",
+                value=1,
+                upper_threshold=0.0,
+                lower_threshold=None,
+                allowed_values=None,
+                disallowed_values=None,
+                must_be_none=None,
+                must_be_non_none=None,
             ),
             ValidationFailure(
                 id="myid",
-                metric="response.sentiment_polarity",
-                details="Value 0.8513 is above threshold 0.8",
-                value=0.8513,
-                upper_threshold=0.8,
+                metric="prompt.pii.credit_card",
+                details="Value 1 is above threshold 0",
+                value=1,
+                upper_threshold=0.0,
                 lower_threshold=None,
+                allowed_values=None,
+                disallowed_values=None,
+                must_be_none=None,
+                must_be_non_none=None,
+            ),
+            ValidationFailure(
+                id="myid",
+                metric="prompt.pii.redacted",
+                details="Value My email address is <EMAIL_ADDRESS> and my credit card is <CREDIT_CARD> is not None",
+                value="My email address is <EMAIL_ADDRESS> and my credit card is <CREDIT_CARD>",
+                upper_threshold=None,
+                lower_threshold=None,
+                allowed_values=None,
+                disallowed_values=None,
+                must_be_none=True,
+                must_be_non_none=None,
+            ),
+            ValidationFailure(
+                id="myid",
+                metric="response.pii.redacted",
+                details="Value <EMAIL_ADDRESS>, nice! is not None",
+                value="<EMAIL_ADDRESS>, nice!",
+                upper_threshold=None,
+                lower_threshold=None,
+                allowed_values=None,
+                disallowed_values=None,
+                must_be_none=True,
+                must_be_non_none=None,
             ),
         ],
     )

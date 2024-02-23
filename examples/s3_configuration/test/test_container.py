@@ -51,6 +51,10 @@ def test_multiple_failures_135(client: AuthenticatedClient):
                 value=3,
                 upper_threshold=None,
                 lower_threshold=10.0,
+                must_be_none=None,
+                must_be_non_none=None,
+                disallowed_values=None,
+                allowed_values=None,
             ),
             ValidationFailure(
                 id="myid",
@@ -59,6 +63,10 @@ def test_multiple_failures_135(client: AuthenticatedClient):
                 value=0.8513,
                 upper_threshold=0.8,
                 lower_threshold=None,
+                must_be_none=None,
+                must_be_non_none=None,
+                disallowed_values=None,
+                allowed_values=None,
             ),
         ],
     )

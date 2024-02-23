@@ -1,0 +1,38 @@
+id: 9294f3fa-4f4b-4363-9397-87d3499fce28
+policy_version: 1
+schema_version: 0.0.1
+whylabs_dataset_id: model-135
+
+metrics:
+  # This is a group of metrics under the hood that contains various metrics.
+  # Validation has to target the individual metrics in the validation section
+  - metric: prompt.pii_presidio
+  - metric: response.pii_presidio
+
+validators:
+  - validator: constraint
+    options:
+      target_metric: prompt.pii.email_address
+      upper_threshold: 0
+
+  - validator: constraint
+    options:
+      target_metric: prompt.pii.credit_card
+      upper_threshold: 0
+
+  - validator: constraint
+    options:
+      target_metric: prompt.pii.redacted
+      must_be_none: True
+
+  - validator: constraint
+    options:
+      target_metric: response.pii.redacted
+      must_be_none: True
+
+callbacks:
+  - callback: static_bearer_auth_validation_failure
+    options:
+      url: http://host.docker.internal:8001/failures
+      auth_token: password
+      include_input: true
