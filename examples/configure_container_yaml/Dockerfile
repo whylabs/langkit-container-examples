@@ -1,4 +1,4 @@
-FROM whylabs/whylogs:py-llm-1.0.6
+FROM whylabs/whylogs:py-llm-1.0.7
 
 # Force the container to fail if the config is not present. Safeguard for messing up the
 # build in such a way that the config is not included correctly.

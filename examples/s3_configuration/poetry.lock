@@ -1135,13 +1135,13 @@ url = "https://whypy.s3.us-west-2.amazonaws.com/whylogs-1.3.23.dev3-py3-none-any
 
 [[package]]
 name = "whylogs-container-client"
-version = "1.0.6"
+version = "1.0.7"
 description = "A client library for accessing the whylogs python container"
 optional = false
 python-versions = ">=3.8,<4.0"
 files = [
-    {file = "whylogs_container_client-1.0.6-py3-none-any.whl", hash = "sha256:82023246e981bf1b73971afed8433192d78d4ba69cf5f076e23c6e250bbcbea3"},
-    {file = "whylogs_container_client-1.0.6.tar.gz", hash = "sha256:a47b0f96270071ea6617dd5f4dc594781c9a2ccfc2d48836070ef27f26348847"},
+    {file = "whylogs_container_client-1.0.7-py3-none-any.whl", hash = "sha256:e37acb7a94206e006e127e17dc87d40af9dab121fc169ba775094599df8615d6"},
+    {file = "whylogs_container_client-1.0.7.tar.gz", hash = "sha256:f31e5981e75ebf84c1860327bd7ee23778ca09017283c22b5d7073715e767182"},
 ]
 
 [package.dependencies]
@@ -1234,4 +1234,4 @@ torch = "2.2.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "57210d4414564c61139d05509a8bf8ae438ea65acd07890e95896e7966e58729"
+content-hash = "1179b2e151f0ae6a94ba874b53dcee92b1aab3a1f218096e0c7b2be063980125"
