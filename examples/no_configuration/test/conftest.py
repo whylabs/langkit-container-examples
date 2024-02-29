@@ -13,7 +13,7 @@ image_name = "langkit_example_configure_container_python"  # from the makefile, 
 T = TypeVar("T")
 
 
-def retry(func: Callable[[], T], max_retries=40, interval=1) -> T:
+def retry(func: Callable[[], T], max_retries=40, interval=2) -> T:
     """
     Retry a function until it succeeds or the max_retries is reached.
     """
@@ -64,7 +64,7 @@ def create_server(port: int) -> subprocess.Popen[bytes]:
 
 @pytest.fixture(scope="module")
 def client() -> Generator[AuthenticatedClient, None, None]:
-    port = random.randint(8000, 9000)
+    port = random.randint(10000, 11000)
     proc = create_server(port=port)
     client = AuthenticatedClient(base_url=f"http://localhost:{port}", token="password", prefix="", auth_header_name="X-API-Key")  # type: ignore[reportGeneralTypeIssues]
 

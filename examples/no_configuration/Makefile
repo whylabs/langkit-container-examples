@@ -1,7 +1,7 @@
 .PHONY: help requirements build run all clean lint lint-fix format format-fix fix test pip-install-python-client pull install
 
 CONTAINER_NAME = langkit_example_configure_container_python
-DOCKER_IMAGE = whylabs/whylogs:py-llm-1.0.7
+DOCKER_IMAGE = registry.gitlab.com/whylabs/langkit-container:1.0.8
 
 
 all: build
@@ -16,7 +16,7 @@ build:
 	docker tag $(DOCKER_IMAGE) $(CONTAINER_NAME)
 
 test:
-	poetry run pytest -vvv ./test
+	poetry run pytest -vvv -s ./test
 
 run:
 	docker run -it --platform=linux/amd64 --rm -p 127.0.0.1:8000:8000 --env-file local.env $(CONTAINER_NAME)

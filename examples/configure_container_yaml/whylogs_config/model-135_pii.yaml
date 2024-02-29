@@ -6,8 +6,8 @@ whylabs_dataset_id: model-135
 metrics:
   # This is a group of metrics under the hood that contains various metrics.
   # Validation has to target the individual metrics in the validation section
-  - metric: prompt.pii_presidio
-  - metric: response.pii_presidio
+  - metric: prompt.pii
+  - metric: response.pii
 
 validators:
   - validator: constraint

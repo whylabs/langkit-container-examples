@@ -11,7 +11,7 @@ build: requirements.txt
 	docker build --platform=linux/amd64 . -t $(CONTAINER_NAME)
 
 test:
-	poetry run pytest -vvv ./test
+	poetry run pytest -vvv -s ./test
 
 run:
 	docker run -it --platform=linux/amd64 --rm -p 127.0.0.1:8000:8000 --env-file local.env $(CONTAINER_NAME)

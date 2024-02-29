@@ -1,5 +1,6 @@
-import whylogs_container_client.api.llm.validate_llm as ValidateLLM
+import whylogs_container_client.api.llm.evaluate as Evaluate
 from whylogs_container_client import AuthenticatedClient
+from whylogs_container_client.models.evaluation_result import EvaluationResult
 from whylogs_container_client.models.llm_validate_request import LLMValidateRequest
 from whylogs_container_client.models.validation_failure import ValidationFailure
 from whylogs_container_client.models.validation_result import ValidationResult
@@ -12,12 +13,12 @@ def test_toxic_response_131(client: AuthenticatedClient):
         dataset_id="model-131",
     )
 
-    response = ValidateLLM.sync_detailed(client=client, body=request)
+    response = Evaluate.sync_detailed(client=client, body=request)
 
-    if not isinstance(response.parsed, ValidationResult):
+    if not isinstance(response.parsed, EvaluationResult):
         raise Exception(f"Failed to validate data. Status code: {response.status_code}. {response.parsed}")
 
-    actual: ValidationResult = response.parsed
+    actual = response.parsed.validation_results
 
     expected = ValidationResult(
         report=[
@@ -46,12 +47,12 @@ def test_upper_case_letters_prompt_131(client: AuthenticatedClient):
         dataset_id="model-131",
     )
 
-    response = ValidateLLM.sync_detailed(client=client, body=request)
+    response = Evaluate.sync_detailed(client=client, body=request)
 
-    if not isinstance(response.parsed, ValidationResult):
+    if not isinstance(response.parsed, EvaluationResult):
         raise Exception(f"Failed to validate data. Status code: {response.status_code}. {response.parsed}")
 
-    actual: ValidationResult = response.parsed
+    actual = response.parsed.validation_results
 
     expected = ValidationResult(
         report=[
@@ -92,12 +93,12 @@ def test_upper_case_letters_prompt_reading_ease_response_131(client: Authenticat
         dataset_id="model-131",
     )
 
-    response = ValidateLLM.sync_detailed(client=client, body=request)
+    response = Evaluate.sync_detailed(client=client, body=request)
 
-    if not isinstance(response.parsed, ValidationResult):
+    if not isinstance(response.parsed, EvaluationResult):
         raise Exception(f"Failed to validate data. Status code: {response.status_code}. {response.parsed}")
 
-    actual: ValidationResult = response.parsed
+    actual = response.parsed.validation_results
 
     expected = ValidationResult(
         report=[
@@ -139,12 +140,12 @@ def test_prompt_sentiment_133(client: AuthenticatedClient):
         id="myid",
     )
 
-    response = ValidateLLM.sync_detailed(client=client, body=request)
+    response = Evaluate.sync_detailed(client=client, body=request)
 
-    if not isinstance(response.parsed, ValidationResult):
+    if not isinstance(response.parsed, EvaluationResult):
         raise Exception(f"Failed to validate data. Status code: {response.status_code}. {response.parsed}")
 
-    actual: ValidationResult = response.parsed
+    actual = response.parsed.validation_results
 
     expected = ValidationResult(
         report=[
@@ -174,12 +175,12 @@ def test_response_lower_case_133(client: AuthenticatedClient):
         id="myid",
     )
 
-    response = ValidateLLM.sync_detailed(client=client, body=request)
+    response = Evaluate.sync_detailed(client=client, body=request)
 
-    if not isinstance(response.parsed, ValidationResult):
+    if not isinstance(response.parsed, EvaluationResult):
         raise Exception(f"Failed to validate data. Status code: {response.status_code}. {response.parsed}")
 
-    actual: ValidationResult = response.parsed
+    actual = response.parsed.validation_results
 
     expected = ValidationResult(
         report=[

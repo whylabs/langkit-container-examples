@@ -1,7 +1,6 @@
 import time
 from test.assert_util import get_profile_list
 
-import pandas as pd
 import whylogs_container_client.api.llm.log_llm as LogLLM
 import whylogs_container_client.api.manage.status as Status
 from whylogs_container_client import AuthenticatedClient
@@ -21,15 +20,11 @@ def test_log(client: AuthenticatedClient):
     time.sleep(30)
 
     response = Status.sync_detailed(client=client)
-    print("TESTING")
-    print(response.parsed)
 
     if response.parsed is None:
-        print("LAME")
         raise Exception("Unexpected response type")
 
     profiles = get_profile_list(response.parsed)
-    print(profiles)
 
     assert len(profiles) == 1
 
@@ -44,8 +39,7 @@ def test_log(client: AuthenticatedClient):
         "prompt.difficult_words",
         "prompt.flesch_kincaid_grade",
         "prompt.flesch_reading_ease",
-        "prompt.injections",
-        "prompt.jailbreak_similarity",
+        "prompt.is_injection",
         "prompt.letter_count",
         "prompt.lexicon_count",
         "prompt.monosyllabcount",
@@ -57,7 +51,6 @@ def test_log(client: AuthenticatedClient):
         "prompt.pii.us_bank_number",
         "prompt.pii.us_ssn",
         "prompt.polysyllabcount",
-        "prompt.relevance_to_response",
         "prompt.sentence_count",
         "prompt.sentiment_polarity",
         "prompt.syllable_count",
@@ -67,6 +60,7 @@ def test_log(client: AuthenticatedClient):
         "response.difficult_words",
         "response.flesch_kincaid_grade",
         "response.flesch_reading_ease",
+        "response.is_refusal",
         "response.letter_count",
         "response.lexicon_count",
         "response.monosyllabcount",
@@ -78,15 +72,8 @@ def test_log(client: AuthenticatedClient):
         "response.pii.us_bank_number",
         "response.pii.us_ssn",
         "response.polysyllabcount",
-        "response.refusal_similarity",
-        "response.relevance_to_prompt",
         "response.sentence_count",
         "response.sentiment_polarity",
         "response.syllable_count",
         "response.toxicity",
     ]
-
-    # This profile has all of the langkit metrics that are sent to whylogs
-    pd.set_option("display.max_columns", None)
-    pd.set_option("display.width", None)
-    print(profile.to_pandas())  # type: ignore

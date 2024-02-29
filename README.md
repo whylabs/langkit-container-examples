@@ -1,30 +1,45 @@
 # Langkit Container Examples
 
+The langkit container is a containerized solution that hosts [langkit](https://github.com/whylabs/langkit). It simplifies the deployment of
+langkit by hosting model assets, required dependencies, metric configuration, as well as integration with the WhyLabs platform. The
+container exposes endpoints for computing these metrics that can be called from LLM applications. It can also be configured to generate
+validation reports based on thresholds for each metric.
+
 This repo has various examples for configuring and using the WhyLabs langkit container. Each example in the `examples` folder showcases a
 different use case and contains a `test` directory with working Python code that demonstrates how to use it. Browse that folder if you're
 looking for a specific example. Each example either configures or calls a deployed instance of the container.
 
-The rest of this README will go over the process of customizing the langkit container in general. If you want to use the container only for
-logging (no validation) then you can jump directly to testing it out with the [no configuration][no_config] example.
+## Zero Configuration
 
-# Configuration Steps
+If you want to use the container only for logging (no validation) then you can jump directly to testing it out with the
+[no_configuration][no_config] example. Without configuration, you'll be able to use the [`/evaluate`][api_docs_evaluate] endpoint to
+compute LLM metrics, upload and monitor them in WhyLabs, but you won't be able to use the validation functionality because validation
+thresholds are defined in custom configuration.
+
+See [no_configuration][no_config] example for more.
+
+## Custom Configuration
+
+There are a few differemt configuration methods you can choose. The only one that doesn't involve building a container that extends from
+ours is s3 polling. See the [s3 example][s3_config] for more information. The rest of this section describes the general custom building
+process and points to additional examples in this repo that demonstrate it.
 
 When you configure the container, you should think about it as a standalone project that you can build and test. Each of the examples are,
 in fact, stand alone projects that have their own Poetry dependencies and build steps. The only real requirement in the end is that you have
 a Dockerfile that extends our image and copies certain files into a certain spot. This section will describe how that build process works.
 
-## Step 1: Pick an Image Tag
+### Step 1: Pick an Image Tag
 
 You'll want to either use `py-llm-latest` or browse the [docker tags][docker_tags] for a version to use instead if you don't want to risk
 breaking changes.
 
-## Step 2: Create a Configuration File
+### Step 2: Create a Configuration File
 
 Depending on whether you're using Python, Yaml, or both, you'll be creating different files. Yaml is the easiest way to configure the
 container but sometimes you need more control. If you're going to be deploying custom models, for example, then you'll need to use Python
 most likely since you'll probably have to reference libraries like `torch` and execute some setup code.
 
-### Step 2.1: Custom Yaml Configuration
+#### Step 2.1: Custom Yaml Configuration
 
 This is what your project will look like.
 
@@ -44,7 +59,7 @@ These files will be included by your Dockerfile in the section below. The contai
 
 See [configure_container_yaml][configure_container_yaml] to see what you can put in there.
 
-### Step 2.2: Custom Python Configuration
+#### Step 2.2: Custom Python Configuration
 
 This is what your project will look like.
 
@@ -64,7 +79,7 @@ along as well and use relative imports and that will work out at runtime.
 
 See [configure_container_python][configure_container_python] for an example that demonstrates using Python to configure the container.
 
-## Step 3: Create a Dockerfile
+### Step 3: Create a Dockerfile
 
 What goes into this Dockerfile can depend on what you're trying to do. The simplest Dockerfile would look like this.
 
@@ -89,10 +104,10 @@ include a requirements file if you need something that isn't in the container al
 you can find the dependencies it was bundled with. You can get this from the image with this command.
 
 ```
-# Get the declared dependnecies
+## Get the declared dependnecies
 docker run --platform=linux/amd64 --rm --entrypoint /bin/bash whylabs/whylogs:py-llm-1.0.2.dev0 -c 'cat pyproject.toml'
 
-# Or start an interactive Python shell and test imports
+## Or start an interactive Python shell and test imports
 docker run -it --platform=linux/amd64 --rm --entrypoint /bin/bash whylabs/whylogs:py-llm-1.0.2.dev0 -c "source .venv/bin/activate; python3.10"
 ```
 
@@ -101,7 +116,7 @@ they pull in.
 
 See the [custom_model][custom_model] for a complete example that packages extra dependencies.
 
-## Step 4: Build the Image
+### Step 4: Build the Image
 
 The build time will vary depending on what you put in your Dockerfile. The simple example of copying your python code into the image will be
 very fast, while installing dependencies can be very slow.
@@ -112,7 +127,7 @@ docker build . -t my_llm_container
 
 Each of the examples do this with `make build`
 
-## Step 5: Deploy a Container
+### Step 5: Deploy a Container
 
 This will depend heavily on your infrastructure. The simplest deployment method is Docker of course.
 
@@ -124,7 +139,7 @@ Each of the examples do this with `make run`
 
 See [our sample Helm file][helm_llm_file] for an example of deploying via Helm.
 
-## Step 6: Call the Container
+### Step 6: Call the Container
 
 The container has a client that you can use to call it, [python-container-client][python-container-client]. If you prefer using other
 languages, curl, or generic http then see the [api docs][api_docs] for request formats.
@@ -135,7 +150,9 @@ languages, curl, or generic http then see the [api docs][api_docs] for request f
 [configure_container_yaml]: https://github.com/whylabs/langkit-container-examples/tree/master/examples/configure_container_yaml
 [custom_model]: https://github.com/whylabs/langkit-container-examples/tree/master/examples/custom_model
 [no_config]: https://github.com/whylabs/langkit-container-examples/tree/master/examples/no_configuration
-[api_docs]: https://whylabs.github.io/langkit-container-examples/api.html
+[s3_config]: https://github.com/whylabs/langkit-container-examples/tree/master/examples/s3_configuration
+[api_docs]: https://whylabs.github.io/whylogs-container-python-docs/whylogs-container-python.html
+[api_docs_evaluate]: https://whylabs.github.io/whylogs-container-python-docs/whylogs-container-python.html#operation/evaluate
 [docker_tags]: https://hub.docker.com/repository/docker/whylabs/whylogs/tags?page=1&ordering=last_updated&name=llm
 [python-container-client]: https://pypi.org/project/whylogs-container-client/
 [helm_repo]: https://github.com/whylabs/charts

@@ -41,12 +41,10 @@ metrics:
   - metric: response.sentiment_polarity
   - metric: prompt.toxicity
   - metric: response.toxicity
-  - metric: prompt.injections
-  - metric: prompt.jailbreak_similarity
-  - metric: response.refusal_similarity
+  - metric: prompt.is_injection
+  - metric: response.is_refusal
 
-
-  # no validation options for these yet
-  - metric: prompt.pii_presidio
-  - metric: response.pii_presidio
-
+  # These are metric groups that create multiple metrics like `prompt.pii.email_address`,
+  # and `response.pii.credit_card`.
+  - metric: prompt.pii
+  - metric: response.pii

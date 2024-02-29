@@ -64,7 +64,7 @@ def create_server(port: int) -> subprocess.Popen[bytes]:
 
 @pytest.fixture(scope="module")
 def client() -> Generator[AuthenticatedClient, None, None]:
-    port = random.randint(8000, 9000)
+    port = random.randint(10000, 11000)
     proc = create_server(port=port)
     client = AuthenticatedClient(base_url=f"http://localhost:{port}", token="password", prefix="", auth_header_name="X-API-Key")  # type: ignore[reportGeneralTypeIssues]
 
