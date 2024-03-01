@@ -30,8 +30,13 @@ a Dockerfile that extends our image and copies certain files into a certain spot
 
 ### Step 1: Pick an Image Tag
 
-You'll want to either use `py-llm-latest` or browse the [docker tags][docker_tags] for a version to use instead if you don't want to risk
-breaking changes.
+You'll want to either use `latest` or browse the available tags from our Gitlab respository with
+
+```bash
+curl "https://gitlab.com/api/v4/projects/55361491/registry/repositories/6125233/tags" --header "PRIVATE-TOKEN: <api token>"
+```
+
+Reach out to us at support@whylabs.ai to get an API token.
 
 ### Step 2: Create a Configuration File
 
@@ -84,7 +89,8 @@ See [configure_container_python][configure_container_python] for an example that
 What goes into this Dockerfile can depend on what you're trying to do. The simplest Dockerfile would look like this.
 
 ```Dockerfile
-FROM whylabs/whylogs:py-llm-1.0.1
+FROM registry.gitlab.com/whylabs/langkit-container:latest
+
 COPY ./whylogs_config /opt/whylogs-container/whylogs_container/whylogs_config/
 ```
 
@@ -92,7 +98,7 @@ You're in full control of this Dockerfile and build and you can do basically any
 you might want to include some additional pip dependencies as well, which could look like this.
 
 ```Dockerfile
-FROM whylabs/whylogs:py-llm-1.0.1
+FROM registry.gitlab.com/whylabs/langkit-container:latest
 
 COPY ./whylogs_config /opt/whylogs-container/whylogs_container/whylogs_config/
 COPY ./requirements.txt ./
@@ -105,13 +111,13 @@ you can find the dependencies it was bundled with. You can get this from the ima
 
 ```
 ## Get the declared dependnecies
-docker run --platform=linux/amd64 --rm --entrypoint /bin/bash whylabs/whylogs:py-llm-1.0.2.dev0 -c 'cat pyproject.toml'
+docker run --platform=linux/amd64 --rm --entrypoint /bin/bash registry.gitlab.com/whylabs/langkit-container:latest -c 'cat pyproject.toml'
 
 ## Or start an interactive Python shell and test imports
-docker run -it --platform=linux/amd64 --rm --entrypoint /bin/bash whylabs/whylogs:py-llm-1.0.2.dev0 -c "source .venv/bin/activate; python3.10"
+docker run -it --platform=linux/amd64 --rm --entrypoint /bin/bash registry.gitlab.com/whylabs/langkit-container:latest -c "source .venv/bin/activate; python3.10"
 ```
 
-In general, you can expect `pandas`, `whylogs`, `langkit`, and `torch/torchvision==2.0.0` to be present, as well as whatever dependencies
+In general, you can expect `pandas`, `whylogs`, `langkit`, and `torch==2.0.0` to be present, as well as whatever dependencies
 they pull in.
 
 See the [custom_model][custom_model] for a complete example that packages extra dependencies.
@@ -153,7 +159,6 @@ languages, curl, or generic http then see the [api docs][api_docs] for request f
 [s3_config]: https://github.com/whylabs/langkit-container-examples/tree/master/examples/s3_configuration
 [api_docs]: https://whylabs.github.io/whylogs-container-python-docs/whylogs-container-python.html
 [api_docs_evaluate]: https://whylabs.github.io/whylogs-container-python-docs/whylogs-container-python.html#operation/evaluate
-[docker_tags]: https://hub.docker.com/repository/docker/whylabs/whylogs/tags?page=1&ordering=last_updated&name=llm
 [python-container-client]: https://pypi.org/project/whylogs-container-client/
 [helm_repo]: https://github.com/whylabs/charts
 [helm_llm_file]: https://github.com/whylabs/charts/tree/mainline/charts/langkit
