@@ -115,7 +115,7 @@ docker run --platform=linux/amd64 --rm --entrypoint /bin/bash registry.gitlab.co
 docker run -it --platform=linux/amd64 --rm --entrypoint /bin/bash registry.gitlab.com/whylabs/langkit-container:latest -c "source .venv/bin/activate; python3.10"
 ```
 
-In general, you can expect `pandas`, `whylogs`, `langkit`, and `torch/torchvision==2.0.0` to be present, as well as whatever dependencies
+In general, you can expect `pandas`, `whylogs`, `langkit`, and `torch==2.0.0` to be present, as well as whatever dependencies
 they pull in.
 
 See the [custom_model][custom_model] for a complete example that packages extra dependencies.
@@ -160,4 +160,3 @@ languages, curl, or generic http then see the [api docs][api_docs] for request f
 [python-container-client]: https://pypi.org/project/whylogs-container-client/
 [helm_repo]: https://github.com/whylabs/charts
 [helm_llm_file]: https://github.com/whylabs/charts/tree/mainline/charts/langkit
-
