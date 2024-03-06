@@ -55,8 +55,7 @@ This is what your project will look like.
 ├── pyproject.toml
 └── whylogs_config
     ├── model-1.yaml
-    ├── model-2.yaml
-    └── __init__.py
+    └── model-2.yaml
 ```
 
 These files will be included by your Dockerfile in the section below. The container is hard coded to search  
@@ -74,8 +73,7 @@ This is what your project will look like.
 ├── Makefile
 ├── pyproject.toml
 └── whylogs_config
-    ├── config.py
-    └── __init__.py
+    └── config.py
 ```
 
 The container is hard coded to import whatever is at `/opt/whylogs-container/whylogs_container/whylogs_config/config.py`. This is the
@@ -117,7 +115,7 @@ docker run --platform=linux/amd64 --rm --entrypoint /bin/bash registry.gitlab.co
 docker run -it --platform=linux/amd64 --rm --entrypoint /bin/bash registry.gitlab.com/whylabs/langkit-container:latest -c "source .venv/bin/activate; python3.10"
 ```
 
-In general, you can expect `pandas`, `whylogs`, `langkit`, and `torch==2.0.0` to be present, as well as whatever dependencies
+In general, you can expect `pandas`, `whylogs`, `langkit`, and `torch/torchvision==2.0.0` to be present, as well as whatever dependencies
 they pull in.
 
 See the [custom_model][custom_model] for a complete example that packages extra dependencies.
@@ -147,7 +145,7 @@ See [our sample Helm file][helm_llm_file] for an example of deploying via Helm.
 
 ### Step 6: Call the Container
 
-The container has a client that you can use to call it, [python-container-client][python-container-client]. If you prefer using other
+The container has a client that you can use to call it, [whylogs-container-client][python-container-client]. If you prefer using other
 languages, curl, or generic http then see the [api docs][api_docs] for request formats.
 
 <!-- Links -->
@@ -162,3 +160,4 @@ languages, curl, or generic http then see the [api docs][api_docs] for request f
 [python-container-client]: https://pypi.org/project/whylogs-container-client/
 [helm_repo]: https://github.com/whylabs/charts
 [helm_llm_file]: https://github.com/whylabs/charts/tree/mainline/charts/langkit
+
