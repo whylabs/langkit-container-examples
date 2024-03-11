@@ -1,4 +1,4 @@
-FROM registry.gitlab.com/whylabs/langkit-container:1.0.8
+FROM registry.gitlab.com/whylabs/langkit-container:1.0.9
 
 # Force the container to fail if the config is not present. Safeguard for messing up the
 # build in such a way that the config is not included correctly.

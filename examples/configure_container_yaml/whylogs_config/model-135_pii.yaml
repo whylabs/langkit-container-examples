@@ -1,4 +1,4 @@
-id: 9294f3fa-4f4b-4363-9397-87d3499fce28
+id: my-id 
 policy_version: 1
 schema_version: 0.0.1
 whylabs_dataset_id: model-135
@@ -31,7 +31,7 @@ validators:
       must_be_none: True
 
 callbacks:
-  - callback: static_bearer_auth_validation_failure
+  - callback: webhook.static_bearer_auth_validation_failure
     options:
       url: http://host.docker.internal:8001/failures
       auth_token: password

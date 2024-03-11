@@ -6,7 +6,7 @@ from whylogs_container_client.models.validation_failure import ValidationFailure
 from whylogs_container_client.models.validation_result import ValidationResult
 
 
-def test_prompt_char_count_134(client: AuthenticatedClient):
+def test_prompt_char_count_133(client: AuthenticatedClient):
     request = LLMValidateRequest(
         prompt="?",
         response="I'm sorry you feel that way.",
@@ -25,7 +25,7 @@ def test_prompt_char_count_134(client: AuthenticatedClient):
         report=[
             ValidationFailure(
                 id="myid",
-                metric="prompt.char_count",
+                metric="prompt.stats.char_count",
                 details="Value 1 is below threshold 2.0",
                 value=1,
                 upper_threshold=None,
@@ -60,8 +60,8 @@ def test_prompt_char_count_139(client: AuthenticatedClient):
         report=[
             ValidationFailure(
                 id="myid",
-                metric="prompt.char_count",
-                details="Value 1 is below threshold 2.0",
+                metric="prompt.stats.char_count",
+                details="Value 1 is below threshold 2",
                 value=1,
                 upper_threshold=None,
                 lower_threshold=2.0,
@@ -95,7 +95,7 @@ def test_prompt_sentiment_134(client: AuthenticatedClient):
         report=[
             ValidationFailure(
                 id="myid",
-                metric="prompt.sentiment_polarity",
+                metric="prompt.sentiment.sentiment_score",
                 details="Value -0.7579 is below threshold 0.0",
                 value=-0.7579,
                 upper_threshold=None,

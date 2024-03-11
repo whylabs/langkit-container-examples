@@ -6,7 +6,7 @@ whylabs_dataset_id: model-131
 # Optionally, you can pair custom python configuration with the yaml based option as well and they'll both
 # be used.
 metrics:
-  - metric: response.flesch_reading_ease
+  - metric: response.stats.flesch_reading_ease
     validation:
       lower_threshold: 70
 

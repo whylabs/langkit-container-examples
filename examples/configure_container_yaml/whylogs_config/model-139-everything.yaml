@@ -1,50 +1,14 @@
-id: 9294f3fa-4f4b-4363-9397-87d3499fce28
+id: my-id
 policy_version: 1
 schema_version: 0.0.1
 whylabs_dataset_id: model-139
 
 metrics:
-  # Only validate for prompt.char_count, but still send all metrics to WhyLabs
-  - metric: prompt.char_count
-    validation:
+  - metric: presets.all
+
+validators:
+  - validator: constraint
+    options:
+      target_metric: prompt.stats.char_count
       upper_threshold: 200
       lower_threshold: 2
-
-  - metric: response.char_count
-  - metric: prompt.reading_ease
-  - metric: response.reading_ease
-  - metric: prompt.flesch_reading_ease
-  - metric: response.flesch_reading_ease
-  - metric: prompt.flesch_kincaid_grade
-  - metric: response.flesch_kincaid_grade
-  - metric: prompt.syllable_count
-  - metric: response.syllable_count
-  - metric: prompt.lexicon_count
-  - metric: response.lexicon_count
-  - metric: prompt.sentence_count
-  - metric: response.sentence_count
-  - metric: prompt.letter_count
-  - metric: response.letter_count
-  - metric: prompt.difficult_words
-  - metric: response.difficult_words
-  - metric: prompt.regex.ssn
-  - metric: response.regex.ssn
-  - metric: prompt.regex.phone_number
-  - metric: response.regex.phone_number
-  - metric: prompt.regex.email_address
-  - metric: response.regex.email_address
-  - metric: prompt.regex.mailing_address
-  - metric: response.regex.mailing_address
-  - metric: prompt.regex.credit_card_number
-  - metric: response.regex.credit_card_number
-  - metric: prompt.sentiment_polarity
-  - metric: response.sentiment_polarity
-  - metric: prompt.toxicity
-  - metric: response.toxicity
-  - metric: prompt.is_injection
-  - metric: response.is_refusal
-
-  # These are metric groups that create multiple metrics like `prompt.pii.email_address`,
-  # and `response.pii.credit_card`.
-  - metric: prompt.pii
-  - metric: response.pii

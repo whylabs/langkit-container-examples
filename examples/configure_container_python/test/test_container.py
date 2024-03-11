@@ -24,7 +24,7 @@ def test_toxic_response_131(client: AuthenticatedClient):
         report=[
             ValidationFailure(
                 id="0",
-                metric="response.toxicity",
+                metric="response.toxicity.toxicity_score",
                 details="Value 0.9642418622970581 is above threshold 0.4",
                 value=0.9642418622970581,
                 upper_threshold=0.4,
@@ -116,7 +116,7 @@ def test_upper_case_letters_prompt_reading_ease_response_131(client: Authenticat
             ),
             ValidationFailure(
                 id="0",
-                metric="response.flesch_reading_ease",
+                metric="response.stats.flesch_reading_ease",
                 details="Value 52.23 is below threshold 70.0",
                 value=52.23,
                 upper_threshold=None,
@@ -151,7 +151,7 @@ def test_prompt_sentiment_133(client: AuthenticatedClient):
         report=[
             ValidationFailure(
                 id="myid",
-                metric="prompt.sentiment_polarity",
+                metric="prompt.sentiment.sentiment_score",
                 details="Value -0.4215 is below threshold 0",
                 value=-0.4215,
                 upper_threshold=None,
