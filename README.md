@@ -247,6 +247,3 @@ validations for pii you would have to use one of these names as the `target_metr
 - prompt.pii.us_ssn
 - prompt.pii.us_bank_number
 - prompt.pii.redacted
-
-
-**Full Changelog**: https://github.com/whylabs-ai/whylogs-container-python/compare/1.0.8...1.0.9
