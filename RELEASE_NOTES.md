@@ -1,3 +1,53 @@
+# 1.0.10 Release Notes
+
+## General changes
+
+- Documentation snippets are taken directly from source code now so they shouldn't get stale when apis change.
+- Add the ability to send just the prompt or response. This allows you to validate the prompt before you have the response.
+```python
+prompt_request = LLMValidateRequest(
+    prompt="What is your name?",
+    dataset_id="model-134",
+    id="myid-prompt",
+)
+
+# Send the request with log=False so that the prompt isn't logged to WhyLabs.
+prompt_response = Evaluate.sync_detailed(client=client, body=prompt_request, log=False)
+```
+- Add the ability to send additional data along with llm requests. This data will show up in WhyLabs and can be used for normal whylogs
+  features like segmentation.
+```python
+"model-170": DatasetOptions(
+    dataset_cadence=DatasetCadence.HOURLY,
+    whylabs_upload_cadence=DatasetUploadCadence(
+        interval=5,
+        granularity=DatasetUploadCadenceGranularity.MINUTE,
+    ),
+    schema=DatasetSchema(
+        segments={model_170_segment_def.name: model_170_segment_def},
+        resolvers=DeclarativeResolver(
+            [
+                # This applies to all columns and provides the baseline whylogs metrics, like quantiles,
+                # averages, and other statistics. Its there by default normally but we have to include it
+                # here because we're touching the resolvers.
+                *NO_FI_RESOLVER,
+                # Include the Frequent Items metric on the "version" column so that we can see
+                # the raw version values in the WhyLabs UI. This is normally disabled so string values aren't
+                # sent to WhyLabs.
+                ResolverSpec(
+                    column_name=VERSION_COLUMN,
+                    metrics=[MetricSpec(StandardMetric.frequent_items.value)],
+                ),
+            ]
+        ),
+    ),
+),
+```
+- There are now default validators to accompany the default metrics when there is no configuration present. This is mostly to aid in testing
+  the container functionality.
+- New example that demonstrates how to use segments with the LLM endpoints.
+# 1.0.9 Release Notes
+
 ## General changes
 
 - Remove input_output metric. It's too noisy to be used for real time validation.
@@ -70,49 +120,3 @@ validations for pii you would have to use one of these names as the `target_metr
 - prompt.pii.us_ssn
 - prompt.pii.us_bank_number
 - prompt.pii.redacted
-## General changes
-
-- Documentation snippets are taken directly from source code now so they shouldn't get stale when apis change.
-- Add the ability to send just the prompt or response. This allows you to validate the prompt before you have the response.
-```python
-prompt_request = LLMValidateRequest(
-    prompt="What is your name?",
-    dataset_id="model-134",
-    id="myid-prompt",
-)
-
-# Send the request with log=False so that the prompt isn't logged to WhyLabs.
-prompt_response = Evaluate.sync_detailed(client=client, body=prompt_request, log=False)
-```
-- Add the ability to send additional data along with llm requests. This data will show up in WhyLabs and can be used for normal whylogs
-  features like segmentation.
-```python
-"model-170": DatasetOptions(
-    dataset_cadence=DatasetCadence.HOURLY,
-    whylabs_upload_cadence=DatasetUploadCadence(
-        interval=5,
-        granularity=DatasetUploadCadenceGranularity.MINUTE,
-    ),
-    schema=DatasetSchema(
-        segments={model_170_segment_def.name: model_170_segment_def},
-        resolvers=DeclarativeResolver(
-            [
-                # This applies to all columns and provides the baseline whylogs metrics, like quantiles,
-                # averages, and other statistics. Its there by default normally but we have to include it
-                # here because we're touching the resolvers.
-                *NO_FI_RESOLVER,
-                # Include the Frequent Items metric on the "version" column so that we can see
-                # the raw version values in the WhyLabs UI. This is normally disabled so string values aren't
-                # sent to WhyLabs.
-                ResolverSpec(
-                    column_name=VERSION_COLUMN,
-                    metrics=[MetricSpec(StandardMetric.frequent_items.value)],
-                ),
-            ]
-        ),
-    ),
-),
-```
-- There are now default validators to accompany the default metrics when there is no configuration present. This is mostly to aid in testing
-  the container functionality.
-- New example that demonstrates how to use segments with the LLM endpoints.
