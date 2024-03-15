@@ -46,6 +46,10 @@ prompt_response = Evaluate.sync_detailed(client=client, body=prompt_request, log
 - There are now default validators to accompany the default metrics when there is no configuration present. This is mostly to aid in testing
   the container functionality.
 - New example that demonstrates how to use segments with the LLM endpoints.
+- Metric name changes to conform to our new three part structure released in 1.0.9.
+    - `response.is_refusal` -> `response.refusal.is_refusal`
+    - `prompt.is_injection` -> `prompt.injection.is_injection`
+
 # 1.0.9 Release Notes
 
 ## General changes
