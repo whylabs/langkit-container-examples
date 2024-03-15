@@ -1,3 +1,4 @@
+# 1.0.10 Release Notes
 ## General changes
 
 - Remove input_output metric. It's too noisy to be used for real time validation.
@@ -70,6 +71,8 @@ validations for pii you would have to use one of these names as the `target_metr
 - prompt.pii.us_ssn
 - prompt.pii.us_bank_number
 - prompt.pii.redacted
+
+# 1.0.9 Release Notes
 ## General changes
 
 - Documentation snippets are taken directly from source code now so they shouldn't get stale when apis change.
