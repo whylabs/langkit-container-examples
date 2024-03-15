@@ -50,7 +50,9 @@ langkit_config: Dict[str, LangkitOptions] = {
         ],
         validators=[
             validators_lib.constraint("response.toxicity.toxicity_score", upper_threshold=0.4),
+            # DOCSUB_START ex_python_constraint
             validators_lib.constraint("prompt.upper_case_char_count", lower_threshold=1),
+            # DOCSUB_END
         ],
     ),
     "model-133": LangkitOptions(

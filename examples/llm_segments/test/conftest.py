@@ -5,9 +5,10 @@ import time
 from typing import Callable, Generator, List, TypeVar
 
 import pytest
+import whylogs_container_client.api.manage.health as Health
 from whylogs_container_client import AuthenticatedClient
 
-image_name = "langkit_example_configure_container_yaml"  # from the makefile, run `make build` to build the image
+image_name = "llm_segments"  # from the makefile, run `make build` to build the image
 
 T = TypeVar("T")
 
@@ -61,18 +62,15 @@ def create_server(port: int) -> subprocess.Popen[bytes]:
     return subprocess.Popen(ServerCommands.docker(str(port)))
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="function")
 def client() -> Generator[AuthenticatedClient, None, None]:
     port = random.randint(10000, 11000)
     proc = create_server(port=port)
     client = AuthenticatedClient(base_url=f"http://localhost:{port}", token="password", prefix="", auth_header_name="X-API-Key")  # type: ignore[reportGeneralTypeIssues]
 
     def _check_health():
-        # DOCSUB_START llm_health_check_example
-        import whylogs_container_client.api.manage.health as Health
-
+        print("Checking health", flush=True)
         Health.sync_detailed(client=client)
-        # DOCSUB_END
 
     try:
         retry(_check_health)

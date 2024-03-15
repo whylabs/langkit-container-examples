@@ -1,0 +1,58 @@
+# LLM Segmentation Example
+
+Sample project that demonstrates how to combine langkit's LLM metrics with whylogs'/WhyLabs segmentation features. Segments are a
+powerful WhyLabs feature that let you divide your dataset up into smaller portions according to columns in your data. See the [segment
+documentation](https://docs.whylabs.ai/docs/whylabs-capabilities/#segments) for more information.
+
+In order to enable segments in the container, you need to build a version of the container that uses python to configure whylogs to
+segment data. The langkit portion can be defined in python or in yaml.
+
+```python
+<!-- DOCSUB_INSERT example_segmented_schema_additional_data -->
+```
+
+See the `whylogs_config/config.py` file for the full example.
+
+## Setup
+
+Make sure you have [poetry](https://python-poetry.org/) and docker installed. Create a `local.env` file with your WhyLabs credentials.
+
+```
+# Generated at https://hub.whylabsapp.com/settings/access-tokens
+WHYLABS_API_KEY=<api key>
+CONTAINER_PASSWORD=password
+
+# Set based on your model type in WhyLabs. Daily is the default.
+DEFAULT_WHYLABS_DATASET_CADENCE=DAILY
+```
+
+Now you can build the custom container and send validation requests to it.
+
+```
+make install build test
+```
+
+Or just run the container locally to manually test and send ad hoc requests.
+
+```
+make install build run
+```
+
+## Making Requests
+
+The big difference with requests when you're using segments is that you most likely need to provide some additional data to segment on. You
+can do this using the `additional_data` argument. Everything that you provide in that argument will also show up in WhyLabs.
+
+```python
+<!-- DOCSUB_INSERT example_segmented_request -->
+```
+
+If you're segmenting on the name of one of the generated llm metrics then you don't have to send any additional data for segmentation
+purposes, though you can still send additional data if you want it to appear in WhyLabs along side your prompt and response info.
+
+Check out the `tests` folder for a full example that uses the python client to make requests. If you prefer using other languages, curl, or
+generic http then see the [api docs](https://whylabs.github.io/langkit-container-examples/api.html) for request formats.
+
+- [validate api](https://whylabs.github.io/langkit-container-examples/api.html#tag/llm/operation/validate_llm)
+- [log api](https://whylabs.github.io/langkit-container-examples/api.html#tag/llm/operation/log_llm)
+- [bulk log api](https://whylabs.github.io/langkit-container-examples/api.html#tag/profile/operation/log)

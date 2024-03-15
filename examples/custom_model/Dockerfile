@@ -1,5 +1,5 @@
-FROM registry.gitlab.com/whylabs/langkit-container:1.0.9
-
+# DOCSUB_START docker_dependencies
+FROM registry.gitlab.com/whylabs/langkit-container:1.0.10
 
 # Force the container to fail if the config is not present. Safeguard for messing up the
 # build in such a way that the config is not included correctly.
@@ -7,6 +7,7 @@ ENV FAIL_STARTUP_WITHOUT_CONFIG=True
 
 COPY ./requirements.txt ./requirements.txt
 RUN /bin/bash -c "source .venv/bin/activate; pip install -r ./requirements.txt"
+# DOCSUB_END
 
 # Copy our custom config code
 COPY ./whylogs_config /opt/whylogs-container/whylogs_container/whylogs_config/

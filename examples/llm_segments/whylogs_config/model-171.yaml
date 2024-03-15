@@ -1,0 +1,10 @@
+id: my_id
+policy_version: 1
+schema_version: 0.0.1
+whylabs_dataset_id: model-171
+
+metrics:
+  - metric: prompt.injection.is_injection
+  - metric: prompt.pii
+  - metric: response.refusal.is_refusal
+  - metric: response.sentiment.sentiment_score

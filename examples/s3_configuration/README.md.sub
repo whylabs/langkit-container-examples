@@ -17,35 +17,7 @@ See [configure_container_yaml][configure_container_yaml] to see what you can put
 Make sure you have [poetry](https://python-poetry.org/) and docker installed. Create a `local.env` file with your WhyLabs credentials.
 
 ```
-# Generated at https://hub.whylabsapp.com/settings/access-tokens
-WHYLABS_API_KEY=xxxxxxxxxx.xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx:org-xxxxxx
-CONTAINER_PASSWORD=password
-
-# Set based on your model type in WhyLabs. Daily is the default.
-DEFAULT_WHYLABS_DATASET_CADENCE=DAILY
-DEFAULT_WHYLABS_UPLOAD_CADENCE=M
-DEFAULT_WHYLABS_UPLOAD_INTERVAL=5
-
-# IMPORTANT
-# Usually the container fails without custom config because that's the primary use case, but
-# this example shows how it works without custom config at startup time.
-FAIL_STARTUP_WITHOUT_CONFIG=False
-LOG_LEVEL=INFO
-
-# These are the s3 related variables
-S3_CONFIG_SYNC=True
-S3_CONFIG_BUCKET_NAME=my-bucket
-S3_CONFIG_PREFIX=container/policy
-S3_CONFIG_SYNC_CADENCE=M
-S3_CONFIG_SYNC_INTERVAL=1
-
-# We use the AWS Python SDK (boto3) to access s3. It checks the environment for certain
-# AWS variables to determine auth. These have to be available in the container.
-AWS_ACCESS_KEY_ID=....
-AWS_SECRET_ACCESS_KEY=....
-AWS_SESSION_TOKEN=...
-# Or use roles
-S3_CONFIG_SYNC_ROLE_ARN=
+<!-- DOCSUB_INSERT ex_s3_env_file -->
 ```
 
 

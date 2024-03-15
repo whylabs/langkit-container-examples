@@ -87,28 +87,14 @@ See [configure_container_python][configure_container_python] for an example that
 What goes into this Dockerfile can depend on what you're trying to do. The simplest Dockerfile would look like this.
 
 ```Dockerfile
-FROM registry.gitlab.com/whylabs/langkit-container:1.0.9
-
-# Force the container to fail if the config is not present. Safeguard for messing up the
-# build in such a way that the config is not included correctly.
-ENV FAIL_STARTUP_WITHOUT_CONFIG=True
-
-# Copy our custom config code
-COPY ./whylogs_config /opt/whylogs-container/whylogs_container/whylogs_config/
+<!-- DOCSUB_INSERT simple_dockerfile -->
 ```
 
 You're in full control of this Dockerfile and build and you can do basically anything you need to do to the base image here. For example,
 you might want to include some additional pip dependencies as well, which could look like this.
 
 ```Dockerfile
-FROM registry.gitlab.com/whylabs/langkit-container:1.0.9
-
-# Force the container to fail if the config is not present. Safeguard for messing up the
-# build in such a way that the config is not included correctly.
-ENV FAIL_STARTUP_WITHOUT_CONFIG=True
-
-COPY ./requirements.txt ./requirements.txt
-RUN /bin/bash -c "source .venv/bin/activate; pip install -r ./requirements.txt"
+<!-- DOCSUB_INSERT docker_dependencies -->
 ```
 
 Just make sure you use the virtualenv that we packaged along with the image so dependencies are installed correctly. You only need to
