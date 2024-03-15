@@ -15,6 +15,7 @@ def test_separate_prompt_response(client: AuthenticatedClient):
 
     This example shows how to do the first method.
     """
+    # DOCSUB_START example_just_prompt
     prompt_request = LLMValidateRequest(
         prompt="What is your name?",
         dataset_id="model-134",
@@ -23,6 +24,7 @@ def test_separate_prompt_response(client: AuthenticatedClient):
 
     # Send the request with log=False so that the prompt isn't logged to WhyLabs.
     prompt_response = Evaluate.sync_detailed(client=client, body=prompt_request, log=False)
+    # DOCSUB_END
 
     if not isinstance(prompt_response.parsed, EvaluationResult):
         raise Exception(f"Failed to validate data. Status code: {prompt_response.status_code}. {prompt_response.parsed}")
