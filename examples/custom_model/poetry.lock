@@ -529,12 +529,12 @@ data = ["language-data (>=1.1,<2.0)"]
 
 [[package]]
 name = "langkit"
-version = "0.0.91"
+version = "0.0.96"
 description = "A language toolkit for monitoring LLM interactions"
 optional = false
 python-versions = ">=3.8,<4"
 files = [
-    {file = "langkit-0.0.91-py3-none-any.whl", hash = "sha256:d6a782a22e4c1ca6f7f41feac5b9a91f864a698a5287028e6fdf96c3c49f5464"},
+    {file = "langkit-0.0.96-py3-none-any.whl", hash = "sha256:c83ba51e07e245c482d70368e535d654917535911b4e99029853afefef226a7f"},
 ]
 
 [package.dependencies]
@@ -549,7 +549,7 @@ torch = ["torch (==2.0.0)"]
 
 [package.source]
 type = "url"
-url = "https://whypy.s3.us-west-2.amazonaws.com/langkit-0.0.91-py3-none-any.whl"
+url = "https://whypy.s3.us-west-2.amazonaws.com/langkit-0.0.96-py3-none-any.whl"
 
 [[package]]
 name = "markupsafe"
@@ -2352,13 +2352,13 @@ url = "https://whypy.s3.us-west-2.amazonaws.com/whylogs-1.3.23.dev8-py3-none-any
 
 [[package]]
 name = "whylogs-container-client"
-version = "1.0.10"
+version = "1.0.11"
 description = "A client library for accessing the whylogs python container"
 optional = false
-python-versions = ">=3.8,<4.0"
+python-versions = "<4.0,>=3.8"
 files = [
-    {file = "whylogs_container_client-1.0.10-py3-none-any.whl", hash = "sha256:41df16e21159089df976455d41bb1ea0cdf9a2f53dc462a917b48d633391325f"},
-    {file = "whylogs_container_client-1.0.10.tar.gz", hash = "sha256:2e88db4767608e150068e3fa2f56f9654ce86d743a1d56b7298e9d9044113ec0"},
+    {file = "whylogs_container_client-1.0.11-py3-none-any.whl", hash = "sha256:cd22b969838873bbe8be3a1ea5e663fbb080e1db3ca71c59dac2882f8fc36027"},
+    {file = "whylogs_container_client-1.0.11.tar.gz", hash = "sha256:bbd58cb85a87bcc0a07542bc2afeaf785ef06a93e53ba2b286952c814eac7a70"},
 ]
 
 [package.dependencies]
@@ -2368,23 +2368,23 @@ python-dateutil = ">=2.8.0,<3.0.0"
 
 [[package]]
 name = "whylogs-container-types"
-version = "0.4.11"
+version = "0.4.12"
 description = ""
 optional = false
 python-versions = ">=3.8,<4.0"
 files = [
-    {file = "whylogs_container_types-0.4.11-py3-none-any.whl", hash = "sha256:d2e107015b24426263c8ad366c5614d2b53344b7eacb9d374dbef9b8226434ac"},
+    {file = "whylogs_container_types-0.4.12-py3-none-any.whl", hash = "sha256:a9ed7507a8e3da2cef93bdd1e477f7015317e75dc4389d0552b3af6fbb84715e"},
 ]
 
 [package.dependencies]
 whylogs = "*"
 
 [package.extras]
-llm = ["langkit[all] @ https://whypy.s3.us-west-2.amazonaws.com/langkit-0.0.47-py3-none-any.whl"]
+llm = ["langkit[all] @ https://whypy.s3.us-west-2.amazonaws.com/langkit-0.0.95-py3-none-any.whl"]
 
 [package.source]
 type = "url"
-url = "https://whypy.s3.us-west-2.amazonaws.com/whylogs_container_types-0.4.11-py3-none-any.whl"
+url = "https://whypy.s3.us-west-2.amazonaws.com/whylogs_container_types-0.4.12-py3-none-any.whl"
 
 [[package]]
 name = "whylogs-sketching"
@@ -2449,4 +2449,4 @@ torch = "2.0.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "2594741c20e6b478ff1a6ab1f122ba23fe5d9d4ace44852c7e1de7850c91e3a2"
+content-hash = "217d3015aa18b69d095a58f95de888906329b8749513808f522bfa0c8002fd29"

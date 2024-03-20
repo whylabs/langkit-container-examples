@@ -1,0 +1,19 @@
+# DOCSUB_START example_yaml
+id: my-policy-id
+policy_version: 1
+schema_version: 0.0.1
+whylabs_dataset_id: model-155
+
+metrics:
+  - metric: prompt.similarity.injection
+    validation:
+      upper_threshold: 0.4
+
+  - metric: prompt.stats.token_count
+    validation:
+      upper_threshold: 400
+
+  - metric: response.similarity.refusal
+    validation:
+      upper_threshold: 0.6
+# DOCSUB_END

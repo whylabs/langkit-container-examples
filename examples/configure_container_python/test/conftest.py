@@ -45,6 +45,8 @@ class ServerCommands:
             "--env",
             "DEFAULT_MODEL_ID=model-62",
             "--env",
+            "FAIL_STARTUP_WITHOUT_CONFIG=True",
+            "--env",
             "CONTAINER_PASSWORD=password",
             "--env",
             "DEFAULT_WHYLABS_DATASET_CADENCE=DAILY",

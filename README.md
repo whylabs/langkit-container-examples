@@ -87,7 +87,7 @@ See [configure_container_python][configure_container_python] for an example that
 What goes into this Dockerfile can depend on what you're trying to do. The simplest Dockerfile would look like this.
 
 ```Dockerfile
-FROM registry.gitlab.com/whylabs/langkit-container:1.0.10
+FROM registry.gitlab.com/whylabs/langkit-container:1.0.11
 
 # Force the container to fail if the config is not present. Safeguard for messing up the
 # build in such a way that the config is not included correctly.
@@ -101,7 +101,7 @@ You're in full control of this Dockerfile and build and you can do basically any
 you might want to include some additional pip dependencies as well, which could look like this.
 
 ```Dockerfile
-FROM registry.gitlab.com/whylabs/langkit-container:1.0.10
+FROM registry.gitlab.com/whylabs/langkit-container:1.0.11
 
 # Force the container to fail if the config is not present. Safeguard for messing up the
 # build in such a way that the config is not included correctly.

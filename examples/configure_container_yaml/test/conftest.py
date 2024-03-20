@@ -5,7 +5,7 @@ import time
 from typing import Callable, Generator, List, TypeVar
 
 import pytest
-from whylogs_container_client import AuthenticatedClient
+from whylogs_container_client import AuthenticatedClient as AC
 
 image_name = "langkit_example_configure_container_yaml"  # from the makefile, run `make build` to build the image
 
@@ -62,10 +62,15 @@ def create_server(port: int) -> subprocess.Popen[bytes]:
 
 
 @pytest.fixture(scope="module")
-def client() -> Generator[AuthenticatedClient, None, None]:
+def client() -> Generator[AC, None, None]:
     port = random.randint(10000, 11000)
     proc = create_server(port=port)
+
+    # DOCSUB_START create_client
+    from whylogs_container_client import AuthenticatedClient
+
     client = AuthenticatedClient(base_url=f"http://localhost:{port}", token="password", prefix="", auth_header_name="X-API-Key")  # type: ignore[reportGeneralTypeIssues]
+    # DOCSUB_END
 
     def _check_health():
         # DOCSUB_START llm_health_check_example

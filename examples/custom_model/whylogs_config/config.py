@@ -9,7 +9,7 @@ from whylogs_container_types import ContainerConfiguration, LangkitOptions
 
 from langkit.core.metric import MetricCreator, MetricResult, MultiMetric, MultiMetricResult
 from langkit.core.validation import ValidationResult
-from langkit.core.workflow import Callback, EvaluationWorkflow
+from langkit.core.workflow import Callback, Workflow
 from langkit.metrics.library import lib
 from langkit.validators.library import lib as validators_lib
 
@@ -136,7 +136,7 @@ if __name__ == "__main__":
     # from the Dockerfile. The langkit container already does a full initialization on all of the built
     # in metrics so we don't have to worry about running init ourselves on everything, only the custom
     # stuff that we add.
-    wf = EvaluationWorkflow(metrics=[custom_presidio_metric("prompt")])
+    wf = Workflow(metrics=[custom_presidio_metric("prompt")])
 
     # If you want, you can run this file directly to see the output of the workflow
     df = pd.DataFrame(

@@ -1,3 +1,11 @@
+# 1.0.11 Release Notes
+
+## General changes
+
+- Default dataset type changed from `DAILY` to `HOURLY`. This makes more sense since the hourly variant ends up working just fine for daily
+  models, but the opposite isn't true.
+- Better error messages when importing the custom config.py file fails.
+
 # 1.0.10 Release Notes
 
 ## General changes
@@ -49,7 +57,6 @@ prompt_response = Evaluate.sync_detailed(client=client, body=prompt_request, log
 - Metric name changes to conform to our new three part structure released in 1.0.9.
     - `response.is_refusal` -> `response.refusal.is_refusal`
     - `prompt.is_injection` -> `prompt.injection.is_injection`
-
 # 1.0.9 Release Notes
 
 ## General changes
