@@ -1,0 +1,36 @@
+id: my_id
+policy_version: 1
+schema_version: 0.0.1
+whylabs_dataset_id: model-151
+
+metrics:
+  - metric: prompt.similarity.injection
+  - metric: prompt.topics
+    options:
+      topics:
+        - computer code
+        - medicine
+        - advice
+
+validators:
+  # Fail validation if computer code and injection attempts are detected
+  - validator: multi_column_constraint
+    options:
+      operator: "AND"
+      report_mode: "ALL_FAILED_METRICS"
+      constraints:
+        - target_metric: prompt.topics.computer_code
+          upper_threshold: .5
+        - target_metric: prompt.similarity.injection
+          upper_threshold: .4
+
+  - validator: multi_column_constraint
+    options:
+      operator: "OR"
+      # This one will always show up as the first failure detected of its defined constraints
+      report_mode: "FIRST_FAILED_METRIC"
+      constraints:
+        - target_metric: prompt.topics.medicine
+          upper_threshold: .4
+        - target_metric: prompt.topics.advice
+          upper_threshold: .4
