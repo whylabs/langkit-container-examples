@@ -51,6 +51,42 @@ metrics:
         - history
 ```
 
+If you want to play around with various topics to see what certain prompts are categorized as, you can locally test by installing the latest
+development langkit
+
+```bash
+pip install langkit[all,torch]@https://whypy.s3.us-west-2.amazonaws.com/langkit-0.0.104-py3-none-any.whl
+```
+
+And create a workflow that uses the new metric with whichever categories you want to test.
+
+```python
+import pandas as pd
+
+from langkit.core.workflow import Workflow
+from langkit.metrics.library import lib
+
+
+code = """
+from demo.big_prompt import big_prompt_1000_token
+from langkit.metrics.topic import get_custom_topic_modules, prompt_topic_module, topic_metric
+from langkit.metrics.library import lib
+"""
+
+if __name__ == "__main__":
+    wf = Workflow(metrics=[lib.prompt.topics(topics=["computer code", "medical"])])
+
+    df = pd.DataFrame(
+        {
+            "prompt": [code, "What is the best treatment for cancer?"],
+        }
+    )
+
+    result = wf.run(df)
+    print(result.metrics.transpose())
+```
+
+
 ## Multi Column Validators
 
 Policy files can now include multi_column_constraint validators which target multiple columns and force an AND/OR on them before the trigger
