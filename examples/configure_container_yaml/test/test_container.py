@@ -1,22 +1,93 @@
 import pytest
+import whylogs_container_client.api.debug.debug_evaluate as DebugEvaluate
 import whylogs_container_client.api.llm.evaluate as Evaluate
 from pytest import approx  # type: ignore
 from whylogs_container_client import AuthenticatedClient
+from whylogs_container_client.models.debug_llm_validate_request import DebugLLMValidateRequest
 from whylogs_container_client.models.evaluation_result import EvaluationResult
 from whylogs_container_client.models.evaluation_result_metrics_item import EvaluationResultMetricsItem
 from whylogs_container_client.models.llm_validate_request import LLMValidateRequest
+from whylogs_container_client.models.metric_filter_options import MetricFilterOptions
+from whylogs_container_client.models.run_options import RunOptions
 from whylogs_container_client.models.validation_failure import ValidationFailure
 from whylogs_container_client.models.validation_result import ValidationResult
 
 
+def test_override_policy_1(client: AuthenticatedClient):
+    prompt_request = DebugLLMValidateRequest(
+        prompt="What is your name?",
+        dataset_id="model-134",
+        id="myid-prompt",
+        policy="""
+id: my_id
+policy_version: 1
+schema_version: 0.0.1
+whylabs_dataset_id: default
+
+metrics:
+  - metric: prompt.similarity.injection
+  - metric: prompt.stats.token_count
+  - metric: prompt.stats.char_count
+  - metric: prompt.topics
+    options:
+        topics:
+            - medical
+            - legal
+
+        """,
+    )
+
+    prompt_response = DebugEvaluate.sync_detailed(client=client, body=prompt_request)
+
+    if not isinstance(prompt_response.parsed, EvaluationResult):
+        raise Exception(f"Failed to validate data. Status code: {prompt_response.status_code}. {prompt_response.parsed}")
+
+    response = prompt_response.parsed
+
+    assert response.metrics[0].additional_properties["prompt.topics.medical"] == approx(0.0053703151643276215, abs=1.5e-06)
+    assert response.metrics[0].additional_properties["prompt.topics.legal"] == approx(0.25662317872047424, abs=1.5e-06)
+    assert response.metrics[0].additional_properties["prompt.similarity.injection"] == approx(0.31260836124420166, abs=1.5e-06)
+    assert response.metrics[0].additional_properties["prompt.stats.token_count"] == 5
+    assert response.metrics[0].additional_properties["prompt.stats.char_count"] == 15
+    assert response.metrics[0].additional_properties["id"] == "myid-prompt"
+
+
+def test_override_policy_2(client: AuthenticatedClient):
+    prompt_request = DebugLLMValidateRequest(
+        prompt="What is your name?",
+        dataset_id="model-150",
+        id="myid-prompt",
+        policy="""
+id: my_id
+policy_version: 1
+schema_version: 0.0.1
+whylabs_dataset_id: default
+
+metrics:
+  - metric: prompt.topics
+    options:
+        topics:
+            - medical
+
+        """,
+    )
+
+    prompt_response = DebugEvaluate.sync_detailed(client=client, body=prompt_request)
+
+    if not isinstance(prompt_response.parsed, EvaluationResult):
+        raise Exception(f"Failed to validate data. Status code: {prompt_response.status_code}. {prompt_response.parsed}")
+
+    response = prompt_response.parsed
+
+    assert response.metrics[0].additional_properties["prompt.topics.medical"] == approx(0.0053703151643276215, abs=1.5e-06)
+    assert response.metrics[0].additional_properties["id"] == "myid-prompt"
+
+
 def test_separate_prompt_response(client: AuthenticatedClient):
     """
-    There are two ways that you can independently send the prompt and response to WhyLabs.
-
-    1c. Send the prompt first with log=False, then send the the prompt and response with log=True.
-    2. Send the prompt and response alone in two requests.
-
-    This example shows how to do the first method.
+    The best way to independently send the prompt and response is to first send only the prompt
+    and then send both the prompt and response together without running any of the metrics that
+    were already computed for the prompt.
     """
     # DOCSUB_START example_just_prompt
     prompt_request = LLMValidateRequest(
@@ -26,24 +97,25 @@ def test_separate_prompt_response(client: AuthenticatedClient):
     )
 
     # Send the request with log=False so that the prompt isn't logged to WhyLabs.
-    prompt_response = Evaluate.sync_detailed(client=client, body=prompt_request, log=False)
-    # DOCSUB_END
+    prompt_response = Evaluate.sync_detailed(client=client, body=prompt_request)
 
     if not isinstance(prompt_response.parsed, EvaluationResult):
         raise Exception(f"Failed to validate data. Status code: {prompt_response.status_code}. {prompt_response.parsed}")
 
-    actual: ValidationResult = prompt_response.parsed.validation_results
+    result: ValidationResult = prompt_response.parsed.validation_results
 
-    expected = ValidationResult(report=[])
-
-    assert actual == expected
+    assert result == ValidationResult(report=[])
 
     full_request = LLMValidateRequest(
-        prompt="What is your name?",  # Send the prompt again for logging this time
+        prompt="What is your name?",  # Send the prompt again
         response="MY NAME IS JEFF GEE GOLY WOW YOU'RE THE BEST!",  # This was the LLM response
         dataset_id="model-134",
         id="myid-prompt",
+        # Tell the container to only compute the metrics that operate on the response or both the prompt and response,
+        # but omit the ones that only run on the prompt since they were already in the first request.
+        options=RunOptions(metric_filter=MetricFilterOptions(by_required_inputs=[["response"], ["prompt", "response"]])),
     )
+    # DOCSUB_END
 
     # Log the full prompt and response to WhyLabs.
     full_response = Evaluate.sync_detailed(client=client, body=full_request)

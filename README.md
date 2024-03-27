@@ -9,6 +9,21 @@ This repo has various examples for configuring and using the WhyLabs langkit con
 different use case and contains a `test` directory with working Python code that demonstrates how to use it. Browse that folder if you're
 looking for a specific example. Each example either configures or calls a deployed instance of the container.
 
+## Container Access
+
+We distrubite the container from our private Gitlab repository. We'll generate a user name and password for you to pull the container. Once
+you have those credentials, you can authenticate and pull whichever tag you need. Check our [release notes][release_notes] to see the latest
+version.
+
+```bash
+# Manually pulling via Docker
+docker login registry.gitlab.com
+docker pull registry.gitlab.com/whylabs/langkit-container:latest
+```
+
+If you're deploying through Helm then see our [Helm
+instructions](https://github.com/whylabs/charts/tree/mainline/charts/langkit#credentials) to use these credentials to pull images.
+
 ## Zero Configuration
 
 If you want to use the container only for logging (no validation) then you can jump directly to testing it out with the
@@ -87,7 +102,7 @@ See [configure_container_python][configure_container_python] for an example that
 What goes into this Dockerfile can depend on what you're trying to do. The simplest Dockerfile would look like this.
 
 ```Dockerfile
-FROM registry.gitlab.com/whylabs/langkit-container:1.0.12
+FROM registry.gitlab.com/whylabs/langkit-container:1.0.13
 
 # Force the container to fail if the config is not present. Safeguard for messing up the
 # build in such a way that the config is not included correctly.
@@ -101,7 +116,7 @@ You're in full control of this Dockerfile and build and you can do basically any
 you might want to include some additional pip dependencies as well, which could look like this.
 
 ```Dockerfile
-FROM registry.gitlab.com/whylabs/langkit-container:1.0.12
+FROM registry.gitlab.com/whylabs/langkit-container:1.0.13
 
 # Force the container to fail if the config is not present. Safeguard for messing up the
 # build in such a way that the config is not included correctly.
@@ -168,3 +183,5 @@ languages, curl, or generic http then see the [api docs][api_docs] for request f
 [python-container-client]: https://pypi.org/project/whylogs-container-client/
 [helm_repo]: https://github.com/whylabs/charts
 [helm_llm_file]: https://github.com/whylabs/charts/tree/mainline/charts/langkit
+[release_notes]: https://github.com/whylabs/langkit-container-examples/blob/master/RELEASE_NOTES.md
+

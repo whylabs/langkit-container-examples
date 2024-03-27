@@ -21,7 +21,7 @@ def upper_case_char_count(input_name: str) -> MetricCreator:
 
         return SingleMetricResult(metrics=metrics)
 
-    return lambda: SingleMetric(name=f"{input_name}.upper_case_char_count", input_name=input_name, evaluate=udf)
+    return lambda: SingleMetric(name=f"{input_name}.upper_case_char_count", input_names=[input_name], evaluate=udf)
 
 
 def lower_case_char_count(input_name: str) -> MetricCreator:
@@ -37,7 +37,7 @@ def lower_case_char_count(input_name: str) -> MetricCreator:
 
         return SingleMetricResult(metrics=metrics)
 
-    return lambda: SingleMetric(name=f"{input_name}.lower_case_char_count", input_name=input_name, evaluate=udf)
+    return lambda: SingleMetric(name=f"{input_name}.lower_case_char_count", input_names=[input_name], evaluate=udf)
 
 
 langkit_config: Dict[str, LangkitOptions] = {

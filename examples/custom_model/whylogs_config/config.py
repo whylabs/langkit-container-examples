@@ -86,7 +86,7 @@ def custom_presidio_metric(input_name: str) -> MetricCreator:
         f"{input_name}.pii.credit_card",
         f"{input_name}.pii.anonymized",
     ]
-    return lambda: MultiMetric(names=metric_names, input_name=input_name, evaluate=udf, init=init, cache_assets=cache_assets)
+    return lambda: MultiMetric(names=metric_names, input_names=[input_name], evaluate=udf, init=init, cache_assets=cache_assets)
 
 
 class MyCallback(Callback):

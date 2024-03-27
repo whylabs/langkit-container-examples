@@ -1,3 +1,107 @@
+# 1.0.13 Release Notes
+
+## General Changes
+
+- Switch dependencies from s3 to pypi where they were s3. We were developing rapidly off of s3 to avoid polluting pypi with too many dev
+  versions.
+
+## New URL Regex Metric
+
+We added a new regex based url detection metric. We already had support for url detection via our pii metric, which uses Presidio, but there
+are a lot of false positives, especially when parsing code.
+
+```yaml
+id: my_id
+policy_version: 1
+schema_version: 0.0.1
+whylabs_dataset_id: default
+
+metrics:
+  - metric: prompt.regexes.url
+  - metric: response.regexes.url
+
+  # We also have support for presidio url detection but it tends to have a lot of false
+  # positives, especially when code snippets are involved.
+  -metric: prompt.pii
+    options:
+      entities:
+        - URL
+
+```
+
+## Evaluation Options
+
+The `/evaluate` api now accepts options that let you filter down the set of metrics that are run. To illustrate, the following example shows
+how you would use this feature to send the prompt before you have the response.
+
+```python
+prompt_request = LLMValidateRequest(
+    prompt="What is your name?",
+    dataset_id="model-134",
+)
+
+# Send the request with log=False so that the prompt isn't logged to WhyLabs.
+prompt_response = Evaluate.sync_detailed(client=client, body=prompt_request)
+
+full_request = LLMValidateRequest(
+    prompt="What is your name?",  # Send the prompt again
+    response="My name is Jeff",  # This was the LLM response
+    dataset_id="model-134",
+    # Tell the container to only compute the metrics that operate on the response or both the prompt and response,
+    # but omit the ones that only run on the prompt since they were already in the first request.
+    options=RunOptions(metric_filter=MetricFilterOptions(by_required_inputs=[["response"], ["prompt", "response"]])),
+)
+```
+
+## Policy Testing Endpoint
+
+This release contains a new endpoint, `/debug/evaluate` that allows you to rapidly experiment with policy options. You can supply a policy
+along with your request to specify which metrics and thresholds should be applied. This is only for experimenting and it will never end up
+flowing through to WhyLabs. It also doesn't perform quite as well as the normal `/evaluate`.
+
+```python
+from whylogs_container_client import AuthenticatedClient
+import json
+from whylogs_container_client.models.evaluation_result import EvaluationResult
+from whylogs_container_client.models.debug_llm_validate_request import DebugLLMValidateRequest
+import whylogs_container_client.api.debug.debug_evaluate as DebugEvaluate
+
+
+client = AuthenticatedClient(base_url="http://localhost:8000", token="password", prefix="", auth_header_name="X-API-Key")
+
+if __name__ == "__main__":
+    prompt_request = DebugLLMValidateRequest(
+        prompt="What is your name?",
+        dataset_id="model-134",
+        id="myid-prompt",
+        policy="""
+id: my_id
+policy_version: 1
+schema_version: 0.0.1
+whylabs_dataset_id: default
+
+metrics:
+  - metric: prompt.similarity.injection
+  - metric: prompt.stats.token_count
+  - metric: prompt.stats.char_count
+  - metric: prompt.topics
+    options:
+        topics:
+            - medical
+            - legal
+
+        """,
+    )
+
+    prompt_response = DebugEvaluate.sync_detailed(client=client, body=prompt_request)
+
+    if not isinstance(prompt_response.parsed, EvaluationResult):
+        raise Exception(f"Failed to validate data. Status code: {prompt_response.status_code}. {prompt_response.parsed}")
+
+    result = prompt_response.parsed.metrics
+    metrics = [it.to_dict() for it in result]
+    print(json.dumps(metrics))
+```
 # 1.0.12 Release Notes
 
 ## Default Policy Configuration
@@ -85,7 +189,6 @@ if __name__ == "__main__":
     result = wf.run(df)
     print(result.metrics.transpose())
 ```
-
 
 ## Multi Column Validators
 
