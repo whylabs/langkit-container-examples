@@ -85,3 +85,9 @@ def client() -> Generator[AC, None, None]:
     finally:
         proc.send_signal(signal.SIGINT)
         proc.wait()
+
+
+@pytest.fixture(scope="module")
+def client_external() -> Generator[AC, None, None]:
+    port = 8000
+    yield AC(base_url=f"http://localhost:{port}", token="password", prefix="", auth_header_name="X-API-Key")  # type: ignore[reportGeneralTypeIssues]

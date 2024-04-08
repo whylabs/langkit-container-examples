@@ -111,8 +111,8 @@ class MyCallback(Callback):
 langkit_config: Dict[str, LangkitOptions] = {
     "model-131": LangkitOptions(
         metrics=[
-            lib.prompt.toxicity.toxicity_score(),
-            lib.response.toxicity.toxicity_score(),
+            lib.prompt.sentiment.sentiment_score(),
+            lib.response.sentiment.sentiment_score(),
             custom_presidio_metric("prompt"),
         ],
         validators=[

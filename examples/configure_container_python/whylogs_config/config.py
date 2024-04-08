@@ -43,8 +43,8 @@ def lower_case_char_count(input_name: str) -> MetricCreator:
 langkit_config: Dict[str, LangkitOptions] = {
     "model-131": LangkitOptions(
         metrics=[
-            lib.prompt.toxicity.toxicity_score(),
-            lib.response.toxicity.toxicity_score(),
+            lib.prompt.toxicity.toxicity_score(onnx=False),
+            lib.response.toxicity.toxicity_score(onnx=False),
             upper_case_char_count("prompt"),
             upper_case_char_count("response"),
         ],

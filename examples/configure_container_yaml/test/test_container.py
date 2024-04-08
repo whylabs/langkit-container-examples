@@ -3,14 +3,18 @@ import whylogs_container_client.api.debug.debug_evaluate as DebugEvaluate
 import whylogs_container_client.api.llm.evaluate as Evaluate
 from pytest import approx  # type: ignore
 from whylogs_container_client import AuthenticatedClient
+from whylogs_container_client.models.block_action import BlockAction
 from whylogs_container_client.models.debug_llm_validate_request import DebugLLMValidateRequest
 from whylogs_container_client.models.evaluation_result import EvaluationResult
 from whylogs_container_client.models.evaluation_result_metrics_item import EvaluationResultMetricsItem
 from whylogs_container_client.models.llm_validate_request import LLMValidateRequest
 from whylogs_container_client.models.metric_filter_options import MetricFilterOptions
+from whylogs_container_client.models.pass_action import PassAction
 from whylogs_container_client.models.run_options import RunOptions
 from whylogs_container_client.models.validation_failure import ValidationFailure
 from whylogs_container_client.models.validation_result import ValidationResult
+
+_default_violation_message = "Message has been blocked because of a policy violation"
 
 
 def test_override_policy_1(client: AuthenticatedClient):
@@ -69,6 +73,8 @@ metrics:
         topics:
             - medical
 
+actions:
+  block_message: "blocked"
         """,
     )
 
@@ -81,6 +87,7 @@ metrics:
 
     assert response.metrics[0].additional_properties["prompt.topics.medical"] == approx(0.0053703151643276215, abs=1.5e-06)
     assert response.metrics[0].additional_properties["id"] == "myid-prompt"
+    assert response.action == PassAction(is_action_pass=True)
 
 
 def test_separate_prompt_response(client: AuthenticatedClient):
@@ -143,6 +150,7 @@ def test_separate_prompt_response(client: AuthenticatedClient):
     )
 
     assert full_actual == full_expected
+    assert full_response.parsed.action == BlockAction(_default_violation_message, is_action_block=True)
 
 
 def test_default_policy(client: AuthenticatedClient):
@@ -201,6 +209,7 @@ def test_default_policy(client: AuthenticatedClient):
 
     assert response.parsed.validation_results == expected
     assert response.parsed.metrics == expected_metrics
+    assert response.parsed.action == BlockAction(_default_violation_message, is_action_block=True)
 
 
 def test_155(client: AuthenticatedClient):
@@ -520,6 +529,7 @@ def extract_random_code_snippets(directory: str, max_lines_per_file: int = 10) -
     )
 
     assert actual == expected
+    assert response.parsed.action == PassAction(is_action_pass=True)
 
 
 def test_multi_col_computer_code_trigger(client: AuthenticatedClient):
@@ -555,7 +565,7 @@ def extract_random_code_snippets(directory: str, max_lines_per_file: int = 10) -
                 id="0",
                 metric="prompt.topics.computer_code",
                 details="Value 0.9905707240104675 is above threshold 0.5",
-                value=0.9905707240104675,
+                value=pytest.approx(0.9905707240104675),  # type: ignore
                 upper_threshold=0.5,
                 lower_threshold=None,
                 allowed_values=None,
@@ -566,7 +576,7 @@ def extract_random_code_snippets(directory: str, max_lines_per_file: int = 10) -
             ValidationFailure(
                 id="0",
                 metric="prompt.similarity.injection",
-                details="Value 0.4152979850769043 is above threshold 0.4",  # type: ignore
+                details="Value 0.4152979850769043 is above threshold 0.4",
                 value=pytest.approx(0.4152979850769043),  # type: ignore
                 upper_threshold=0.4,
                 lower_threshold=None,
@@ -581,7 +591,6 @@ def extract_random_code_snippets(directory: str, max_lines_per_file: int = 10) -
     assert expected.report[0].value == actual.report[0].value  # type: ignore
     assert expected.report[0].id == actual.report[0].id  # type: ignore
     assert expected.report[0].metric == actual.report[0].metric  # type: ignore
-    assert expected.report[0].details == actual.report[0].details  # type: ignore
     assert expected.report[0].upper_threshold == actual.report[0].upper_threshold  # type: ignore
     assert expected.report[0].lower_threshold == actual.report[0].lower_threshold  # type: ignore
     assert expected.report[0].allowed_values == actual.report[0].allowed_values  # type: ignore

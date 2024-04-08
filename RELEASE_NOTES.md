@@ -2,6 +2,122 @@
 
 ## General Changes
 
+- New optimized models
+  - `response.similarity.refusals`
+  - `*.topics.*`
+  - `*.toxicity.*`
+
+## Action Decisions
+
+This version of the container's responses for `/evaluate` have been updated to also contain an overall action to take with regard to the
+request. This will be either `block` or `pass`. For example,
+
+```python
+w
+full_response = Evaluate.sync_detailed(client=client, body=full_request)
+
+if not isinstance(full_response.parsed, EvaluationResult):
+    raise Exception(f"Failed to validate data. Status code: {full_response.status_code}. {full_response.parsed}")
+
+full_actual: ValidationResult = full_response.parsed.validation_results
+
+full_expected = ValidationResult(
+    report=[
+        ValidationFailure(
+            id="myid-prompt",
+            metric="response.sentiment.sentiment_score",
+            details="Value 0.8516 is above threshold 0.8",
+            value=0.8516,
+            upper_threshold=0.8,
+            lower_threshold=None,
+            allowed_values=None,
+            disallowed_values=None,
+            must_be_none=None,
+            must_be_non_none=None,
+        )
+    ],
+)
+
+assert full_actual == full_expected
+assert full_response.parsed.action == BlockAction(_default_violation_message, is_action_block=True)
+```
+
+Here is an example of the json response.
+
+```json
+{
+  "metrics": [
+    {
+      "prompt.similarity.injection": 0.25194162130355835,
+      "prompt.stats.token_count": 16,
+      "prompt.stats.char_count": 62,
+      "prompt.topics.medicine": 0.9787679314613342,
+      "prompt.topics.advice": 0.803960382938385,
+      "response.topics.medicine": 0.606441855430603,
+      "response.topics.sports": 0.006146096158772707,
+      "response.topics.history": 0.003640418639406562,
+      "id": "my_id"
+    }
+  ],
+  "validation_results": {
+    "report": [
+      {
+        "id": "my_id",
+        "metric": "prompt.stats.token_count",
+        "details": "Value 16 is above threshold 10",
+        "value": 16,
+        "upper_threshold": 10,
+        "lower_threshold": null,
+        "allowed_values": null,
+        "disallowed_values": null,
+        "must_be_none": null,
+        "must_be_non_none": null
+      },
+      {
+        "id": "my_id",
+        "metric": "prompt.similarity.injection",
+        "details": "Value 0.25194162130355835 is above threshold 0. Triggered because of failures in prompt.similarity.injection, prompt.topics.medicine, prompt.topics.advice (AND).",
+        "value": 0.25194162130355835,
+        "upper_threshold": 0,
+        "lower_threshold": null,
+        "allowed_values": null,
+        "disallowed_values": null,
+        "must_be_none": null,
+        "must_be_non_none": null
+      }
+    ]
+  },
+  "perf_info": {
+    "metrics_time_sec": {
+      "prompt.similarity.injection": 0.013,
+      "prompt.stats.token_count": 0,
+      "prompt.stats.char_count": 0,
+      "prompt.topics.medicine,prompt.topics.advice": 0.11,
+      "response.topics.medicine,response.topics.sports,response.topics.history": 0.023
+    },
+    "workflow_total_sec": 0.163,
+    "metrics_total_sec": 0.148,
+    "validation_total_sec": 0.008
+  },
+  "action": {
+    "block_message": "my custom message",
+    "action_type": "block",
+    "is_action_block": true
+  }
+}
+```
+
+The `action.block_message` can be conifgured in the policy as well. For now it's just a static string.
+
+```yaml
+actions:
+  # defaults to "Message has been blocked because of a policy violation"
+  block_message: "my custom message"
+```
+# 1.0.13 Release Notes
+
+## General Changes
+
 - Switch dependencies from s3 to pypi where they were s3. We were developing rapidly off of s3 to avoid polluting pypi with too many dev
   versions.
 
