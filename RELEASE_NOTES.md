@@ -1,3 +1,62 @@
+# 1.0.15 Release Notes
+
+## General Changes
+
+- More granular performance reports when `perf_info=True`. This now separates out common steps that were previously included as the first
+  metric that happened to require them.
+- New endpoint `/policy` that returns a json schema for the policy yaml so you can programatically validate the yaml policies.
+
+## New RAG Context and Metrics
+
+The `/evaluate` and `/log/llm` endpoints were updated to take in an optional RAG context that can be used with the new
+`prompt.similarity.context` metric.
+
+```python
+from whylogs_container_client.models.debug_llm_validate_request import DebugLLMValidateRequest
+from whylogs_container_client.models.input_context import InputContext
+from whylogs_container_client.models.input_context_item import InputContextItem
+from whylogs_container_client.models.input_context_item_metadata import InputContextItemMetadata
+import whylogs_container_client.api.debug.debug_evaluate as DebugEvaluate
+
+
+prompt_request = DebugLLMValidateRequest(
+    prompt="What is the talest mountain in the world?",
+    response="Mount Everest is the tallest mountain in the world.",
+    context=InputContext(
+        entries=[
+            InputContextItem(
+                content="Mount Everest is the tallest mountain in the world."
+            )
+        ]
+    ),
+    dataset_id="model-1500",
+    id="mountain-prompt",
+    policy="""
+id: my_id
+policy_version: 1
+schema_version: 0.0.1
+whylabs_dataset_id: default
+
+metrics:
+- metric: prompt.similarity.context
+- metric: response.similarity.context
+    """,
+)
+
+prompt_response = DebugEvaluate.sync_detailed(client=client_external, body=prompt_request)
+response = prompt_response.parsed
+
+assert response.metrics[0].additional_properties["prompt.similarity.context"] == 0.5
+assert response.metrics[0].additional_properties["response.similarity.context"] == 1
+```
+
+## Tracing Support
+
+This has simple tracing support for the WhyLabs platform. Traces (using open telemetry) will be sent to WhyLabs for all requests that have
+validation failures. Traces (soon to be generally available) will be viewable by logging into the WhyLabs website and navigating to the
+Trace section. We'll announce details soon. Tracing can be disabled by setting the environment variable `DISABLE_TRACING` to `False`.
+
+![WhyLabs Platform Tracing Page](https://github.com/whylabs/langkit-container-examples/assets/1233709/4c5221c0-ccb3-4169-a6b5-5b35d8143967)
 # 1.0.14 Release Notes
 
 ## General Changes

@@ -42,7 +42,7 @@ The `make run` command will use Docker to launch an instance of the langkit cont
 Check out the `tests` folder for a full example that uses the python client to make requests. If you prefer using other languages, curl, or
 generic http then see the [api docs](https://whylabs.github.io/langkit-container-examples/api.html) for request formats.
 
-- [validate api](https://whylabs.github.io/langkit-container-examples/api.html#tag/llm/operation/validate_llm)
-- [log api](https://whylabs.github.io/langkit-container-examples/api.html#tag/llm/operation/log_llm)
-- [bulk log api](https://whylabs.github.io/langkit-container-examples/api.html#tag/profile/operation/log)
+- [validate api](https://whylabs.github.io/whylogs-container-python-docs/whylogs-container-python.html#operation/evaluate)
+- [log api] (https://whylabs.github.io/whylogs-container-python-docs/whylogs-container-python.html#operation/log_llm)
+- [bulk log api](https://whylabs.github.io/whylogs-container-python-docs/whylogs-container-python.html#operation/log)
 

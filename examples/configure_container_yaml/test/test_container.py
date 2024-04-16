@@ -7,6 +7,9 @@ from whylogs_container_client.models.block_action import BlockAction
 from whylogs_container_client.models.debug_llm_validate_request import DebugLLMValidateRequest
 from whylogs_container_client.models.evaluation_result import EvaluationResult
 from whylogs_container_client.models.evaluation_result_metrics_item import EvaluationResultMetricsItem
+from whylogs_container_client.models.input_context import InputContext
+from whylogs_container_client.models.input_context_item import InputContextItem
+from whylogs_container_client.models.input_context_item_metadata import InputContextItemMetadata
 from whylogs_container_client.models.llm_validate_request import LLMValidateRequest
 from whylogs_container_client.models.metric_filter_options import MetricFilterOptions
 from whylogs_container_client.models.pass_action import PassAction
@@ -87,6 +90,80 @@ actions:
 
     assert response.metrics[0].additional_properties["prompt.topics.medical"] == approx(0.0053703151643276215, abs=1.5e-06)
     assert response.metrics[0].additional_properties["id"] == "myid-prompt"
+    assert response.action == PassAction(is_action_pass=True)
+
+
+def test_rag_context_prompt(client: AuthenticatedClient):
+    prompt_request = DebugLLMValidateRequest(
+        prompt="What is the talest mountain in the world?",
+        response="Mount Everest is the tallest mountain in the world.",
+        context=InputContext(
+            entries=[
+                InputContextItem(
+                    content="Mount Everest is the tallest mountain in the world.",
+                    metadata=InputContextItemMetadata.from_dict({"source": "wikipedia"}),
+                )
+            ]
+        ),
+        dataset_id="model-1500",
+        id="mountain-prompt",
+        policy="""
+id: my_id
+policy_version: 1
+schema_version: 0.0.1
+whylabs_dataset_id: default
+
+metrics:
+  - metric: prompt.similarity.context
+        """,
+    )
+
+    prompt_response = DebugEvaluate.sync_detailed(client=client, body=prompt_request)
+
+    if not isinstance(prompt_response.parsed, EvaluationResult):
+        raise Exception(f"Failed to validate data. Status code: {prompt_response.status_code}. {prompt_response.parsed}")
+
+    response = prompt_response.parsed
+
+    assert response.metrics[0].additional_properties["prompt.similarity.context"] > 0.5
+    assert response.metrics[0].additional_properties["id"] == "mountain-prompt"
+    assert response.action == PassAction(is_action_pass=True)
+
+
+def test_rag_context_response(client: AuthenticatedClient):
+    prompt_request = DebugLLMValidateRequest(
+        prompt="What is the talest mountain in the world?",
+        response="Mount Everest is the tallest mountain in the world.",
+        context=InputContext(
+            entries=[
+                InputContextItem(
+                    content="Mount Everest is the tallest mountain in the world.",
+                    metadata=InputContextItemMetadata.from_dict({"source": "wikipedia"}),
+                )
+            ]
+        ),
+        dataset_id="model-1500",
+        id="mountain-prompt",
+        policy="""
+id: my_id
+policy_version: 1
+schema_version: 0.0.1
+whylabs_dataset_id: default
+
+metrics:
+  - metric: response.similarity.context
+        """,
+    )
+
+    prompt_response = DebugEvaluate.sync_detailed(client=client, body=prompt_request)
+
+    if not isinstance(prompt_response.parsed, EvaluationResult):
+        raise Exception(f"Failed to validate data. Status code: {prompt_response.status_code}. {prompt_response.parsed}")
+
+    response = prompt_response.parsed
+
+    assert response.metrics[0].additional_properties["response.similarity.context"] > 0.5
+    assert response.metrics[0].additional_properties["id"] == "mountain-prompt"
     assert response.action == PassAction(is_action_pass=True)
 
 
