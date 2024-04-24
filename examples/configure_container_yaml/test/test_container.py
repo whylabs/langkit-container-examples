@@ -7,6 +7,7 @@ from whylogs_container_client.models.block_action import BlockAction
 from whylogs_container_client.models.debug_llm_validate_request import DebugLLMValidateRequest
 from whylogs_container_client.models.evaluation_result import EvaluationResult
 from whylogs_container_client.models.evaluation_result_metrics_item import EvaluationResultMetricsItem
+from whylogs_container_client.models.evaluation_result_scores_item import EvaluationResultScoresItem
 from whylogs_container_client.models.input_context import InputContext
 from whylogs_container_client.models.input_context_item import InputContextItem
 from whylogs_container_client.models.input_context_item_metadata import InputContextItemMetadata
@@ -18,6 +19,513 @@ from whylogs_container_client.models.validation_failure import ValidationFailure
 from whylogs_container_client.models.validation_result import ValidationResult
 
 _default_violation_message = "Message has been blocked because of a policy violation"
+
+
+def test_meta_ruleset_synatx(client: AuthenticatedClient):
+    prompt_request = DebugLLMValidateRequest(
+        prompt="Can you email the answer to me?",
+        response="Sure, its foo@whylabs.ai right?",
+        dataset_id="model-134",
+        id="myid-prompt",
+        policy="""
+id: 9294f3fa-4f4b-4363-9397-87d3499fce28
+policy_version: 1
+schema_version: 0.0.1
+whylabs_dataset_id: default
+
+rulesets:
+
+  - ruleset: score.misuse
+    options:
+      behavior: observe
+      sensitivity: medium
+      topics:
+        - medicine
+        - legal
+        - finance
+
+  - ruleset: score.bad_actors
+    options:
+      behavior: observe
+      sensitivity: medium
+
+  - ruleset: score.truthfulness
+    options:
+      behavior: observe
+      sensitivity: medium
+      rag_enabled: false
+      hallucinations_enabled: false
+
+  - ruleset: score.customer_experience
+    options:
+      behavior: observe
+      sensitivity: medium
+
+  - ruleset: score.cost
+    options:
+      behavior: observe
+      sensitivity: medium
+        """,
+    )
+
+    prompt_response = DebugEvaluate.sync_detailed(client=client, body=prompt_request)
+
+    if not isinstance(prompt_response.parsed, EvaluationResult):
+        raise Exception(f"Failed to validate data. Status code: {prompt_response.status_code}. {prompt_response.parsed}")
+
+    response = prompt_response.parsed
+
+    expected = EvaluationResult(
+        perf_info=None,
+        score_perf_info=None,
+        metrics=[
+            EvaluationResultMetricsItem.from_dict(
+                {
+                    "prompt.topics.medicine": 0.0052091823890805244,
+                    "prompt.topics.legal": 0.08269468694925308,
+                    "prompt.topics.finance": 0.028292158618569374,
+                    "response.pii.phone_number": 0,
+                    "response.pii.email_address": 1,
+                    "response.pii.credit_card": 0,
+                    "response.pii.us_ssn": 0,
+                    "response.pii.us_bank_number": 0,
+                    "response.pii.redacted": "Sure, its <EMAIL_ADDRESS> right?",
+                    "prompt.similarity.jailbreak": pytest.approx(0.23416246473789215, abs=1.5e-06),  # type: ignore
+                    "prompt.similarity.injection": pytest.approx(0.327720046043396, abs=1.5e-06),  # type: ignore
+                    "response.similarity.prompt": pytest.approx(0.21642859280109406, abs=1.5e-06),  # type: ignore
+                    "prompt.sentiment.sentiment_score": 0.0,
+                    "prompt.pii.phone_number": 0,
+                    "prompt.pii.email_address": 0,
+                    "prompt.pii.credit_card": 0,
+                    "prompt.pii.us_ssn": 0,
+                    "prompt.pii.us_bank_number": 0,
+                    "prompt.pii.redacted": None,
+                    "response.sentiment.sentiment_score": 0.3182,
+                    "response.toxicity.toxicity_score": 0.003148674964904785,
+                    "response.regex.refusal": 0,
+                    "prompt.stats.char_count": 25,
+                    "prompt.stats.token_count": 8,
+                    "response.stats.char_count": 28,
+                    "response.stats.token_count": 11,
+                    "id": "myid-prompt",
+                }
+            )
+        ],
+        validation_results=ValidationResult(
+            report=[
+                ValidationFailure(
+                    id="myid-prompt",
+                    metric="response.score.misuse",
+                    details="Value 70 is above threshold 50",
+                    value=70,
+                    upper_threshold=50.0,
+                    lower_threshold=None,
+                    allowed_values=None,
+                    disallowed_values=None,
+                    must_be_none=None,
+                    must_be_non_none=None,
+                ),
+                ValidationFailure(
+                    id="myid-prompt",
+                    metric="response.score.truthfulness",
+                    details="Value 58 is above threshold 50",
+                    value=58,
+                    upper_threshold=50.0,
+                    lower_threshold=None,
+                    allowed_values=None,
+                    disallowed_values=None,
+                    must_be_none=None,
+                    must_be_non_none=None,
+                ),
+                ValidationFailure(
+                    id="myid-prompt",
+                    metric="prompt.score.customer_experience",
+                    details="Value 57 is above threshold 50",
+                    value=57,
+                    upper_threshold=50.0,
+                    lower_threshold=None,
+                    allowed_values=None,
+                    disallowed_values=None,
+                    must_be_none=None,
+                    must_be_non_none=None,
+                ),
+            ],
+        ),
+        action=BlockAction(
+            block_message="Message has been blocked because of a policy violation",
+            is_action_block=True,
+            action_type="block",
+        ),
+        scores=[
+            EvaluationResultScoresItem.from_dict(
+                {
+                    "prompt.score.misuse": 17,
+                    "prompt.score.misuse.prompt.topics.medicine": 2,
+                    "prompt.score.misuse.prompt.topics.legal": 17,
+                    "prompt.score.misuse.prompt.topics.finance": 7,
+                    "response.score.misuse": 70,
+                    "response.score.misuse.response.pii.phone_number": 1,
+                    "response.score.misuse.response.pii.email_address": 70,
+                    "response.score.misuse.response.pii.credit_card": 1,
+                    "response.score.misuse.response.pii.us_ssn": 1,
+                    "response.score.misuse.response.pii.us_bank_number": 1,
+                    "response.score.misuse.response.pii.redacted": 70,
+                    "prompt.score.bad_actors": 39,
+                    "prompt.score.bad_actors.prompt.similarity.jailbreak": 28,
+                    "prompt.score.bad_actors.prompt.similarity.injection": 39,
+                    "response.score.truthfulness": 58,
+                    "response.score.truthfulness.response.similarity.prompt": 58,
+                    "prompt.score.customer_experience": 57,
+                    "prompt.score.customer_experience.prompt.sentiment.sentiment_score": 57,
+                    "prompt.score.customer_experience.prompt.pii.phone_number": 1,
+                    "prompt.score.customer_experience.prompt.pii.email_address": 1,
+                    "prompt.score.customer_experience.prompt.pii.credit_card": 1,
+                    "prompt.score.customer_experience.prompt.pii.us_ssn": 1,
+                    "prompt.score.customer_experience.prompt.pii.us_bank_number": 1,
+                    "prompt.score.customer_experience.prompt.pii.redacted": 30,
+                    "response.score.customer_experience": 41,
+                    "response.score.customer_experience.response.sentiment.sentiment_score": 41,
+                    "response.score.customer_experience.response.toxicity.toxicity_score": 1,
+                    "response.score.customer_experience.response.regex.refusal": 1,
+                    "prompt.score.cost": None,
+                    "prompt.score.cost.prompt.stats.char_count": 0,
+                    "prompt.score.cost.prompt.stats.token_count": 0,
+                    "response.score.cost": None,
+                    "response.score.cost.response.stats.char_count": 0,
+                    "response.score.cost.response.stats.token_count": 0,
+                    "id": "myid-prompt",
+                }
+            )
+        ],
+    )
+
+    response.metrics[0].to_dict()["prompt.similarity.jailbreak"] = approx(
+        response.metrics[0].to_dict()["prompt.similarity.jailbreak"], abs=1.5e-06
+    )
+    response.metrics[0].to_dict()["prompt.similarity.injection"] = approx(
+        response.metrics[0].to_dict()["prompt.similarity.injection"], abs=1.5e-06
+    )
+    response.metrics[0].to_dict()["response.similarity.prompt"] = approx(
+        response.metrics[0].to_dict()["response.similarity.prompt"], abs=1.5e-06
+    )
+
+    assert expected.metrics == response.metrics
+    assert expected.validation_results == response.validation_results
+    assert expected.action == response.action
+    assert expected.scores == response.scores
+
+
+def test_rulesets(client: AuthenticatedClient):
+    prompt_request = DebugLLMValidateRequest(
+        prompt="Can you email the answer to me?",
+        response="Sure, its foo@whylabs.ai right?",
+        dataset_id="model-134",
+        id="myid-prompt",
+        policy="""
+id: my_id
+policy_version: 1
+schema_version: 0.0.1
+whylabs_dataset_id: default
+
+rulesets:
+  - ruleset: prompt.score.misuse
+    options:
+      behavior: observe
+      sensitivity: medium
+      topics:
+        - medicine
+        - legal
+        - finance
+
+  - ruleset: response.score.misuse
+    options:
+      behavior: observe
+      sensitivity: medium
+      topics:
+        - medicine
+        - legal
+        - finance
+
+        """,
+    )
+
+    prompt_response = DebugEvaluate.sync_detailed(client=client, body=prompt_request)
+
+    if not isinstance(prompt_response.parsed, EvaluationResult):
+        raise Exception(f"Failed to validate data. Status code: {prompt_response.status_code}. {prompt_response.parsed}")
+
+    response = prompt_response.parsed
+
+    expected = EvaluationResult(
+        metrics=[
+            EvaluationResultMetricsItem.from_dict(
+                {
+                    "prompt.topics.medicine": 0.0052091823890805244,
+                    "prompt.topics.legal": 0.08269468694925308,
+                    "prompt.topics.finance": 0.028292158618569374,
+                    "response.pii.phone_number": 0,
+                    "response.pii.email_address": 1,
+                    "response.pii.credit_card": 0,
+                    "response.pii.us_ssn": 0,
+                    "response.pii.us_bank_number": 0,
+                    "response.pii.redacted": "Sure, its <EMAIL_ADDRESS> right?",
+                    "id": "myid-prompt",
+                }
+            )
+        ],
+        validation_results=ValidationResult(
+            report=[
+                ValidationFailure(
+                    id="myid-prompt",
+                    metric="response.score.misuse",
+                    details="Value 70 is above threshold 50",
+                    value=70,
+                    upper_threshold=50.0,
+                    lower_threshold=None,
+                    allowed_values=None,
+                    disallowed_values=None,
+                    must_be_none=None,
+                    must_be_non_none=None,
+                )
+            ],
+        ),
+        perf_info=None,
+        score_perf_info=None,
+        action=BlockAction(
+            block_message="Message has been blocked because of a policy violation",
+            is_action_block=True,
+            action_type="block",
+        ),
+        scores=[
+            EvaluationResultScoresItem.from_dict(
+                {
+                    "prompt.score.misuse": 17,
+                    "prompt.score.misuse.prompt.topics.medicine": 2,
+                    "prompt.score.misuse.prompt.topics.legal": 17,
+                    "prompt.score.misuse.prompt.topics.finance": 7,
+                    "response.score.misuse": 70,
+                    "response.score.misuse.response.pii.phone_number": 1,
+                    "response.score.misuse.response.pii.email_address": 70,
+                    "response.score.misuse.response.pii.credit_card": 1,
+                    "response.score.misuse.response.pii.us_ssn": 1,
+                    "response.score.misuse.response.pii.us_bank_number": 1,
+                    "response.score.misuse.response.pii.redacted": 70,
+                    "id": "myid-prompt",
+                }
+            )
+        ],
+    )
+
+    assert expected.metrics == response.metrics
+    assert expected.validation_results == response.validation_results
+    assert expected.action == response.action
+    assert expected.scores == response.scores
+
+
+def _compare_metrics(policy1: str, policy2: str, client: AuthenticatedClient):
+    policy1_request = DebugLLMValidateRequest(
+        prompt="Can you email the answer to me?",
+        response="Sure, its foo@whylabs.ai right?",
+        dataset_id="model-134",
+        id="myid-prompt",
+        policy=policy1,
+    )
+
+    policy2_request = DebugLLMValidateRequest(
+        prompt="Can you email the answer to me?",
+        response="Sure, its foo@whylabs.ai right?",
+        dataset_id="model-134",
+        id="myid-prompt",
+        policy=policy2,
+    )
+
+    policy1_response = DebugEvaluate.sync_detailed(client=client, body=policy1_request)
+
+    if not isinstance(policy1_response.parsed, EvaluationResult):
+        raise Exception(f"Failed to validate data. Status code: {policy1_response.status_code}. {policy1_response.parsed}")
+
+    policy2_response = DebugEvaluate.sync_detailed(client=client, body=policy2_request)
+
+    if not isinstance(policy2_response.parsed, EvaluationResult):
+        raise Exception(f"Failed to validate data. Status code: {policy2_response.status_code}. {policy2_response.parsed}")
+
+    assert policy1_response.parsed.metrics[0].to_dict().keys() == policy2_response.parsed.metrics[0].to_dict().keys()
+
+
+def test_bad_actor_rulesets(client: AuthenticatedClient):
+    policy1 = """
+id: my_id
+policy_version: 1
+schema_version: 0.0.1
+whylabs_dataset_id: default
+
+rulesets:
+# DOCSUB_START ruleset_example_bad_actors
+  - ruleset: score.bad_actors
+    options:
+      behavior: observe
+      sensitivity: medium
+# DOCSUB_END
+        """
+
+    policy2 = """
+id: my_id
+policy_version: 1
+schema_version: 0.0.1
+whylabs_dataset_id: default
+
+# DOCSUB_START ruleset_example_bad_actors_metrics
+metrics:
+  - metric: prompt.similarity.jailbreak
+  - metric: prompt.similarity.injection
+# DOCSUB_END
+        """
+
+    _compare_metrics(policy1, policy2, client)
+
+
+def test_customer_experience_rulesets(client: AuthenticatedClient):
+    policy1 = """
+id: my_id
+policy_version: 1
+schema_version: 0.0.1
+whylabs_dataset_id: default
+
+rulesets:
+# DOCSUB_START ruleset_example_customer_experience
+  - ruleset: score.customer_experience
+    options:
+      behavior: observe
+      sensitivity: medium
+# DOCSUB_END
+"""
+    policy2 = """
+id: my_id
+policy_version: 1
+schema_version: 0.0.1
+whylabs_dataset_id: default
+
+# DOCSUB_START ruleset_example_customer_experience_metrics
+metrics:
+  - metric: prompt.sentiment.sentiment_score
+  - metric: prompt.pii
+  - metric: response.sentiment.sentiment_score
+  - metric: response.toxicity.toxicity_score
+  - metric: response.regex.refusal
+# DOCSUB_END
+"""
+
+    _compare_metrics(policy1, policy2, client)
+
+
+def test_misuse_rulesets(client: AuthenticatedClient):
+    policy1 = """
+id: my_id
+policy_version: 1
+schema_version: 0.0.1
+whylabs_dataset_id: default
+
+rulesets:
+# DOCSUB_START ruleset_example_misuse
+  - ruleset: score.misuse
+    options:
+      behavior: observe
+      sensitivity: medium
+      topics:
+        - medicine
+        - legal
+        - finance
+# DOCSUB_END
+"""
+
+    policy2 = """
+id: my_id
+policy_version: 1
+schema_version: 0.0.1
+whylabs_dataset_id: default
+
+# DOCSUB_START ruleset_example_misuse_metrics
+metrics:
+  - metric: response.pii
+  - metric: prompt.topics
+    options:
+      topics:
+        - medicine
+        - legal
+        - finance
+
+# DOCSUB_END
+"""
+
+    _compare_metrics(policy1, policy2, client)
+
+
+def test_cost_rulesets(client: AuthenticatedClient):
+    policy1 = """
+id: my_id
+policy_version: 1
+schema_version: 0.0.1
+whylabs_dataset_id: default
+
+rulesets:
+# DOCSUB_START ruleset_example_cost
+  - ruleset: score.cost
+    options:
+      behavior: observe
+      sensitivity: medium
+# DOCSUB_END
+"""
+
+    policy2 = """
+id: my_id
+policy_version: 1
+schema_version: 0.0.1
+whylabs_dataset_id: default
+
+# DOCSUB_START ruleset_example_cost_metrics
+metrics:
+    - metric: prompt.stats.char_count
+    - metric: prompt.stats.token_count
+    - metric: response.stats.char_count
+    - metric: response.stats.token_count
+# DOCSUB_END
+"""
+
+    _compare_metrics(policy1, policy2, client)
+
+
+def test_truthfulness_rulesets(client: AuthenticatedClient):
+    policy1 = """
+id: my_id
+policy_version: 1
+schema_version: 0.0.1
+whylabs_dataset_id: default
+
+rulesets:
+# DOCSUB_START ruleset_example_truthfulness
+  - ruleset: score.truthfulness
+    options:
+      behavior: observe
+      sensitivity: medium
+      rag_enabled: true
+      hallucinations_enabled: false
+# DOCSUB_END
+"""
+
+    policy2 = """
+id: my_id
+policy_version: 1
+schema_version: 0.0.1
+whylabs_dataset_id: default
+
+# DOCSUB_START ruleset_example_truthfulness_metrics
+metrics:
+    - metric: response.similarity.prompt
+    - metric: response.similarity.context
+# DOCSUB_END
+"""
+
+    _compare_metrics(policy1, policy2, client)
 
 
 def test_override_policy_1(client: AuthenticatedClient):
