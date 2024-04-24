@@ -1,3 +1,187 @@
+# 1.0.16 Release Notes
+
+## General Changes
+
+- Removed the `/validate/llm` endpoint. It was deprecated for a while and the `/evaluate` endpoint can do everything it was doing and more.
+
+## New Refusal Metric
+
+A new pattern based refusal metric is available. This checks the response for known refusal phrases.
+
+```yaml
+id: 9294f3fa-4f4b-4363-9397-87d3499fce28
+policy_version: 1
+schema_version: 0.0.1
+whylabs_dataset_id: model-177
+
+metrics:
+  - metric: response.regex.refusal
+```
+
+## Policy Syncing with WhyLabs
+
+The container can now pull down policy files from the platform on a cadence, similar to how the s3 sync functionality works. This is
+controlled with new environment variables.
+
+```bash
+# sync with the platform policies every 15 minutes
+AUTO_PULL_WHYLABS_POLICY_MODEL_IDS=model-177,model-178
+CONFIG_SYNC_CADENCE=M
+CONFIG_SYNC_INTERVAL=15
+```
+
+These policies can be written via our [public API](https://api.whylabsapp.com/swagger-ui#/Policy/AddPolicy) or our platform UI.
+
+## Support for Rulesets
+
+Policies can now have rulesets that internally map to metrics. These have a score based interface and are intended to simplify the
+validation process by putting a collection of metrics behind logical categories. These are intended to be used instead of metrics, rather
+than along side them.
+
+```
+id: 9294f3fa-4f4b-4363-9397-87d3499fce28
+policy_version: 1
+schema_version: 0.0.1
+whylabs_dataset_id: model-177
+
+rulesets:
+  - ruleset: score.misuse
+    options:
+      behavior: observe
+      sensitivity: medium
+      topics:
+        - medicine
+        - legal
+        - finance
+
+  - ruleset: score.bad_actors
+    options:
+      behavior: observe
+      sensitivity: medium
+
+  - ruleset: score.truthfulness
+    options:
+      behavior: observe
+      sensitivity: medium
+      rag_enabled: false
+      hallucinations_enabled: false
+
+  - ruleset: score.customer_experience
+    options:
+      behavior: observe
+      sensitivity: medium
+
+  - ruleset: score.cost
+    options:
+      behavior: observe
+      sensitivity: medium
+```
+
+## Support for Scores
+
+When using Rulesets in your policy files, you'll now have normalized risk scores in addition to metric values.
+
+```json
+{
+  "metrics": [
+    {
+      // ...
+    }
+  ],
+  "validation_results": {
+    "report": [
+      {
+        "id": "my_id",
+        "metric": "response.score.misuse",
+        "details": "Value 30 is below threshold 50",
+        "value": 30,
+        "upper_threshold": null,
+        "lower_threshold": 50,
+        "allowed_values": null,
+        "disallowed_values": null,
+        "must_be_none": null,
+        "must_be_non_none": null
+      },
+      {
+        "id": "my_id",
+        "metric": "prompt.score.bad_actors",
+        "details": "Value 43 is below threshold 50",
+        "value": 43,
+        "upper_threshold": null,
+        "lower_threshold": 50,
+        "allowed_values": null,
+        "disallowed_values": null,
+        "must_be_none": null,
+        "must_be_non_none": null
+      },
+      {
+        "id": "my_id",
+        "metric": "response.score.customer_experience",
+        "details": "Value 28 is below threshold 50",
+        "value": 28,
+        "upper_threshold": null,
+        "lower_threshold": 50,
+        "allowed_values": null,
+        "disallowed_values": null,
+        "must_be_none": null,
+        "must_be_non_none": null
+      }
+    ]
+  },
+  "action": {
+    "block_message": "Message has been blocked because of a policy violation",
+    "action_type": "block",
+    "is_action_block": true
+  },
+  "scores": [
+    {
+      "prompt.score.misuse": 95,
+      "response.score.misuse": 30,
+      "prompt.score.bad_actors": 43,
+      "response.score.truthfulness": 79,
+      "prompt.score.customer_experience": 57,
+      "response.score.customer_experience": 28
+    }
+  ]
+}
+```
+
+Rulesets come along with validation thresholds (detrmined by the `sensitivity` option). Higher numbers are worse and validation failures for
+these scores appear in the same format as with custom metric validations.
+
+## Support for Customizing Similarity Models
+
+Select metrics now support customizing the Sentence Transformers model that is used under the hood.
+
+```yaml
+id: 9294f3fa-4f4b-4363-9397-87d3499fce28
+policy_version: 1
+schema_version: 0.0.1
+whylabs_dataset_id: multi-lingual
+
+metrics:
+  - metric: prompt.similarity.jailbreak
+    options:
+      embedding:
+        name: paraphrase-multilingual-MiniLM-L12-v2
+        revision: bf3bf13ab40c3157080a7ab344c831b9ad18b5eb
+
+  - metric: response.similarity.refusal
+    options:
+      embedding:
+        name: paraphrase-multilingual-MiniLM-L12-v2
+        revision: bf3bf13ab40c3157080a7ab344c831b9ad18b5eb
+```
+
+The metrics that support this are the following:
+
+```
+  - metric: prompt.similarity.jailbreak
+  - metric: response.similarity.refusal
+  - metric: prompt.similarity.context
+  - metric: response.similarity.prompt
+  - metric: response.similarity.context
+```
 # 1.0.15 Release Notes
 
 ## General Changes
