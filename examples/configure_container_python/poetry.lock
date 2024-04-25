@@ -1141,13 +1141,13 @@ viz = ["Pillow (>=9.2.0,<10.0.0)", "ipython", "numpy", "numpy (>=1.23.2)", "pyba
 
 [[package]]
 name = "whylogs-container-client"
-version = "1.0.15"
+version = "1.0.16"
 description = "A client library for accessing the whylogs python container"
 optional = false
 python-versions = "<4.0,>=3.8"
 files = [
-    {file = "whylogs_container_client-1.0.15-py3-none-any.whl", hash = "sha256:04afaae114fa81294a1747829593e0188c45caec18ed0d881a234b90032d46f8"},
-    {file = "whylogs_container_client-1.0.15.tar.gz", hash = "sha256:4f073fd0f69a9e9cab37ab4f032fc23416cb252bd99bdc0de2a7b5ec63ecca31"},
+    {file = "whylogs_container_client-1.0.16-py3-none-any.whl", hash = "sha256:48cae3827db3cd0f2f51c73c541bc28d9b235c4c6aa760bc836a2ac430b2f5c7"},
+    {file = "whylogs_container_client-1.0.16.tar.gz", hash = "sha256:bad035557509c952d9c8686296de490924aac7e3406b9564d5a971f32a5580c0"},
 ]
 
 [package.dependencies]
@@ -1237,4 +1237,4 @@ torch = "2.1.2"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "967073ad3712f80a3ff2087345c899493ba8425f558c050ea260033cd401694a"
+content-hash = "cd0e78a2b642c757e1a30ba06cd2c453bee496e14aa34477f217272c7e4e890c"

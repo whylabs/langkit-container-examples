@@ -4,6 +4,34 @@
 
 - Removed the `/validate/llm` endpoint. It was deprecated for a while and the `/evaluate` endpoint can do everything it was doing and more.
 
+## Validation Levels
+
+This adds the ability to mark a validation as either block/flag. By default, validations have the block flag, which mean that the container
+will use them to determine that a request should be blocked in the `action` section of the response. Validation failures that have the flag
+`flag` won't be considered for block decisions, but will still appear in the validation report with that flag attached to them.
+
+These can be set in the policy as follows.
+
+```yaml
+id: my_id
+policy_version: 1
+schema_version: 0.0.1
+whylabs_dataset_id: default
+
+metrics:
+  - metric: prompt.topics
+    options:
+      topics:
+        - medical
+
+validators:
+  - validator: constraint
+    options:
+      target_metric: prompt.topics.medical
+      upper_threshold: 0
+      failure_level: flag # defaults to block, the previous behavior
+```
+
 ## New Refusal Metric
 
 A new pattern based refusal metric is available. This checks the response for known refusal phrases.

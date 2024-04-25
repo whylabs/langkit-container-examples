@@ -16,6 +16,7 @@ from whylogs_container_client.models.metric_filter_options import MetricFilterOp
 from whylogs_container_client.models.pass_action import PassAction
 from whylogs_container_client.models.run_options import RunOptions
 from whylogs_container_client.models.validation_failure import ValidationFailure
+from whylogs_container_client.models.validation_failure_failure_level import ValidationFailureFailureLevel
 from whylogs_container_client.models.validation_result import ValidationResult
 
 _default_violation_message = "Message has been blocked because of a policy violation"
@@ -37,7 +38,7 @@ rulesets:
 
   - ruleset: score.misuse
     options:
-      behavior: observe
+      behavior: block
       sensitivity: medium
       topics:
         - medicine
@@ -46,24 +47,24 @@ rulesets:
 
   - ruleset: score.bad_actors
     options:
-      behavior: observe
+      behavior: block
       sensitivity: medium
 
   - ruleset: score.truthfulness
     options:
-      behavior: observe
+      behavior: block
       sensitivity: medium
       rag_enabled: false
       hallucinations_enabled: false
 
   - ruleset: score.customer_experience
     options:
-      behavior: observe
+      behavior: block
       sensitivity: medium
 
   - ruleset: score.cost
     options:
-      behavior: observe
+      behavior: block
       sensitivity: medium
         """,
     )
@@ -215,7 +216,221 @@ rulesets:
     assert expected.scores == response.scores
 
 
-def test_rulesets(client: AuthenticatedClient):
+def test_rulesets_block(client: AuthenticatedClient):
+    prompt_request = DebugLLMValidateRequest(
+        prompt="Can you email the answer to me?",
+        response="Sure, its foo@whylabs.ai right?",
+        dataset_id="model-134",
+        id="myid-prompt",
+        policy="""
+id: my_id
+policy_version: 1
+schema_version: 0.0.1
+whylabs_dataset_id: default
+
+rulesets:
+  - ruleset: prompt.score.misuse
+    options:
+      behavior: block
+      sensitivity: medium
+      topics:
+        - medicine
+        - legal
+        - finance
+
+  - ruleset: response.score.misuse
+    options:
+      behavior: block
+      sensitivity: medium
+      topics:
+        - medicine
+        - legal
+        - finance
+
+        """,
+    )
+
+    prompt_response = DebugEvaluate.sync_detailed(client=client, body=prompt_request)
+
+    if not isinstance(prompt_response.parsed, EvaluationResult):
+        raise Exception(f"Failed to validate data. Status code: {prompt_response.status_code}. {prompt_response.parsed}")
+
+    response = prompt_response.parsed
+
+    expected = EvaluationResult(
+        metrics=[
+            EvaluationResultMetricsItem.from_dict(
+                {
+                    "prompt.topics.medicine": 0.0052091823890805244,
+                    "prompt.topics.legal": 0.08269468694925308,
+                    "prompt.topics.finance": 0.028292158618569374,
+                    "response.pii.phone_number": 0,
+                    "response.pii.email_address": 1,
+                    "response.pii.credit_card": 0,
+                    "response.pii.us_ssn": 0,
+                    "response.pii.us_bank_number": 0,
+                    "response.pii.redacted": "Sure, its <EMAIL_ADDRESS> right?",
+                    "id": "myid-prompt",
+                }
+            )
+        ],
+        validation_results=ValidationResult(
+            report=[
+                ValidationFailure(
+                    id="myid-prompt",
+                    metric="response.score.misuse",
+                    details="Value 70 is above threshold 50",
+                    value=70,
+                    upper_threshold=50.0,
+                    lower_threshold=None,
+                    allowed_values=None,
+                    disallowed_values=None,
+                    must_be_none=None,
+                    must_be_non_none=None,
+                )
+            ],
+        ),
+        perf_info=None,
+        score_perf_info=None,
+        action=BlockAction(
+            block_message="Message has been blocked because of a policy violation",
+            is_action_block=True,
+            action_type="block",
+        ),
+        scores=[
+            EvaluationResultScoresItem.from_dict(
+                {
+                    "prompt.score.misuse": 17,
+                    "prompt.score.misuse.prompt.topics.medicine": 2,
+                    "prompt.score.misuse.prompt.topics.legal": 17,
+                    "prompt.score.misuse.prompt.topics.finance": 7,
+                    "response.score.misuse": 70,
+                    "response.score.misuse.response.pii.phone_number": 1,
+                    "response.score.misuse.response.pii.email_address": 70,
+                    "response.score.misuse.response.pii.credit_card": 1,
+                    "response.score.misuse.response.pii.us_ssn": 1,
+                    "response.score.misuse.response.pii.us_bank_number": 1,
+                    "response.score.misuse.response.pii.redacted": 70,
+                    "id": "myid-prompt",
+                }
+            )
+        ],
+    )
+
+    assert expected.metrics == response.metrics
+    assert expected.validation_results == response.validation_results
+    assert expected.action == response.action
+    assert expected.scores == response.scores
+
+
+def test_rulesets_no_block(client: AuthenticatedClient):
+    prompt_request = DebugLLMValidateRequest(
+        prompt="Can you email the answer to me?",
+        response="Sure, its foo@whylabs.ai right?",
+        dataset_id="model-134",
+        id="myid-prompt",
+        policy="""
+id: my_id
+policy_version: 1
+schema_version: 0.0.1
+whylabs_dataset_id: default
+
+rulesets:
+  - ruleset: prompt.score.misuse
+    options:
+      behavior: flag
+      sensitivity: medium
+      topics:
+        - medicine
+        - legal
+        - finance
+
+  - ruleset: response.score.misuse
+    options:
+      behavior: flag
+      sensitivity: medium
+      topics:
+        - medicine
+        - legal
+        - finance
+
+        """,
+    )
+
+    prompt_response = DebugEvaluate.sync_detailed(client=client, body=prompt_request)
+
+    if not isinstance(prompt_response.parsed, EvaluationResult):
+        raise Exception(f"Failed to validate data. Status code: {prompt_response.status_code}. {prompt_response.parsed}")
+
+    response = prompt_response.parsed
+
+    expected = EvaluationResult(
+        metrics=[
+            EvaluationResultMetricsItem.from_dict(
+                {
+                    "prompt.topics.medicine": 0.0052091823890805244,
+                    "prompt.topics.legal": 0.08269468694925308,
+                    "prompt.topics.finance": 0.028292158618569374,
+                    "response.pii.phone_number": 0,
+                    "response.pii.email_address": 1,
+                    "response.pii.credit_card": 0,
+                    "response.pii.us_ssn": 0,
+                    "response.pii.us_bank_number": 0,
+                    "response.pii.redacted": "Sure, its <EMAIL_ADDRESS> right?",
+                    "id": "myid-prompt",
+                }
+            )
+        ],
+        validation_results=ValidationResult(
+            report=[
+                ValidationFailure(
+                    id="myid-prompt",
+                    metric="response.score.misuse",
+                    details="Value 70 is above threshold 50",
+                    value=70,
+                    upper_threshold=50.0,
+                    lower_threshold=None,
+                    allowed_values=None,
+                    disallowed_values=None,
+                    must_be_none=None,
+                    must_be_non_none=None,
+                    failure_level=ValidationFailureFailureLevel.FLAG,
+                )
+            ],
+        ),
+        perf_info=None,
+        score_perf_info=None,
+        action=PassAction(
+            is_action_pass=True,
+            action_type="pass",
+        ),
+        scores=[
+            EvaluationResultScoresItem.from_dict(
+                {
+                    "prompt.score.misuse": 17,
+                    "prompt.score.misuse.prompt.topics.medicine": 2,
+                    "prompt.score.misuse.prompt.topics.legal": 17,
+                    "prompt.score.misuse.prompt.topics.finance": 7,
+                    "response.score.misuse": 70,
+                    "response.score.misuse.response.pii.phone_number": 1,
+                    "response.score.misuse.response.pii.email_address": 70,
+                    "response.score.misuse.response.pii.credit_card": 1,
+                    "response.score.misuse.response.pii.us_ssn": 1,
+                    "response.score.misuse.response.pii.us_bank_number": 1,
+                    "response.score.misuse.response.pii.redacted": 70,
+                    "id": "myid-prompt",
+                }
+            )
+        ],
+    )
+
+    assert expected.metrics == response.metrics
+    assert expected.validation_results == response.validation_results
+    assert expected.action == response.action
+    assert expected.scores == response.scores
+
+
+def test_rulesets_observe(client: AuthenticatedClient):
     prompt_request = DebugLLMValidateRequest(
         prompt="Can you email the answer to me?",
         response="Sure, its foo@whylabs.ai right?",
@@ -274,27 +489,13 @@ rulesets:
             )
         ],
         validation_results=ValidationResult(
-            report=[
-                ValidationFailure(
-                    id="myid-prompt",
-                    metric="response.score.misuse",
-                    details="Value 70 is above threshold 50",
-                    value=70,
-                    upper_threshold=50.0,
-                    lower_threshold=None,
-                    allowed_values=None,
-                    disallowed_values=None,
-                    must_be_none=None,
-                    must_be_non_none=None,
-                )
-            ],
+            report=[],
         ),
         perf_info=None,
         score_perf_info=None,
-        action=BlockAction(
-            block_message="Message has been blocked because of a policy violation",
-            is_action_block=True,
-            action_type="block",
+        action=PassAction(
+            is_action_pass=True,
+            action_type="pass",
         ),
         scores=[
             EvaluationResultScoresItem.from_dict(
@@ -565,6 +766,50 @@ metrics:
     assert response.metrics[0].additional_properties["prompt.stats.token_count"] == 5
     assert response.metrics[0].additional_properties["prompt.stats.char_count"] == 15
     assert response.metrics[0].additional_properties["id"] == "myid-prompt"
+
+
+def test_metric_flag_level(client: AuthenticatedClient):
+    prompt_request = DebugLLMValidateRequest(
+        prompt="What is your name?",
+        dataset_id="model-150",
+        id="myid-prompt",
+        policy="""
+id: my_id
+policy_version: 1
+schema_version: 0.0.1
+whylabs_dataset_id: default
+
+metrics:
+  - metric: prompt.topics
+    options:
+        topics:
+            - medical
+
+validators:
+  - validator: constraint
+    options:
+      target_metric: prompt.topics.medical
+      upper_threshold: 0
+      failure_level: flag
+
+actions:
+  block_message: "blocked"
+        """,
+    )
+
+    prompt_response = DebugEvaluate.sync_detailed(client=client, body=prompt_request)
+
+    if not isinstance(prompt_response.parsed, EvaluationResult):
+        raise Exception(f"Failed to validate data. Status code: {prompt_response.status_code}. {prompt_response.parsed}")
+
+    response = prompt_response.parsed
+
+    # Not blocked now because the failure level is flag, but still shows up in validation reports
+    assert response.validation_results.report[0].failure_level == ValidationFailureFailureLevel.FLAG  # type: ignore
+
+    assert response.metrics[0].additional_properties["prompt.topics.medical"] == approx(0.0053703151643276215, abs=1.5e-06)
+    assert response.metrics[0].additional_properties["id"] == "myid-prompt"
+    assert response.action == PassAction(is_action_pass=True)
 
 
 def test_override_policy_2(client: AuthenticatedClient):
