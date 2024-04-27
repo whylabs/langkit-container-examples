@@ -1,6 +1,7 @@
 import whylogs_container_client.api.llm.evaluate as Evaluate
 from whylogs_container_client import AuthenticatedClient
 from whylogs_container_client.models.evaluation_result import EvaluationResult
+from whylogs_container_client.models.evaluation_result_metrics_item import EvaluationResultMetricsItem
 from whylogs_container_client.models.llm_validate_request import LLMValidateRequest
 from whylogs_container_client.models.validation_failure import ValidationFailure
 from whylogs_container_client.models.validation_result import ValidationResult
@@ -25,6 +26,10 @@ from whylogs_container_client.models.validation_result import ValidationResult
 #   - metric: response.sentiment.sentiment_score
 #     validation:
 #       upper_threshold: 0.8
+#
+#   - metric: response.similarity.refusal
+#     options:
+#       additional_data_path: s3://guardrails-container-integ-test/additional-data-embeddings/refusals_embeddings.npy
 #
 
 
@@ -71,5 +76,26 @@ def test_multiple_failures_135(client: AuthenticatedClient):
             ),
         ],
     )
+
+    assert actual == expected
+
+
+def test_refusals(client: AuthenticatedClient):
+    request = LLMValidateRequest(
+        response="unique-string",  # Custom refusal in the policy file that isn't present in the default refusal module
+        dataset_id="model-135",
+        id="myid",
+    )
+
+    response = Evaluate.sync_detailed(client=client, body=request)
+
+    if not isinstance(response.parsed, EvaluationResult):
+        raise Exception(f"Failed to validate data. Status code: {response.status_code}. {response.parsed}")
+
+    actual = response.parsed.metrics
+
+    expected = [
+        EvaluationResultMetricsItem.from_dict({"response.sentiment.sentiment_score": 0.0, "response.similarity.refusal": 1.0, "id": "myid"})
+    ]
 
     assert actual == expected

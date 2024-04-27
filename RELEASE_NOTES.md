@@ -1,3 +1,49 @@
+# 1.0.17 Release Notes
+
+## Experimental Refusal Customization
+
+Refusals can now be customized with local and s3 file paths to .npy files with additional formats to come.
+
+```yaml
+id: 9294f3fa-4f4b-4363-9397-87d3499fce28
+policy_version: 1
+schema_version: 0.0.1
+whylabs_dataset_id: model-135
+
+metrics:
+  - metric: response.similarity.refusal
+    options:
+      additional_data_path: s3://guardrails-container-integ-test/additional-data-embeddings/refusals_embeddings.npy
+```
+
+The .npy files contain pre generated embeddings of the additional examples that you want to consider refusals, on top of the default ones
+that we ship. These embeddings have to be generated locally so the container can just pull them down when it starts up, as opposed to
+generating them from raw data which would likely be time consuming. The container looks for the standard s3 auth env variables.
+
+```py
+import pandas as pd
+import numpy as np
+from sentence_transformers import SentenceTransformer
+
+
+def save_embeddings():
+    refusals_csv = pd.read_csv("./data/refusals.csv")
+
+    refusals = refusals_csv["response"]
+
+    name, revision = ("all-MiniLM-L6-v2", "44eb4044493a3c34bc6d7faae1a71ec76665ebc6") # our current default embedding model
+    st = SentenceTransformer(name, revision=revision)
+    refusal_list = refusals.tolist()
+    refusal_list.append("unique-string")
+    numpy_embeddings = st.encode(refusal_list, convert_to_numpy=True, show_progress_bar=True)
+
+    # save them and upload them to s3
+    np.save("my_refusals_embeddings.npy", numpy_embeddings)
+```
+
+This feature is experimental because its on the user to ensure that the refusals are generated with the right embedding model for the
+container version. For now, the default embedding model isn't something that we're changing often though. We'll have more news about
+alternatives for customization with less friction soon.
 # 1.0.16 Release Notes
 
 ## General Changes
