@@ -216,6 +216,150 @@ rulesets:
     assert expected.scores == response.scores
 
 
+def test_meta_ruleset_synatx_prompt_only(client: AuthenticatedClient):
+    prompt_request = DebugLLMValidateRequest(
+        response="Sure, its foo@whylabs.ai right?",
+        dataset_id="model-134",
+        id="myid-prompt",
+        policy="""
+id: 9294f3fa-4f4b-4363-9397-87d3499fce28
+policy_version: 1
+schema_version: 0.0.1
+whylabs_dataset_id: default
+
+rulesets:
+
+  - ruleset: score.misuse
+    options:
+      behavior: block
+      sensitivity: medium
+      topics:
+        - medicine
+        - legal
+        - finance
+
+  - ruleset: score.bad_actors
+    options:
+      behavior: block
+      sensitivity: medium
+
+  - ruleset: score.truthfulness
+    options:
+      behavior: block
+      sensitivity: medium
+      rag_enabled: false
+      hallucinations_enabled: false
+
+  - ruleset: score.customer_experience
+    options:
+      behavior: block
+      sensitivity: medium
+
+  - ruleset: score.cost
+    options:
+      behavior: block
+      sensitivity: medium
+        """,
+    )
+
+    prompt_response = DebugEvaluate.sync_detailed(client=client, body=prompt_request)
+
+    if not isinstance(prompt_response.parsed, EvaluationResult):
+        raise Exception(f"Failed to validate data. Status code: {prompt_response.status_code}. {prompt_response.parsed}")
+
+    response = prompt_response.parsed
+
+    expected = EvaluationResult(
+        perf_info=None,
+        score_perf_info=None,
+        metrics=[
+            EvaluationResultMetricsItem.from_dict(
+                {
+                    "response.pii.phone_number": 0,
+                    "response.pii.email_address": 1,
+                    "response.pii.credit_card": 0,
+                    "response.pii.us_ssn": 0,
+                    "response.pii.us_bank_number": 0,
+                    "response.pii.redacted": "Sure, its <EMAIL_ADDRESS> right?",
+                    "response.sentiment.sentiment_score": 0.3182,
+                    "response.toxicity.toxicity_score": 0.003148674964904785,
+                    "response.regex.refusal": 0,
+                    "response.stats.char_count": 28,
+                    "response.stats.token_count": 11,
+                    "id": "myid-prompt",
+                }
+            )
+        ],
+        validation_results=ValidationResult(
+            report=[
+                ValidationFailure(
+                    id="myid-prompt",
+                    metric="response.score.misuse",
+                    details="Value 70 is above threshold 50",
+                    value=70,
+                    upper_threshold=50.0,
+                    lower_threshold=None,
+                    allowed_values=None,
+                    disallowed_values=None,
+                    must_be_none=None,
+                    must_be_non_none=None,
+                ),
+            ],
+        ),
+        action=BlockAction(
+            block_message="Message has been blocked because of a policy violation",
+            is_action_block=True,
+            action_type="block",
+        ),
+        scores=[
+            EvaluationResultScoresItem.from_dict(
+                {
+                    "prompt.score.misuse": None,
+                    "prompt.score.misuse.prompt.topics.medicine": None,
+                    "prompt.score.misuse.prompt.topics.legal": None,
+                    "prompt.score.misuse.prompt.topics.finance": None,
+                    "response.score.misuse": 70,
+                    "response.score.misuse.response.pii.phone_number": 1,
+                    "response.score.misuse.response.pii.email_address": 70,
+                    "response.score.misuse.response.pii.credit_card": 1,
+                    "response.score.misuse.response.pii.us_ssn": 1,
+                    "response.score.misuse.response.pii.us_bank_number": 1,
+                    "response.score.misuse.response.pii.redacted": 70,
+                    "prompt.score.bad_actors": None,
+                    "prompt.score.bad_actors.prompt.similarity.jailbreak": None,
+                    "prompt.score.bad_actors.prompt.similarity.injection": None,
+                    "response.score.truthfulness": None,
+                    "response.score.truthfulness.response.similarity.prompt": None,
+                    "prompt.score.customer_experience": None,
+                    "prompt.score.customer_experience.prompt.sentiment.sentiment_score": None,
+                    "prompt.score.customer_experience.prompt.pii.phone_number": None,
+                    "prompt.score.customer_experience.prompt.pii.email_address": None,
+                    "prompt.score.customer_experience.prompt.pii.credit_card": None,
+                    "prompt.score.customer_experience.prompt.pii.us_ssn": None,
+                    "prompt.score.customer_experience.prompt.pii.us_bank_number": None,
+                    "prompt.score.customer_experience.prompt.pii.redacted": None,
+                    "response.score.customer_experience": 41,
+                    "response.score.customer_experience.response.sentiment.sentiment_score": 41,
+                    "response.score.customer_experience.response.toxicity.toxicity_score": 1,
+                    "response.score.customer_experience.response.regex.refusal": 1,
+                    "prompt.score.cost": None,
+                    "prompt.score.cost.prompt.stats.char_count": None,
+                    "prompt.score.cost.prompt.stats.token_count": None,
+                    "response.score.cost": None,
+                    "response.score.cost.response.stats.char_count": 0,
+                    "response.score.cost.response.stats.token_count": 0,
+                    "id": "myid-prompt",
+                }
+            )
+        ],
+    )
+
+    assert expected.metrics == response.metrics
+    assert expected.validation_results == response.validation_results
+    assert expected.action == response.action
+    assert expected.scores == response.scores
+
+
 def test_rulesets_block(client: AuthenticatedClient):
     prompt_request = DebugLLMValidateRequest(
         prompt="Can you email the answer to me?",

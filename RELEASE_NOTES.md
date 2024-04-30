@@ -1,3 +1,8 @@
+# 1.0.18 Release Notes
+
+# General Changes
+
+- Bug fix that stopped scores from being partially calculated if only the prompt or the response was present in a request.
 # 1.0.17 Release Notes
 
 ## Experimental Refusal Customization
@@ -18,7 +23,8 @@ metrics:
 
 The .npy files contain pre generated embeddings of the additional examples that you want to consider refusals, on top of the default ones
 that we ship. These embeddings have to be generated locally so the container can just pull them down when it starts up, as opposed to
-generating them from raw data which would likely be time consuming. The container looks for the standard s3 auth env variables.
+generating them from raw data which would likely be time consuming. The container looks for the standard s3 auth env variables. Here is a
+sample script that shows how to generate the .npy files from a csv.
 
 ```py
 import pandas as pd
@@ -41,7 +47,7 @@ def save_embeddings():
     np.save("my_refusals_embeddings.npy", numpy_embeddings)
 ```
 
-This feature is experimental because its on the user to ensure that the refusals are generated with the right embedding model for the
+This feature is experimental because it's on the user to ensure that the refusals are generated with the right embedding model for the
 container version. For now, the default embedding model isn't something that we're changing often though. We'll have more news about
 alternatives for customization with less friction soon.
 # 1.0.16 Release Notes
