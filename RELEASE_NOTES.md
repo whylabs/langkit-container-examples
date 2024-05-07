@@ -1,3 +1,36 @@
+# 1.0.19 Release Notes
+
+## SQS Support
+
+Previously, asynchronous calls would be managed internal to each container instance via an in memory queue. This release adds support for
+externalizing that queue in SQS. There are two parts to this change. The first part is the ability for the container to act as an SQS
+consumer, polling an endpoint for JSON serialized requests. To enable this, set the following two environment variables. The format that the
+consumer expects is the JSON version of the payloads it already takes in the `/evaluate` endpoint.
+
+```bash
+AWS_SQS_URL=...
+AWS_SQS_DLQ_URL=...
+```
+
+The second part is a new endpoint on the container to simplify the queue coordination. You can send the same kind of requests to
+`/evaluate/sqs` as you send to `/evaluate` and the container will handle the enqueue for you.
+
+```python
+from whylogs_container_client.models.llm_validate_request import LLMValidateRequest
+
+prompt = "What is the best way to treat a cold?"
+request = LLMValidateRequest(
+    prompt=prompt,
+    response="I think the best way to treat a cold is to rest and drink plenty of fluids.",
+    dataset_id="model-135",
+    id="myid",
+)
+
+response = EvaluateSqs.sync(client=client_external, body=request)
+```
+
+If you'd rather keep the sending and receiving totally decoupled then you can use the client types just to construct the request objects and
+then dump them to JSON to get the SQS payload that you can send via the boto3 client.
 # 1.0.18 Release Notes
 
 # General Changes

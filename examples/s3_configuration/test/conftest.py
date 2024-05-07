@@ -44,6 +44,10 @@ class ServerCommands:
             raise Exception("S3_CONFIG_BUCKET_NAME not set")
         if not os.environ.get("S3_CONFIG_PREFIX"):
             raise Exception("S3_CONFIG_PREFIX not set")
+        if not os.environ.get("AWS_SQS_URL"):
+            raise Exception("AWS_SQS_URL not set")
+        if not os.environ.get("AWS_SQS_DLQ_URL"):
+            raise Exception("AWS_SQS_DLQ_URL not set")
 
         envs = [
             "--env",
@@ -72,6 +76,12 @@ class ServerCommands:
             "S3_CONFIG_SYNC_CADENCE=M",
             "--env",
             "S3_CONFIG_SYNC_INTERVAL=15",
+            "--env",
+            f"AWS_SQS_URL={os.environ['AWS_SQS_URL']}",
+            "--env",
+            f"AWS_SQS_DLQ_URL={os.environ['AWS_SQS_DLQ_URL']}",
+            "--env",
+            "AWS_DEFAULT_REGION=us-west-2",
         ]
 
         if "AWS_SESSION_TOKEN" in os.environ:
@@ -94,7 +104,7 @@ def create_server(port: int) -> subprocess.Popen[bytes]:
     return subprocess.Popen(ServerCommands.docker(str(port)))
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="function")
 def client() -> Generator[AuthenticatedClient, None, None]:
     port = random.randint(10000, 11000)
     proc = create_server(port=port)
@@ -112,7 +122,7 @@ def client() -> Generator[AuthenticatedClient, None, None]:
         proc.wait()
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="function")
 def client_external() -> Generator[AuthenticatedClient, None, None]:
     port = 8000
     yield AuthenticatedClient(base_url=f"http://localhost:{port}", token="password", prefix="", auth_header_name="X-API-Key")  # type: ignore[reportGeneralTypeIssues]
