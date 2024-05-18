@@ -1,3 +1,14 @@
+# 1.0.20 Release Notes
+
+- New health check endpoint that includes api key validation and metric configuration checks `/health/llm/deep`
+- Bug fixes around WhyLabs policy pulling and parsing
+- Performance improvements to synchronous validation.
+- Smaller disk (5gb to 3.8gb) and memory footprints (3gb to 2gb), which translate into faster auto scaling.
+
+## Breaking Changes
+
+- The `*.is_refusal` and `*.is_jailbreak` metrics have been removed. They took up a lot of space/memory and performed worse than their
+  alternatives.
 # 1.0.19 Release Notes
 
 ## SQS Support

@@ -22,6 +22,134 @@ from whylogs_container_client.models.validation_result import ValidationResult
 _default_violation_message = "Message has been blocked because of a policy violation"
 
 
+def test_whylabs_policy_download(client: AuthenticatedClient):
+    """
+    Test against model-68, which gets pulled down from the WhyLabs platform with our api key. It's configured
+    to use all of the rulesets available.
+    """
+    request = LLMValidateRequest(
+        prompt="Does the corpus callosum produce any hormones?",
+        dataset_id="model-68",
+        id="medical-prompt",
+    )
+
+    response = Evaluate.sync_detailed(client=client, body=request)
+
+    if not isinstance(response.parsed, EvaluationResult):
+        raise Exception(f"Failed to validate data. Status code: {response.status_code}. {response.parsed}")
+
+    expected = EvaluationResult(
+        perf_info=None,
+        score_perf_info=None,
+        metrics=[
+            EvaluationResultMetricsItem.from_dict(
+                {
+                    "prompt.similarity.jailbreak": approx(0.15388792753219604, abs=1.5e-05),
+                    "prompt.similarity.injection": approx(0.2000197172164917, abs=1.5e-05),
+                    "prompt.topics.medical": 0.9830055236816406,
+                    "prompt.topics.legal": 0.1498958021402359,
+                    "prompt.topics.financial": 0.0016819696174934506,
+                    "prompt.stats.char_count": 40,
+                    "prompt.stats.token_count": 10,
+                    "prompt.sentiment.sentiment_score": 0.0,
+                    "prompt.pii.phone_number": 0,
+                    "prompt.pii.email_address": 0,
+                    "prompt.pii.credit_card": 0,
+                    "prompt.pii.us_ssn": 0,
+                    "prompt.pii.us_bank_number": 0,
+                    "prompt.pii.redacted": None,
+                    "id": "medical-prompt",
+                }
+            ),
+        ],
+        validation_results=ValidationResult(
+            report=[
+                ValidationFailure(
+                    id="medical-prompt",
+                    metric="prompt.score.misuse",
+                    details="Value 99 is above threshold 50",
+                    value=99,
+                    upper_threshold=50.0,
+                    lower_threshold=None,
+                    allowed_values=None,
+                    disallowed_values=None,
+                    must_be_none=None,
+                    must_be_non_none=None,
+                    failure_level=ValidationFailureFailureLevel.BLOCK,
+                ),
+                ValidationFailure(
+                    id="medical-prompt",
+                    metric="prompt.score.customer_experience",
+                    details="Value 57 is above threshold 50",
+                    value=57,
+                    upper_threshold=50.0,
+                    lower_threshold=None,
+                    allowed_values=None,
+                    disallowed_values=None,
+                    must_be_none=None,
+                    must_be_non_none=None,
+                    failure_level=ValidationFailureFailureLevel.BLOCK,
+                ),
+            ],
+        ),
+        action=BlockAction(
+            block_message=_default_violation_message,
+            is_action_block=True,
+            action_type="block",
+        ),
+        scores=[
+            EvaluationResultScoresItem.from_dict(
+                {
+                    "prompt.score.bad_actors": 24,
+                    "prompt.score.bad_actors.prompt.similarity.jailbreak": 19,
+                    "prompt.score.bad_actors.prompt.similarity.injection": 24,
+                    "prompt.score.misuse": 99,
+                    "prompt.score.misuse.prompt.topics.medical": 99,
+                    "prompt.score.misuse.prompt.topics.legal": 30,
+                    "prompt.score.misuse.prompt.topics.financial": 1,
+                    "response.score.misuse": None,
+                    "response.score.misuse.response.pii.phone_number": None,
+                    "response.score.misuse.response.pii.email_address": None,
+                    "response.score.misuse.response.pii.credit_card": None,
+                    "response.score.misuse.response.pii.us_ssn": None,
+                    "response.score.misuse.response.pii.us_bank_number": None,
+                    "response.score.misuse.response.pii.redacted": None,
+                    "prompt.score.cost": None,
+                    "prompt.score.cost.prompt.stats.char_count": 0,
+                    "prompt.score.cost.prompt.stats.token_count": 0,
+                    "response.score.cost": None,
+                    "response.score.cost.response.stats.char_count": None,
+                    "response.score.cost.response.stats.token_count": None,
+                    "prompt.score.customer_experience": 57,
+                    "prompt.score.customer_experience.prompt.sentiment.sentiment_score": 57,
+                    "prompt.score.customer_experience.prompt.pii.phone_number": 1,
+                    "prompt.score.customer_experience.prompt.pii.email_address": 1,
+                    "prompt.score.customer_experience.prompt.pii.credit_card": 1,
+                    "prompt.score.customer_experience.prompt.pii.us_ssn": 1,
+                    "prompt.score.customer_experience.prompt.pii.us_bank_number": 1,
+                    "prompt.score.customer_experience.prompt.pii.redacted": 30,
+                    "response.score.customer_experience": None,
+                    "response.score.customer_experience.response.sentiment.sentiment_score": None,
+                    "response.score.customer_experience.response.toxicity.toxicity_score": None,
+                    "response.score.customer_experience.response.regex.refusal": None,
+                    "response.score.truthfulness": None,
+                    "response.score.truthfulness.response.similarity.prompt": None,
+                    "id": "medical-prompt",
+                }
+            ),
+        ],
+    )
+
+    metrics = response.parsed.metrics[0].to_dict()
+    metrics["prompt.similarity.jailbreak"] = approx(metrics["prompt.similarity.jailbreak"], abs=1.5e-05)
+    metrics["prompt.similarity.injection"] = approx(metrics["prompt.similarity.injection"], abs=1.5e-05)
+
+    assert expected.metrics == response.parsed.metrics
+    assert expected.validation_results == response.parsed.validation_results
+    assert expected.scores == response.parsed.scores
+    assert expected.action == response.parsed.action
+
+
 def test_meta_ruleset_synatx(client: AuthenticatedClient):
     prompt_request = DebugLLMValidateRequest(
         prompt="Can you email the answer to me?",

@@ -1,3 +1,4 @@
+import os
 import random
 import signal
 import subprocess
@@ -27,9 +28,6 @@ def retry(func: Callable[[], T], max_retries=40, interval=2) -> T:
     raise Exception(f"Failed to run function after {retry_count} retries")
 
 
-_fake_key = "xxxxxxxxxx.xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx:xxx-xxxxxx"
-
-
 class ServerCommands:
     @staticmethod
     def docker(port: str) -> List[str]:
@@ -40,7 +38,7 @@ class ServerCommands:
             "-p",
             f"127.0.0.1:{port}:8000",
             "--env",
-            f"WHYLABS_API_KEY={_fake_key}",  # Not uploading anything for these tests, doesn't matter
+            f"WHYLABS_API_KEY={os.environ['WHYLABS_API_KEY']}",
             "--env",
             "DEFAULT_MODEL_ID=model-62",
             "--env",
@@ -49,6 +47,8 @@ class ServerCommands:
             "DEFAULT_WHYLABS_DATASET_CADENCE=DAILY",
             "--env",
             "DEFAULT_WHYLABS_UPLOAD_CADENCE=M",
+            "--env",
+            "AUTO_PULL_WHYLABS_POLICY_MODEL_IDS=model-68",
             "--env",
             "DEFAULT_WHYLABS_UPLOAD_INTERVAL=5",
             image_name,

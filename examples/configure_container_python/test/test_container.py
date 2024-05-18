@@ -25,8 +25,8 @@ def test_toxic_response_131(client: AuthenticatedClient):
             ValidationFailure(
                 id="0",
                 metric="response.toxicity.toxicity_score",
-                details="Value 0.9642418622970581 is above threshold 0.4",
-                value=0.9642418622970581,
+                details="Value 0.9642418026924133 is above threshold 0.4",
+                value=0.9642418026924133,
                 upper_threshold=0.4,
                 lower_threshold=None,
                 allowed_values=None,
