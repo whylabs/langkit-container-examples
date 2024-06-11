@@ -28,6 +28,9 @@ def retry(func: Callable[[], T], max_retries=40, interval=2) -> T:
     raise Exception(f"Failed to run function after {retry_count} retries")
 
 
+_fake_key = "xxxxxxxxxx.xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx:xxx-xxxxxx"
+
+
 class ServerCommands:
     @staticmethod
     def docker(port: str) -> List[str]:
@@ -38,7 +41,7 @@ class ServerCommands:
             "-p",
             f"127.0.0.1:{port}:8000",
             "--env",
-            f"WHYLABS_API_KEY={os.environ['WHYLABS_API_KEY']}",
+            f"WHYLABS_API_KEY={os.getenv('WHYLABS_API_KEY', _fake_key )}",
             "--env",
             "DEFAULT_MODEL_ID=model-62",
             "--env",
@@ -48,7 +51,7 @@ class ServerCommands:
             "--env",
             "DEFAULT_WHYLABS_UPLOAD_CADENCE=M",
             "--env",
-            "AUTO_PULL_WHYLABS_POLICY_MODEL_IDS=model-68",
+            f"AUTO_PULL_WHYLABS_POLICY_MODEL_IDS={os.getenv('AUTO_PULL_WHYLABS_POLICY_MODEL_IDS', 'model-68')}",
             "--env",
             "DEFAULT_WHYLABS_UPLOAD_INTERVAL=5",
             image_name,
@@ -58,7 +61,7 @@ class ServerCommands:
 def create_server(port: int) -> subprocess.Popen[bytes]:
     command = ServerCommands.docker(str(port))
     print(f"Starting container with command: {' '.join(command)}")
-    return subprocess.Popen(ServerCommands.docker(str(port)))
+    return subprocess.Popen(command, preexec_fn=os.setsid)
 
 
 @pytest.fixture(scope="module")
@@ -83,7 +86,7 @@ def client() -> Generator[AC, None, None]:
         retry(_check_health)
         yield client
     finally:
-        proc.send_signal(signal.SIGINT)
+        os.killpg(os.getpgid(proc.pid), signal.SIGINT)
         proc.wait()
 
 

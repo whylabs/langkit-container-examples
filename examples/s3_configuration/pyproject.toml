@@ -14,7 +14,7 @@ python = "^3.10"
 # overwrite those versions, we just want types and auto completion in this project.
 langkit = "0.0.28.dev0"
 whylogs-container-types = "^0.4.13"
-whylogs-container-client = "1.0.20"
+whylogs-container-client = "1.0.21"
 whylogs = "^1.3.27"
 pandas = "1.3.5"
 

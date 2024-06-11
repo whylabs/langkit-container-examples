@@ -101,7 +101,7 @@ class ServerCommands:
 def create_server(port: int) -> subprocess.Popen[bytes]:
     command = ServerCommands.docker(str(port))
     print(f"Starting container with command: {' '.join(command)}")
-    return subprocess.Popen(ServerCommands.docker(str(port)))
+    return subprocess.Popen(command, preexec_fn=os.setsid)
 
 
 @pytest.fixture(scope="function")
@@ -118,7 +118,7 @@ def client() -> Generator[AuthenticatedClient, None, None]:
         retry(_check_health)
         yield client
     finally:
-        proc.send_signal(signal.SIGINT)
+        os.killpg(os.getpgid(proc.pid), signal.SIGINT)
         proc.wait()
 
 

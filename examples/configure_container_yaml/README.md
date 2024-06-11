@@ -10,6 +10,7 @@ Make sure you have [poetry](https://python-poetry.org/) and docker installed. Cr
 ```
 # Generated at https://hub.whylabsapp.com/settings/access-tokens
 WHYLABS_API_KEY=<api key>
+AUTO_PULL_WHYLABS_POLICY_MODEL_IDS=model-1
 CONTAINER_PASSWORD=password
 
 # Set based on your model type in WhyLabs. Daily is the default.
@@ -26,6 +27,15 @@ Or just run the container locally to manually test and send ad hoc requests.
 
 ```
 make install build run
+```
+
+The tests depend on having a valid WhyLabs api key and a model that has access to our LLM Secure product with rulesets enabled. If you don't
+have access to LLM Secure then you can run the tests without the LLM Secure assertions with this instead
+
+```
+make install build test-no-secure
+# or for running
+make install build run-no-secure
 ```
 
 ## Making Requests

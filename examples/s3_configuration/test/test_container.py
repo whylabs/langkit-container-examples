@@ -147,10 +147,8 @@ def test_sqs(client: AuthenticatedClient):
 
     assert list(profile.get_columns().keys()) == [
         "id",
-        "prompt",
         "prompt.sentiment.sentiment_score",
         "prompt.stats.char_count",
-        "response",
         "response.sentiment.sentiment_score",
         "response.similarity.refusal",
     ]

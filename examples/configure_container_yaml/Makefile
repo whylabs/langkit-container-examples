@@ -1,4 +1,5 @@
 .PHONY: help requirements build run all clean lint lint-fix format format-fix fix test pip-install-python-client
+.PHONY: test-no-secure
 
 CONTAINER_NAME = langkit_example_configure_container_yaml
 
@@ -13,8 +14,14 @@ build:
 test:
 	poetry run pytest -vvv -s ./test
 
+test-no-secure:
+	AUTO_PULL_WHYLABS_POLICY_MODEL_IDS= poetry run pytest -vvv -s -m "not llm_secure" ./test
+
 run:
 	docker run -it --platform=linux/amd64 --rm -p 127.0.0.1:8000:8000 --env-file local.env $(CONTAINER_NAME)
+
+run-no-secure:
+	docker run -it --platform=linux/amd64 --rm -p 127.0.0.1:8000:8000 --env-file local.env --env AUTO_PULL_WHYLABS_POLICY_MODEL_IDS= $(CONTAINER_NAME)
 
 debug:
 	docker run -it --platform=linux/amd64 --entrypoint /bin/bash $(CONTAINER_NAME)

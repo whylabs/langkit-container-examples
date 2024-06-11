@@ -49,7 +49,6 @@ def test_segmented_request_170(client: AuthenticatedClient):
     for profile in profiles:
         assert list(profile.get_columns().keys()) == [
             "id",
-            "prompt",
             "prompt.pii.credit_card",
             "prompt.pii.email_address",
             "prompt.pii.phone_number",
@@ -57,7 +56,6 @@ def test_segmented_request_170(client: AuthenticatedClient):
             "prompt.pii.us_bank_number",
             "prompt.pii.us_ssn",
             "prompt.similarity.injection",
-            "response",
             "response.similarity.refusal",
             "version",
         ]
@@ -106,7 +104,6 @@ def test_segmented_request_async_171(client: AuthenticatedClient):
     for profile in profiles:
         assert list(profile.get_columns().keys()) == [
             "id",
-            "prompt",
             "prompt.pii.credit_card",
             "prompt.pii.email_address",
             "prompt.pii.phone_number",
@@ -114,7 +111,6 @@ def test_segmented_request_async_171(client: AuthenticatedClient):
             "prompt.pii.us_bank_number",
             "prompt.pii.us_ssn",
             "prompt.similarity.injection",
-            "response",
             "response.refusal.is_refusal",
             "response.sentiment.sentiment_score",
             "response.similarity.refusal",

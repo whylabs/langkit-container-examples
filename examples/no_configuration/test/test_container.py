@@ -94,7 +94,6 @@ def test_llm_log(client: AuthenticatedClient):
 
     assert list(profile.get_columns().keys()) == [
         "id",
-        "prompt",
         "prompt.pii.credit_card",
         "prompt.pii.email_address",
         "prompt.pii.phone_number",
@@ -105,7 +104,6 @@ def test_llm_log(client: AuthenticatedClient):
         "prompt.similarity.jailbreak",
         "prompt.stats.char_count",
         "prompt.stats.token_count",
-        "response",
         "response.pii.credit_card",
         "response.pii.email_address",
         "response.pii.phone_number",

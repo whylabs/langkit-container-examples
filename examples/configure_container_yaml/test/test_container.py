@@ -22,13 +22,14 @@ from whylogs_container_client.models.validation_result import ValidationResult
 _default_violation_message = "Message has been blocked because of a policy violation"
 
 
+@pytest.mark.llm_secure
 def test_whylabs_policy_download(client: AuthenticatedClient):
     """
     Test against model-68, which gets pulled down from the WhyLabs platform with our api key. It's configured
     to use all of the rulesets available.
     """
     request = LLMValidateRequest(
-        prompt="Does the corpus callosum produce any hormones?",
+        prompt="Should I go to the urgent care? I got bit by a dog and it's bleeding.",
         dataset_id="model-68",
         id="medical-prompt",
     )
@@ -39,19 +40,17 @@ def test_whylabs_policy_download(client: AuthenticatedClient):
         raise Exception(f"Failed to validate data. Status code: {response.status_code}. {response.parsed}")
 
     expected = EvaluationResult(
-        perf_info=None,
-        score_perf_info=None,
         metrics=[
             EvaluationResultMetricsItem.from_dict(
                 {
-                    "prompt.similarity.jailbreak": approx(0.15388792753219604, abs=1.5e-05),
-                    "prompt.similarity.injection": approx(0.2000197172164917, abs=1.5e-05),
-                    "prompt.topics.medical": 0.9830055236816406,
-                    "prompt.topics.legal": 0.1498958021402359,
-                    "prompt.topics.financial": 0.0016819696174934506,
-                    "prompt.stats.char_count": 40,
-                    "prompt.stats.token_count": 10,
-                    "prompt.sentiment.sentiment_score": 0.0,
+                    "prompt.similarity.jailbreak": approx(0.15886713564395905, abs=1.5e-05),
+                    "prompt.similarity.injection": approx(0.16920042037963867, abs=1.5e-05),
+                    "prompt.topics.legal": 0.008368517272174358,
+                    "prompt.topics.medical": approx(0.6553396582603455, abs=1.5e-05),
+                    "prompt.topics.financial": approx(0.17799070477485657, abs=1.5e-05),
+                    "prompt.stats.char_count": 54,
+                    "prompt.stats.token_count": 19,
+                    "prompt.sentiment.sentiment_score": 0.6124,
                     "prompt.pii.phone_number": 0,
                     "prompt.pii.email_address": 0,
                     "prompt.pii.credit_card": 0,
@@ -60,15 +59,15 @@ def test_whylabs_policy_download(client: AuthenticatedClient):
                     "prompt.pii.redacted": None,
                     "id": "medical-prompt",
                 }
-            ),
+            )
         ],
         validation_results=ValidationResult(
             report=[
                 ValidationFailure(
                     id="medical-prompt",
                     metric="prompt.score.misuse",
-                    details="Value 99 is above threshold 50",
-                    value=99,
+                    details="Value 93 is above or equal to threshold 50",
+                    value=93,
                     upper_threshold=50.0,
                     lower_threshold=None,
                     allowed_values=None,
@@ -76,37 +75,26 @@ def test_whylabs_policy_download(client: AuthenticatedClient):
                     must_be_none=None,
                     must_be_non_none=None,
                     failure_level=ValidationFailureFailureLevel.BLOCK,
-                ),
-                ValidationFailure(
-                    id="medical-prompt",
-                    metric="prompt.score.customer_experience",
-                    details="Value 57 is above threshold 50",
-                    value=57,
-                    upper_threshold=50.0,
-                    lower_threshold=None,
-                    allowed_values=None,
-                    disallowed_values=None,
-                    must_be_none=None,
-                    must_be_non_none=None,
-                    failure_level=ValidationFailureFailureLevel.BLOCK,
-                ),
+                )
             ],
         ),
+        perf_info=None,
         action=BlockAction(
-            block_message=_default_violation_message,
+            block_message="Message has been blocked because of a policy violation",
             is_action_block=True,
             action_type="block",
         ),
+        score_perf_info=None,
         scores=[
             EvaluationResultScoresItem.from_dict(
                 {
-                    "prompt.score.bad_actors": 24,
-                    "prompt.score.bad_actors.prompt.similarity.jailbreak": 19,
-                    "prompt.score.bad_actors.prompt.similarity.injection": 24,
-                    "prompt.score.misuse": 99,
-                    "prompt.score.misuse.prompt.topics.medical": 99,
-                    "prompt.score.misuse.prompt.topics.legal": 30,
-                    "prompt.score.misuse.prompt.topics.financial": 1,
+                    "prompt.score.bad_actors": 21,
+                    "prompt.score.bad_actors.prompt.similarity.jailbreak": 20,
+                    "prompt.score.bad_actors.prompt.similarity.injection": 21,
+                    "prompt.score.misuse": 93,
+                    "prompt.score.misuse.prompt.topics.legal": 3,
+                    "prompt.score.misuse.prompt.topics.medical": 93,
+                    "prompt.score.misuse.prompt.topics.financial": 25,
                     "response.score.misuse": None,
                     "response.score.misuse.response.pii.phone_number": None,
                     "response.score.misuse.response.pii.email_address": None,
@@ -115,13 +103,13 @@ def test_whylabs_policy_download(client: AuthenticatedClient):
                     "response.score.misuse.response.pii.us_bank_number": None,
                     "response.score.misuse.response.pii.redacted": None,
                     "prompt.score.cost": None,
-                    "prompt.score.cost.prompt.stats.char_count": 0,
-                    "prompt.score.cost.prompt.stats.token_count": 0,
+                    "prompt.score.cost.prompt.stats.char_count": None,
+                    "prompt.score.cost.prompt.stats.token_count": None,
                     "response.score.cost": None,
                     "response.score.cost.response.stats.char_count": None,
                     "response.score.cost.response.stats.token_count": None,
-                    "prompt.score.customer_experience": 57,
-                    "prompt.score.customer_experience.prompt.sentiment.sentiment_score": 57,
+                    "prompt.score.customer_experience": 30,
+                    "prompt.score.customer_experience.prompt.sentiment.sentiment_score": 14,
                     "prompt.score.customer_experience.prompt.pii.phone_number": 1,
                     "prompt.score.customer_experience.prompt.pii.email_address": 1,
                     "prompt.score.customer_experience.prompt.pii.credit_card": 1,
@@ -134,9 +122,8 @@ def test_whylabs_policy_download(client: AuthenticatedClient):
                     "response.score.customer_experience.response.regex.refusal": None,
                     "response.score.truthfulness": None,
                     "response.score.truthfulness.response.similarity.prompt": None,
-                    "id": "medical-prompt",
                 }
-            ),
+            )
         ],
     )
 
@@ -150,6 +137,7 @@ def test_whylabs_policy_download(client: AuthenticatedClient):
     assert expected.action == response.parsed.action
 
 
+@pytest.mark.llm_secure
 def test_meta_ruleset_synatx(client: AuthenticatedClient):
     prompt_request = DebugLLMValidateRequest(
         prompt="Can you email the answer to me?",
@@ -245,7 +233,7 @@ rulesets:
                 ValidationFailure(
                     id="myid-prompt",
                     metric="response.score.misuse",
-                    details="Value 70 is above threshold 50",
+                    details="Value 70 is above or equal to threshold 50",
                     value=70,
                     upper_threshold=50.0,
                     lower_threshold=None,
@@ -257,20 +245,8 @@ rulesets:
                 ValidationFailure(
                     id="myid-prompt",
                     metric="response.score.truthfulness",
-                    details="Value 58 is above threshold 50",
+                    details="Value 58 is above or equal to threshold 50",
                     value=58,
-                    upper_threshold=50.0,
-                    lower_threshold=None,
-                    allowed_values=None,
-                    disallowed_values=None,
-                    must_be_none=None,
-                    must_be_non_none=None,
-                ),
-                ValidationFailure(
-                    id="myid-prompt",
-                    metric="prompt.score.customer_experience",
-                    details="Value 57 is above threshold 50",
-                    value=57,
                     upper_threshold=50.0,
                     lower_threshold=None,
                     allowed_values=None,
@@ -290,8 +266,8 @@ rulesets:
                 {
                     "prompt.score.misuse": 17,
                     "prompt.score.misuse.prompt.topics.medicine": 2,
-                    "prompt.score.misuse.prompt.topics.legal": 17,
                     "prompt.score.misuse.prompt.topics.finance": 7,
+                    "prompt.score.misuse.prompt.topics.legal": 17,
                     "response.score.misuse": 70,
                     "response.score.misuse.response.pii.phone_number": 1,
                     "response.score.misuse.response.pii.email_address": 70,
@@ -304,27 +280,27 @@ rulesets:
                     "prompt.score.bad_actors.prompt.similarity.injection": 39,
                     "response.score.truthfulness": 58,
                     "response.score.truthfulness.response.similarity.prompt": 58,
-                    "prompt.score.customer_experience": 57,
-                    "prompt.score.customer_experience.prompt.sentiment.sentiment_score": 57,
+                    "prompt.score.customer_experience": 30,
+                    "prompt.score.customer_experience.prompt.sentiment.sentiment_score": 34,
                     "prompt.score.customer_experience.prompt.pii.phone_number": 1,
                     "prompt.score.customer_experience.prompt.pii.email_address": 1,
                     "prompt.score.customer_experience.prompt.pii.credit_card": 1,
                     "prompt.score.customer_experience.prompt.pii.us_ssn": 1,
                     "prompt.score.customer_experience.prompt.pii.us_bank_number": 1,
                     "prompt.score.customer_experience.prompt.pii.redacted": 30,
-                    "response.score.customer_experience": 41,
-                    "response.score.customer_experience.response.sentiment.sentiment_score": 41,
+                    "response.score.customer_experience": 24,
+                    "response.score.customer_experience.response.sentiment.sentiment_score": 24,
                     "response.score.customer_experience.response.toxicity.toxicity_score": 1,
                     "response.score.customer_experience.response.regex.refusal": 1,
                     "prompt.score.cost": None,
-                    "prompt.score.cost.prompt.stats.char_count": 0,
-                    "prompt.score.cost.prompt.stats.token_count": 0,
+                    "prompt.score.cost.prompt.stats.char_count": None,
+                    "prompt.score.cost.prompt.stats.token_count": None,
                     "response.score.cost": None,
-                    "response.score.cost.response.stats.char_count": 0,
-                    "response.score.cost.response.stats.token_count": 0,
+                    "response.score.cost.response.stats.char_count": None,
+                    "response.score.cost.response.stats.token_count": None,
                     "id": "myid-prompt",
                 }
-            )
+            ),
         ],
     )
 
@@ -344,6 +320,7 @@ rulesets:
     assert expected.scores == response.scores
 
 
+@pytest.mark.llm_secure
 def test_meta_ruleset_synatx_prompt_only(client: AuthenticatedClient):
     prompt_request = DebugLLMValidateRequest(
         response="Sure, its foo@whylabs.ai right?",
@@ -423,7 +400,7 @@ rulesets:
                 ValidationFailure(
                     id="myid-prompt",
                     metric="response.score.misuse",
-                    details="Value 70 is above threshold 50",
+                    details="Value 70 is above or equal to threshold 50",
                     value=70,
                     upper_threshold=50.0,
                     lower_threshold=None,
@@ -466,16 +443,16 @@ rulesets:
                     "prompt.score.customer_experience.prompt.pii.us_ssn": None,
                     "prompt.score.customer_experience.prompt.pii.us_bank_number": None,
                     "prompt.score.customer_experience.prompt.pii.redacted": None,
-                    "response.score.customer_experience": 41,
-                    "response.score.customer_experience.response.sentiment.sentiment_score": 41,
+                    "response.score.customer_experience": 24,
+                    "response.score.customer_experience.response.sentiment.sentiment_score": 24,
                     "response.score.customer_experience.response.toxicity.toxicity_score": 1,
                     "response.score.customer_experience.response.regex.refusal": 1,
                     "prompt.score.cost": None,
                     "prompt.score.cost.prompt.stats.char_count": None,
                     "prompt.score.cost.prompt.stats.token_count": None,
                     "response.score.cost": None,
-                    "response.score.cost.response.stats.char_count": 0,
-                    "response.score.cost.response.stats.token_count": 0,
+                    "response.score.cost.response.stats.char_count": None,
+                    "response.score.cost.response.stats.token_count": None,
                     "id": "myid-prompt",
                 }
             )
@@ -488,6 +465,7 @@ rulesets:
     assert expected.scores == response.scores
 
 
+@pytest.mark.llm_secure
 def test_rulesets_block(client: AuthenticatedClient):
     prompt_request = DebugLLMValidateRequest(
         prompt="Can you email the answer to me?",
@@ -551,7 +529,7 @@ rulesets:
                 ValidationFailure(
                     id="myid-prompt",
                     metric="response.score.misuse",
-                    details="Value 70 is above threshold 50",
+                    details="Value 70 is above or equal to threshold 50",
                     value=70,
                     upper_threshold=50.0,
                     lower_threshold=None,
@@ -595,6 +573,7 @@ rulesets:
     assert expected.scores == response.scores
 
 
+@pytest.mark.llm_secure
 def test_rulesets_no_block(client: AuthenticatedClient):
     prompt_request = DebugLLMValidateRequest(
         prompt="Can you email the answer to me?",
@@ -658,7 +637,7 @@ rulesets:
                 ValidationFailure(
                     id="myid-prompt",
                     metric="response.score.misuse",
-                    details="Value 70 is above threshold 50",
+                    details="Value 70 is above or equal to threshold 50",
                     value=70,
                     upper_threshold=50.0,
                     lower_threshold=None,
@@ -702,6 +681,7 @@ rulesets:
     assert expected.scores == response.scores
 
 
+@pytest.mark.llm_secure
 def test_rulesets_observe(client: AuthenticatedClient):
     prompt_request = DebugLLMValidateRequest(
         prompt="Can you email the answer to me?",
@@ -1032,7 +1012,7 @@ metrics:
 
     response = prompt_response.parsed
 
-    assert response.metrics[0].additional_properties["prompt.topics.medical"] == approx(0.0053703151643276215, abs=1.5e-06)
+    assert response.metrics[0].additional_properties["prompt.topics.medical"] == approx(0.2715224027633667, abs=1.5e-06)
     assert response.metrics[0].additional_properties["prompt.topics.legal"] == approx(0.25662317872047424, abs=1.5e-06)
     assert response.metrics[0].additional_properties["prompt.similarity.injection"] == approx(0.31260836124420166, abs=1.5e-06)
     assert response.metrics[0].additional_properties["prompt.stats.token_count"] == 5
@@ -1079,7 +1059,7 @@ actions:
     # Not blocked now because the failure level is flag, but still shows up in validation reports
     assert response.validation_results.report[0].failure_level == ValidationFailureFailureLevel.FLAG  # type: ignore
 
-    assert response.metrics[0].additional_properties["prompt.topics.medical"] == approx(0.0053703151643276215, abs=1.5e-06)
+    assert response.metrics[0].additional_properties["prompt.topics.medical"] == approx(0.2715224027633667, abs=1.5e-06)
     assert response.metrics[0].additional_properties["id"] == "myid-prompt"
     assert response.action == PassAction(is_action_pass=True)
 
@@ -1113,7 +1093,7 @@ actions:
 
     response = prompt_response.parsed
 
-    assert response.metrics[0].additional_properties["prompt.topics.medical"] == approx(0.0053703151643276215, abs=1.5e-06)
+    assert response.metrics[0].additional_properties["prompt.topics.medical"] == approx(0.2715224027633667, abs=1.5e-06)
     assert response.metrics[0].additional_properties["id"] == "myid-prompt"
     assert response.action == PassAction(is_action_pass=True)
 
@@ -1729,7 +1709,7 @@ def test_multi_col_computer_medical(client: AuthenticatedClient):
             ValidationFailure(
                 id="0",
                 metric="prompt.topics.medicine",
-                details="Value 0.7482208609580994 is above threshold 0.4",
+                details="...",
                 value=0.7482208609580994,
                 upper_threshold=0.4,
                 lower_threshold=None,
@@ -1767,8 +1747,7 @@ def test_multi_col_computer_medical_advice(client: AuthenticatedClient):
             ValidationFailure(
                 id="0",
                 metric="prompt.topics.medicine",
-                details="Value 0.7294789552688599 is above threshold 0.4. "
-                "Triggered because of failures in prompt.topics.medicine, prompt.topics.advice (OR).",
+                details="..." "Triggered because of failures in prompt.topics.medicine, prompt.topics.advice (OR).",
                 value=0.7294789552688599,
                 upper_threshold=0.4,
                 lower_threshold=None,
