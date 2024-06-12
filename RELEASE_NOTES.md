@@ -5,6 +5,8 @@
   used to determine flagging/blocking. It probably doesn't make sense to block based on what would be an end user's sentiment.
 - Validation thresholds are now inclusive. Before, a ruleset score of 50 wouldn't actually trigger a validation error, it had to be 51. Now
   its inclusive based on the ruleset sensitivity: So 33, 50, and 66 trigger validation errors (based on sensitivity settings).
+- The prompt/response field are no longer profiled with whylogs and they won't appear in WhyLabs. They were redundant with the other metrics
+  we already collected.
 
 ## New Topic Models
 
