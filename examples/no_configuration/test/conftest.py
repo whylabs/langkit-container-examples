@@ -79,3 +79,9 @@ def client() -> Generator[AuthenticatedClient, None, None]:
     finally:
         os.killpg(os.getpgid(proc.pid), signal.SIGINT)
         proc.wait()
+
+
+@pytest.fixture(scope="module")
+def client_external() -> Generator[AuthenticatedClient, None, None]:
+    port = 8000
+    yield AuthenticatedClient(base_url=f"http://localhost:{port}", token="password", prefix="", auth_header_name="X-API-Key")  # type: ignore[reportGeneralTypeIssues]

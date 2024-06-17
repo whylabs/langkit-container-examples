@@ -1,0 +1,38 @@
+id: default-id
+policy_version: 1
+schema_version: 0.0.1
+whylabs_dataset_id: default
+
+rulesets:
+  - ruleset: score.misuse
+    options:
+      behavior: block
+      sensitivity: medium
+      topics:
+        - medical
+        - legal
+        - financial
+        - code
+
+  - ruleset: score.bad_actors
+    options:
+      behavior: block
+      sensitivity: medium
+
+  - ruleset: score.truthfulness
+    options:
+      behavior: block
+      sensitivity: medium
+      rag_enabled: true
+      hallucinations_enabled: false
+
+  - ruleset: score.customer_experience
+    options:
+      behavior: block
+      sensitivity: medium
+
+  - ruleset: score.cost
+    options:
+      behavior: block
+      sensitivity: medium
+

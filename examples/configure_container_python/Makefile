@@ -1,6 +1,9 @@
 .PHONY: help requirements build run all clean lint lint-fix format format-fix fix test pip-install-python-client
+.PHONY: ci-install
 
 CONTAINER_NAME = langkit_example_configure_container_python
+
+version := 1.0.22
 
 all: build
 
@@ -41,6 +44,16 @@ fix: lint-fix format-fix ## Fix all linting and formatting issues
 pip-install-python-client:  ## Install the latest python client from the main project
 	poetry run pip uninstall whylogs-container-client -y || true
 	poetry run pip install ../../../whylogs-container-client/dist/*.whl
+
+ci-install: ## Setup step specific to the CI environment. Requires setting the WHEEL_DIR environment variable
+	poetry install --no-root
+	poetry add --group dev $(WHEEL_DIR)/*.whl
+
+# This step is run before we publish the next version. It ensures that the exported examples reference the most recent version that we're
+# publishing in that CI run.
+pre-release: ## Setup step specific to the CI environment for releases
+	poetry add --group dev whylogs-container-client==$(version)
+	poetry lock --no-update
 
 help: ## Show this help message.
 	@echo 'usage: make [target] ...'

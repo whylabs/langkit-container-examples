@@ -45,9 +45,9 @@ def test_whylabs_policy_download(client: AuthenticatedClient):
                 {
                     "prompt.similarity.jailbreak": approx(0.15886713564395905, abs=1.5e-05),
                     "prompt.similarity.injection": approx(0.16920042037963867, abs=1.5e-05),
-                    "prompt.topics.legal": 0.008368517272174358,
-                    "prompt.topics.medical": approx(0.6553396582603455, abs=1.5e-05),
-                    "prompt.topics.financial": approx(0.17799070477485657, abs=1.5e-05),
+                    "prompt.topics.financial": approx(0.0028537458274513483, abs=1.5e-05),
+                    "prompt.topics.legal": approx(0.008368517272174358, abs=1.5e-05),
+                    "prompt.topics.medical": approx(0.9944393634796143, abs=1.5e-05),
                     "prompt.stats.char_count": 54,
                     "prompt.stats.token_count": 19,
                     "prompt.sentiment.sentiment_score": 0.6124,
@@ -59,15 +59,15 @@ def test_whylabs_policy_download(client: AuthenticatedClient):
                     "prompt.pii.redacted": None,
                     "id": "medical-prompt",
                 }
-            )
+            ),
         ],
         validation_results=ValidationResult(
             report=[
                 ValidationFailure(
                     id="medical-prompt",
                     metric="prompt.score.misuse",
-                    details="Value 93 is above or equal to threshold 50",
-                    value=93,
+                    details="Value 100 is above or equal to threshold 50",
+                    value=100,
                     upper_threshold=50.0,
                     lower_threshold=None,
                     allowed_values=None,
@@ -75,7 +75,7 @@ def test_whylabs_policy_download(client: AuthenticatedClient):
                     must_be_none=None,
                     must_be_non_none=None,
                     failure_level=ValidationFailureFailureLevel.BLOCK,
-                )
+                ),
             ],
         ),
         perf_info=None,
@@ -91,10 +91,10 @@ def test_whylabs_policy_download(client: AuthenticatedClient):
                     "prompt.score.bad_actors": 21,
                     "prompt.score.bad_actors.prompt.similarity.jailbreak": 20,
                     "prompt.score.bad_actors.prompt.similarity.injection": 21,
-                    "prompt.score.misuse": 93,
+                    "prompt.score.misuse": 100,
+                    "prompt.score.misuse.prompt.topics.financial": 1,
                     "prompt.score.misuse.prompt.topics.legal": 3,
-                    "prompt.score.misuse.prompt.topics.medical": 93,
-                    "prompt.score.misuse.prompt.topics.financial": 25,
+                    "prompt.score.misuse.prompt.topics.medical": 100,
                     "response.score.misuse": None,
                     "response.score.misuse.response.pii.phone_number": None,
                     "response.score.misuse.response.pii.email_address": None,
@@ -123,7 +123,7 @@ def test_whylabs_policy_download(client: AuthenticatedClient):
                     "response.score.truthfulness": None,
                     "response.score.truthfulness.response.similarity.prompt": None,
                 }
-            )
+            ),
         ],
     )
 
@@ -1012,7 +1012,7 @@ metrics:
 
     response = prompt_response.parsed
 
-    assert response.metrics[0].additional_properties["prompt.topics.medical"] == approx(0.2715224027633667, abs=1.5e-06)
+    assert response.metrics[0].additional_properties["prompt.topics.medical"] == approx(0.005370316095650196, abs=1.5e-06)
     assert response.metrics[0].additional_properties["prompt.topics.legal"] == approx(0.25662317872047424, abs=1.5e-06)
     assert response.metrics[0].additional_properties["prompt.similarity.injection"] == approx(0.31260836124420166, abs=1.5e-06)
     assert response.metrics[0].additional_properties["prompt.stats.token_count"] == 5
@@ -1059,7 +1059,7 @@ actions:
     # Not blocked now because the failure level is flag, but still shows up in validation reports
     assert response.validation_results.report[0].failure_level == ValidationFailureFailureLevel.FLAG  # type: ignore
 
-    assert response.metrics[0].additional_properties["prompt.topics.medical"] == approx(0.2715224027633667, abs=1.5e-06)
+    assert response.metrics[0].additional_properties["prompt.topics.medical"] == approx(0.005370316095650196, abs=1.5e-06)
     assert response.metrics[0].additional_properties["id"] == "myid-prompt"
     assert response.action == PassAction(is_action_pass=True)
 
@@ -1093,7 +1093,7 @@ actions:
 
     response = prompt_response.parsed
 
-    assert response.metrics[0].additional_properties["prompt.topics.medical"] == approx(0.2715224027633667, abs=1.5e-06)
+    assert response.metrics[0].additional_properties["prompt.topics.medical"] == approx(0.005370316095650196, abs=1.5e-06)
     assert response.metrics[0].additional_properties["id"] == "myid-prompt"
     assert response.action == PassAction(is_action_pass=True)
 

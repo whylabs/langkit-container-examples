@@ -1,32 +1,23 @@
-.PHONY: help requirements build run all clean lint lint-fix format format-fix fix test pip-install-python-client pull install
+.PHONY: install run test lint lint-fix format format-fix fix all clean
 
-CONTAINER_NAME = langkit_example_configure_container_python
-DOCKER_IMAGE = registry.gitlab.com/whylabs/langkit-container:1.0.22
 version := 1.0.22
 
-
-all: build
-
-pull:
-	docker pull $(DOCKER_IMAGE)
-
-install:
-	poetry install --no-root
+all: install build test
 
 build:
-	docker tag $(DOCKER_IMAGE) $(CONTAINER_NAME)
+	poetry build
+
+clean:
+	rm -rf dist
+
+install:
+	poetry install
+
+run:
+	CACHE_ASSETS_RUNTIME=True poetry run python -m demo.app
 
 test:
 	poetry run pytest -vvv -s ./test
-
-run:
-	docker run -it --platform=linux/amd64 --rm -p 127.0.0.1:8000:8000 --env-file local.env $(CONTAINER_NAME)
-
-debug:
-	docker run -it --platform=linux/amd64 --entrypoint /bin/bash $(CONTAINER_NAME)
-
-clean:
-	rm -rf requirements.txt
 
 lint: ## Check for type issues with pyright
 	@{ echo "Running pyright\n"; poetry run pyright; PYRIGHT_EXIT_CODE=$$?; } ; \
@@ -44,18 +35,17 @@ format-fix: ## Fix formatting issues
 
 fix: lint-fix format-fix ## Fix all linting and formatting issues
 
-pip-install-python-client:  ## Install the latest python client from the main project
-	poetry run pip uninstall whylogs-container-client -y || true
-	poetry run pip install ../../../whylogs-container-client/dist/*.whl
-
-ci-install: ## Setup step specific to the CI environment. Requires setting the WHEEL_DIR environment variable
-	poetry install --no-root
-	poetry add --group dev $(WHEEL_DIR)/*.whl
+# This happens before we publish the next version. Its a substitute for installing dependencies and the container library from pypi
+# Installing the wheel alone wouldn't bring in the correct private transitive dependencies.
+ci-install: ## Setup step specific to the CI environment.
+	poetry install
+	poetry run bash -c "cd ../..; poetry install --extras llm"
 
 # This step is run before we publish the next version. It ensures that the exported examples reference the most recent version that we're
 # publishing in that CI run.
 pre-release: ## Setup step specific to the CI environment for releases
 	poetry add --group dev whylogs-container-client==$(version)
+	poetry add --source whylabs_container_gitlab whylogs-container==$(version)
 	poetry lock --no-update
 
 help: ## Show this help message.
@@ -63,5 +53,4 @@ help: ## Show this help message.
 	@echo
 	@echo 'targets:'
 	@egrep '^(.+)\:(.*) ##\ (.+)' ${MAKEFILE_LIST} | sed -s 's/:\(.*\)##/: ##/' | column -t -c 2 -s ':#'
-
 

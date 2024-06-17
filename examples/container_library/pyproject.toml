@@ -1,35 +1,36 @@
 [tool.poetry]
-name =  "whylogs_config"
+name = "demo"
 version = "0.1.0"
 description = ""
 authors = ["Anthony Naddeo <anthony@whylabs.ai>"]
 readme = "README.md"
-packages = []
 
 [tool.poetry.dependencies]
 python = "^3.10"
 
+whylogs-container = {version = "1.0.22", source = "whylabs_container_gitlab"}
+
 [tool.poetry.group.dev.dependencies]
-# These are all dev dependencies. They're already included in the container and we don't want to
-# overwrite those versions, we just want types and auto completion in this project.
-langkit = "0.0.28.dev0"
-whylogs-container-types = "^0.4.13"
+pyright = "^1.1.367"
+ruff = "^0.4.9"
+
 whylogs-container-client = "1.0.22"
-whylogs = "^1.3.27"
-
-pandas = "1.3.5"
-
-pyright = "^1.1.347"
-ruff = "^0.1.13"
-pytest = "^7.4.4"
-
-
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
+[[tool.poetry.source]]
+name = "torch"
+url = "https://download.pytorch.org/whl/cpu"
+priority = "explicit"
+
+[[tool.poetry.source]]
+name = "whylabs_container_gitlab"
+url = "https://gitlab.com/api/v4/projects/55361491/packages/pypi/simple"
+priority = "explicit"
+
 [tool.pyright]
-include = ["./whylogs_config/**/*.py", "./test/**/*.py"]
+include = ["./demo/**/*.py", "./test/**/*.py"]
 typeCheckingMode = "strict"
 
 reportMissingTypeStubs = false
@@ -39,11 +40,11 @@ reportMissingTypeArgumet = false
 [tool.ruff]
 line-length = 140
 indent-width = 4
-include = ["./whylogs_config/**/*.py", "./test/**/*.py"]
+include = ["./demo/**/*.py", "./test/**/*.py"]
 select = ["E", "F", "I", "W"]
 
 [tool.ruff.isort]
-known-first-party = ["whylogs", "langkit"]
+known-first-party = ["whylogs"]
 
 [tool.ruff.lint]
 fixable = ["ALL"]
@@ -54,4 +55,5 @@ quote-style = "double"
 indent-style = "space"
 skip-magic-trailing-comma = false
 line-ending = "auto"
+
 

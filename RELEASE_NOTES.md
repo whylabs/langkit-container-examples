@@ -1,4 +1,49 @@
+# 1.0.22 Release Notes
 
+- Make all rulesets the default when no policy is configured
+- Fixed delays for the default whylogs profile upload time. It was uploading every 5 hours instead of 5 minutes by default
+- Version metadata in responses now as part of the `metadata` field.
+- Fix for the sentiment score on the prompt being too sensitive and mistakenly flagging/blocking. The prompt sentiment will no longer be
+  used to determine flagging/blocking. It probably doesn't make sense to block based on what would be an end user's sentiment.
+- Validation thresholds are now inclusive. Before, a ruleset score of 50 wouldn't actually trigger a validation error, it had to be 51. Now
+  its inclusive based on the ruleset sensitivity: So 33, 50, and 66 trigger validation errors (based on sensitivity settings).
+- The prompt/response field are no longer profiled with whylogs and they won't appear in WhyLabs. They were redundant with the other metrics
+  we already collected.
+
+## New Experimental Topic Models
+
+We're introducing new, faster models for select topics: `code`, `medical`, and `financial`. Now, if you use these topics along with the
+feature flag to enable them, either in the WhyLabs policy UI or in a custom policy, the newer models will implement the generated metrics.
+You can still use arbitrary topics but they won't be optimized and each one will add a constant amount of latency to the request.
+
+We'll be evaluating the performance of these models in the coming weeks and eventually making them default when we're happy with their
+performance relative to the zero shot model we use today.
+
+This is an example custom policy that would enable the newer models:
+
+```yaml
+id: my-id
+policy_version: 1
+schema_version: 0.0.1
+whylabs_dataset_id: model-135
+
+metrics:
+  - metric: prompt.topics
+    options:
+      use_experimental_models: True
+      topics:
+        - medical
+        - financial
+        - code
+```
+
+The spelling matters for these. If the topic names don't match then it will fall back to our zero shot model.
+
+You can also set the environment variable `USE_EXPERIMENTAL_MODELS=True` and that will implicitly enable them for all topics, which is more
+convenient when using rulesets instead of totally custom policies.
+# 1.0.21 Release Notes (deleted)
+
+This release was yanked due to a startup error.
 # 1.0.20 Release Notes
 
 - New health check endpoint that includes api key validation and metric configuration checks `/health/llm/deep`

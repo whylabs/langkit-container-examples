@@ -7,12 +7,12 @@ from whylogs_container_client.models.validation_failure_failure_level import Val
 from whylogs_container_client.models.validation_result import ValidationResult
 
 
-def test_pii_failures(client: AuthenticatedClient):
+def test_multiple_failures(client: AuthenticatedClient):
     request = LLMValidateRequest(
-        prompt="Hey! Here is my phone number: 555-555-5555, and my email is foo@whylabs.ai. And my friend's email is bar@whylabs.ai",
-        response="That's a cool phone number!",
-        dataset_id="model-131",
-        id="user-123",
+        prompt="My email address is foo@gmail.com and my credit card is 3704 4673 5765 635",
+        response="foo@gmail.com, nice!",
+        dataset_id="model-135",
+        id="myid",
     )
 
     response = Evaluate.sync_detailed(client=client, body=request)
@@ -20,16 +20,16 @@ def test_pii_failures(client: AuthenticatedClient):
     if not isinstance(response.parsed, EvaluationResult):
         raise Exception(f"Failed to validate data. Status code: {response.status_code}. {response.parsed}")
 
-    actual = response.parsed.validation_results
+    actual: ValidationResult = response.parsed.validation_results
 
     expected = ValidationResult(
         report=[
             ValidationFailure(
-                id="user-123",
-                metric="prompt.pii.phone_number",
-                details="Value 1 is above threshold 0",
-                value=1,
-                upper_threshold=0.0,
+                id="myid",
+                metric="prompt.score.misuse",
+                details="Value 100 is above or equal to threshold 50",
+                value=100,
+                upper_threshold=50.0,
                 lower_threshold=None,
                 allowed_values=None,
                 disallowed_values=None,
@@ -38,11 +38,11 @@ def test_pii_failures(client: AuthenticatedClient):
                 failure_level=ValidationFailureFailureLevel.BLOCK,
             ),
             ValidationFailure(
-                id="user-123",
-                metric="prompt.pii.email_address",
-                details="Value 2 is above threshold 0",
-                value=2,
-                upper_threshold=0.0,
+                id="myid",
+                metric="response.score.misuse",
+                details="Value 70 is above or equal to threshold 50",
+                value=70,
+                upper_threshold=50.0,
                 lower_threshold=None,
                 allowed_values=None,
                 disallowed_values=None,
@@ -51,7 +51,7 @@ def test_pii_failures(client: AuthenticatedClient):
                 failure_level=ValidationFailureFailureLevel.BLOCK,
             ),
             ValidationFailure(
-                id="user-123",
+                id="myid",
                 metric="prompt.score.customer_experience",
                 details="Value 70 is above or equal to threshold 50",
                 value=70,
@@ -65,5 +65,24 @@ def test_pii_failures(client: AuthenticatedClient):
             ),
         ],
     )
+
+    assert actual == expected
+
+
+def test_no_errors(client: AuthenticatedClient):
+    request = LLMValidateRequest(
+        prompt="This is a great chat, and everything is fantastic, including you!!",
+        response="Thanks, I think you're fantastic also!",
+        dataset_id="model-134",
+    )
+
+    response = Evaluate.sync_detailed(client=client, body=request)
+
+    if not isinstance(response.parsed, EvaluationResult):
+        raise Exception(f"Failed to validate data. Status code: {response.status_code}. {response.parsed}")
+
+    actual: ValidationResult = response.parsed.validation_results
+
+    expected = ValidationResult(report=[])
 
     assert actual == expected
