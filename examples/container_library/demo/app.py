@@ -1,5 +1,4 @@
-from whylogs_container import Server
-from whylogs_container.whylabs.container.startup import ServerConfig
+from whylogs_container import Server, ServerConfig
 
 if __name__ == "__main__":
     # These settings can be set via env as well

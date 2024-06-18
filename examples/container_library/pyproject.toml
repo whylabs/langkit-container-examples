@@ -7,14 +7,13 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.10"
-
-whylogs-container = {version = "1.0.22", source = "whylabs_container_gitlab"}
+whylogs-container = {version = "1.0.22", extras = ["llm"], source = "whylabs_container_gitlab"}
 
 [tool.poetry.group.dev.dependencies]
 pyright = "^1.1.367"
 ruff = "^0.4.9"
-
 whylogs-container-client = "1.0.22"
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"

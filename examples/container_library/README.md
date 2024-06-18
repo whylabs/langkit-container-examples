@@ -10,6 +10,8 @@ Configure poetry with access to our private gitlab repo. Contact us for to get a
 poetry config http-basic.whylabs_container_gitlab __token__ <gitlab api token>
 ```
 
+The container looks in `whylogs_container/whylogs_config/*.yaml` to find policy files to use as configuration as well.
+
 # Run
 
 The `WHYLABS_API_KEY` is the only required config. It can be set as an environment variable or directly in `demo/app.py`.
