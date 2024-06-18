@@ -44,8 +44,9 @@ ci-install: ## Setup step specific to the CI environment.
 # This step is run before we publish the next version. It ensures that the exported examples reference the most recent version that we're
 # publishing in that CI run.
 pre-release: ## Setup step specific to the CI environment for releases
+	poetry install # Needed to work around poetry bugs
 	poetry add --group dev whylogs-container-client==$(version)
-	poetry add --source whylabs_container_gitlab whylogs-container==$(version)
+	poetry add --source whylabs_container_gitlab whylogs-container[llm]==$(version)
 	poetry lock --no-update
 
 help: ## Show this help message.
