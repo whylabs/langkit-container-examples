@@ -2,7 +2,7 @@ from base64 import b64decode
 from dataclasses import dataclass
 from typing import Any, Dict, List, Type, TypeVar, cast
 
-from whylogs_container_client.models.process_logger_status_response import ProcessLoggerStatusResponse
+from whylogs_container_client.models.status_response import StatusResponse
 
 from whylogs.core.view.segmented_dataset_profile_view import DatasetProfileView
 
@@ -20,14 +20,14 @@ class LoggerStatusProfiles:
     pending_views: List[DatasetProfileView]
 
 
-def get_profiles(response: ProcessLoggerStatusResponse) -> Dict[str, LoggerStatusProfiles]:
+def get_profiles(response: StatusResponse) -> Dict[str, LoggerStatusProfiles]:
     """
     Returns a dictionary of dataset_id to a list of dataset profile views.
     This preserves the mapping of dataset id and the separation of pending views from views.
     """
     views: Dict[str, LoggerStatusProfiles] = {}
 
-    for k, v in response.statuses.additional_properties.items():
+    for k, v in response.whylogs_logger_status.additional_properties.items():
         views[k] = LoggerStatusProfiles(
             views=[DatasetProfileView.deserialize(b64decode(x)) for x in v.views],
             pending_views=[DatasetProfileView.deserialize(b64decode(x)) for x in v.pending_views],
@@ -35,12 +35,12 @@ def get_profiles(response: ProcessLoggerStatusResponse) -> Dict[str, LoggerStatu
     return views
 
 
-def get_profile_list(response: ProcessLoggerStatusResponse) -> List[DatasetProfileView]:
+def get_profile_list(response: StatusResponse) -> List[DatasetProfileView]:
     """
     Returns a single list of all dataset profile views.
     """
     views: List[DatasetProfileView] = []
-    for v in response.statuses.additional_properties.values():
+    for v in response.whylogs_logger_status.additional_properties.values():
         views.extend([DatasetProfileView.deserialize(b64decode(x)) for x in v.views])
         views.extend([DatasetProfileView.deserialize(b64decode(x)) for x in v.pending_views])
     return views

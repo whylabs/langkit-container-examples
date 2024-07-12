@@ -1,7 +1,7 @@
 .PHONY: help requirements build run all clean lint lint-fix format format-fix fix test pip-install-python-client
 
 CONTAINER_NAME = llm_segments
-version := 1.0.22
+version := 1.0.23
 
 all: build
 

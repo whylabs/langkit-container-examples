@@ -8,7 +8,7 @@ from whylogs_container_client import AuthenticatedClient
 from whylogs_container_client.models.evaluation_result import EvaluationResult
 from whylogs_container_client.models.llm_validate_request import LLMValidateRequest
 from whylogs_container_client.models.llm_validate_request_additional_data import LLMValidateRequestAdditionalData
-from whylogs_container_client.models.process_logger_status_response import ProcessLoggerStatusResponse
+from whylogs_container_client.models.status_response import StatusResponse
 from whylogs_container_client.models.validation_result import ValidationResult
 
 
@@ -41,7 +41,7 @@ def test_segmented_request_170(client: AuthenticatedClient):
     if response.parsed is None:
         raise Exception("Unexpected response type")
 
-    result: ProcessLoggerStatusResponse = response.parsed
+    result: StatusResponse = response.parsed
 
     profiles = get_profile_list(result)
 
@@ -94,7 +94,7 @@ def test_segmented_request_async_171(client: AuthenticatedClient):
     if response.parsed is None:
         raise Exception("Unexpected response type")
 
-    result: ProcessLoggerStatusResponse = response.parsed
+    result: StatusResponse = response.parsed
 
     profiles = get_profile_list(result)
 

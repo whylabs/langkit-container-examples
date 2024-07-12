@@ -1,0 +1,51 @@
+id: versioned-metrics
+policy_version: 1
+schema_version: 0.0.1
+whylabs_dataset_id: model-140
+
+metrics:
+  - metric: prompt.toxicity.toxicity_score
+    options:
+      # A hugging face revision for https://huggingface.co/martin-ha/toxic-comment-model/tree/main
+      hf_model_revision: 9842c08b35a4687e7b211187d676986c8c96256d
+
+  - metric: prompt.similarity.context
+    options:
+      embedding:
+        # Name of a sentence transformer
+        name: all-MiniLM-L6-v2
+        # Hugging face commit of the sentence transformer repo. This is taken from the commits page
+        # https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/commits/main
+        revision: 8b3219a92973c328a8e22fadcfa821b5dc75636a
+
+  - metric: prompt.similarity.jailbreak
+    options:
+      embedding:
+        name: all-MiniLM-L6-v2
+        revision: 8b3219a92973c328a8e22fadcfa821b5dc75636a
+
+  - metric: response.similarity.context
+    options:
+      embedding:
+        name: all-MiniLM-L6-v2
+        # Can use different revisions for prompt/response too
+        revision: e4ce9877abf3edfe10b0d82785e83bdcb973e22e
+
+  - metric: response.similarity.prompt
+    options:
+      embedding:
+        name: all-MiniLM-L6-v2
+        # Can use different revisions for prompt/response too
+        revision: e4ce9877abf3edfe10b0d82785e83bdcb973e22e
+
+  - metric: response.similarity.refusal
+    options:
+      embedding:
+        name: all-MiniLM-L6-v2
+        # Can use different revisions for prompt/response too
+        revision: e4ce9877abf3edfe10b0d82785e83bdcb973e22e
+
+  - metric: prompt.similarity.injection
+    options:
+      # This uses our internal model and follows a different versioning scheme
+      version: v2

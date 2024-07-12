@@ -44,7 +44,7 @@ def test_whylabs_policy_download(client: AuthenticatedClient):
             EvaluationResultMetricsItem.from_dict(
                 {
                     "prompt.similarity.jailbreak": approx(0.15886713564395905, abs=1.5e-05),
-                    "prompt.similarity.injection": approx(0.16920042037963867, abs=1.5e-05),
+                    "prompt.similarity.injection": approx(0.15005263686180115, abs=1.5e-05),
                     "prompt.topics.financial": approx(0.0028537458274513483, abs=1.5e-05),
                     "prompt.topics.legal": approx(0.008368517272174358, abs=1.5e-05),
                     "prompt.topics.medical": approx(0.9944393634796143, abs=1.5e-05),
@@ -88,9 +88,9 @@ def test_whylabs_policy_download(client: AuthenticatedClient):
         scores=[
             EvaluationResultScoresItem.from_dict(
                 {
-                    "prompt.score.bad_actors": 21,
+                    "prompt.score.bad_actors": 20,
                     "prompt.score.bad_actors.prompt.similarity.jailbreak": 20,
-                    "prompt.score.bad_actors.prompt.similarity.injection": 21,
+                    "prompt.score.bad_actors.prompt.similarity.injection": 19,
                     "prompt.score.misuse": 100,
                     "prompt.score.misuse.prompt.topics.financial": 1,
                     "prompt.score.misuse.prompt.topics.legal": 3,
@@ -208,7 +208,7 @@ rulesets:
                     "response.pii.us_bank_number": 0,
                     "response.pii.redacted": "Sure, its <EMAIL_ADDRESS> right?",
                     "prompt.similarity.jailbreak": pytest.approx(0.23416246473789215, abs=1.5e-06),  # type: ignore
-                    "prompt.similarity.injection": pytest.approx(0.327720046043396, abs=1.5e-06),  # type: ignore
+                    "prompt.similarity.injection": pytest.approx(0.2812325358390808, abs=1.5e-06),  # type: ignore
                     "response.similarity.prompt": pytest.approx(0.21642859280109406, abs=1.5e-06),  # type: ignore
                     "prompt.sentiment.sentiment_score": 0.0,
                     "prompt.pii.phone_number": 0,
@@ -242,18 +242,6 @@ rulesets:
                     must_be_none=None,
                     must_be_non_none=None,
                 ),
-                ValidationFailure(
-                    id="myid-prompt",
-                    metric="response.score.truthfulness",
-                    details="Value 58 is above or equal to threshold 50",
-                    value=58,
-                    upper_threshold=50.0,
-                    lower_threshold=None,
-                    allowed_values=None,
-                    disallowed_values=None,
-                    must_be_none=None,
-                    must_be_non_none=None,
-                ),
             ],
         ),
         action=BlockAction(
@@ -275,11 +263,11 @@ rulesets:
                     "response.score.misuse.response.pii.us_ssn": 1,
                     "response.score.misuse.response.pii.us_bank_number": 1,
                     "response.score.misuse.response.pii.redacted": 70,
-                    "prompt.score.bad_actors": 39,
+                    "prompt.score.bad_actors": 34,
                     "prompt.score.bad_actors.prompt.similarity.jailbreak": 28,
-                    "prompt.score.bad_actors.prompt.similarity.injection": 39,
-                    "response.score.truthfulness": 58,
-                    "response.score.truthfulness.response.similarity.prompt": 58,
+                    "prompt.score.bad_actors.prompt.similarity.injection": 34,
+                    "response.score.truthfulness": 47,
+                    "response.score.truthfulness.response.similarity.prompt": 47,
                     "prompt.score.customer_experience": 30,
                     "prompt.score.customer_experience.prompt.sentiment.sentiment_score": 34,
                     "prompt.score.customer_experience.prompt.pii.phone_number": 1,
@@ -1014,7 +1002,7 @@ metrics:
 
     assert response.metrics[0].additional_properties["prompt.topics.medical"] == approx(0.005370316095650196, abs=1.5e-06)
     assert response.metrics[0].additional_properties["prompt.topics.legal"] == approx(0.25662317872047424, abs=1.5e-06)
-    assert response.metrics[0].additional_properties["prompt.similarity.injection"] == approx(0.31260836124420166, abs=1.5e-06)
+    assert response.metrics[0].additional_properties["prompt.similarity.injection"] == approx(0.277265727519989, abs=1.5e-06)
     assert response.metrics[0].additional_properties["prompt.stats.token_count"] == 5
     assert response.metrics[0].additional_properties["prompt.stats.char_count"] == 15
     assert response.metrics[0].additional_properties["id"] == "myid-prompt"
@@ -1321,8 +1309,8 @@ def test_155(client: AuthenticatedClient):
             ValidationFailure(
                 id="some_id",
                 metric="prompt.similarity.injection",
-                details="Value 0.619040846824646 is above threshold 0.4",
-                value=0.619040846824646,
+                details="Value 0.5281953811645508 is above threshold 0.4",
+                value=0.5281953811645508,
                 upper_threshold=0.4,
                 lower_threshold=None,
                 allowed_values=None,
@@ -1348,7 +1336,7 @@ def test_155(client: AuthenticatedClient):
     expected_metrics = [
         EvaluationResultMetricsItem.from_dict(
             {
-                "prompt.similarity.injection": 0.619040846824646,
+                "prompt.similarity.injection": 0.528195321559906,
                 "prompt.stats.token_count": 17,
                 "response.similarity.refusal": 0.9333669543266296,
                 "id": "some_id",
@@ -1607,11 +1595,40 @@ def extract_random_code_snippets(directory: str, max_lines_per_file: int = 10) -
 
     # No error, only code detected without injection
     expected = ValidationResult(
-        report=[],
+        report=[
+            ValidationFailure(
+                id="0",
+                metric="prompt.topics.computer_code",
+                details="Value 0.9844226837158203 is above threshold 0.5",
+                value=0.9844226837158203,
+                upper_threshold=0.5,
+                lower_threshold=None,
+                allowed_values=None,
+                disallowed_values=None,
+                must_be_none=None,
+                must_be_non_none=None,
+                failure_level=ValidationFailureFailureLevel.BLOCK,
+            ),
+            ValidationFailure(
+                id="0",
+                metric="prompt.similarity.injection",
+                details="Value 0.33220088481903076 is above threshold 0.3",
+                value=0.33220088481903076,
+                upper_threshold=0.3,
+                lower_threshold=None,
+                allowed_values=None,
+                disallowed_values=None,
+                must_be_none=None,
+                must_be_non_none=None,
+                failure_level=ValidationFailureFailureLevel.BLOCK,
+            ),
+        ],
     )
 
     assert actual == expected
-    assert response.parsed.action == PassAction(is_action_pass=True)
+    assert response.parsed.action == BlockAction(
+        is_action_block=True, block_message="Message has been blocked because of a policy violation"
+    )
 
 
 def test_multi_col_computer_code_trigger(client: AuthenticatedClient):
@@ -1658,9 +1675,9 @@ def extract_random_code_snippets(directory: str, max_lines_per_file: int = 10) -
             ValidationFailure(
                 id="0",
                 metric="prompt.similarity.injection",
-                details="Value 0.4152979850769043 is above threshold 0.4",
-                value=pytest.approx(0.4152979850769043),  # type: ignore
-                upper_threshold=0.4,
+                details="Value 0.3633735179901123 is above threshold 0.3",
+                value=pytest.approx(0.3633735179901123),  # type: ignore
+                upper_threshold=0.3,
                 lower_threshold=None,
                 allowed_values=None,
                 disallowed_values=None,

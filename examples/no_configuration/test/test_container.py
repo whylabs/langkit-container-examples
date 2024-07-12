@@ -33,14 +33,14 @@ def test_log(client: AuthenticatedClient):
     time.sleep(10)
 
     import whylogs_container_client.api.manage.status as Status
-    from whylogs_container_client.models.process_logger_status_response import ProcessLoggerStatusResponse
+    from whylogs_container_client.models.status_response import StatusResponse
 
     response = Status.sync_detailed(client=client)
 
     if response.parsed is None:
         raise Exception("Unexpected response type")
 
-    result: ProcessLoggerStatusResponse = response.parsed
+    result: StatusResponse = response.parsed
 
     print(f">>> {result}")
     profiles = get_profile_list(result)
@@ -74,14 +74,14 @@ def test_llm_log(client: AuthenticatedClient):
 
     # DOCSUB_START status_response_example
     import whylogs_container_client.api.manage.status as Status
-    from whylogs_container_client.models.process_logger_status_response import ProcessLoggerStatusResponse
+    from whylogs_container_client.models.status_response import StatusResponse
 
     response = Status.sync_detailed(client=client)
 
     if response.parsed is None:
         raise Exception("Unexpected response type")
 
-    result: ProcessLoggerStatusResponse = response.parsed
+    result: StatusResponse = response.parsed
     # DOCSUB_END
 
     profiles = get_profile_list(result)

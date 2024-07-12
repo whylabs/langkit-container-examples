@@ -3,6 +3,7 @@ from whylogs_container_client import AuthenticatedClient
 from whylogs_container_client.models.evaluation_result import EvaluationResult
 from whylogs_container_client.models.llm_validate_request import LLMValidateRequest
 from whylogs_container_client.models.validation_failure import ValidationFailure
+from whylogs_container_client.models.validation_failure_failure_level import ValidationFailureFailureLevel
 from whylogs_container_client.models.validation_result import ValidationResult
 
 
@@ -33,7 +34,20 @@ def test_toxic_response_131(client: AuthenticatedClient):
                 disallowed_values=None,
                 must_be_none=None,
                 must_be_non_none=None,
-            )
+            ),
+            ValidationFailure(
+                id="0",
+                metric="response.stats.flesch_reading_ease",
+                details="Value 56.93 is below threshold 70.0",
+                value=56.93,
+                upper_threshold=None,
+                lower_threshold=70.0,
+                allowed_values=None,
+                disallowed_values=None,
+                must_be_none=None,
+                must_be_non_none=None,
+                failure_level=ValidationFailureFailureLevel.BLOCK,
+            ),
         ],
     )
 
@@ -117,8 +131,8 @@ def test_upper_case_letters_prompt_reading_ease_response_131(client: Authenticat
             ValidationFailure(
                 id="0",
                 metric="response.stats.flesch_reading_ease",
-                details="Value 52.23 is below threshold 70.0",
-                value=52.23,
+                details="Value 43.77 is below threshold 70.0",
+                value=43.77,
                 upper_threshold=None,
                 lower_threshold=70.0,
                 allowed_values=None,

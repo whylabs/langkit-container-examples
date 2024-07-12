@@ -1,3 +1,14 @@
+# 1.0.23 Release Notes
+
+- Update the `/status` endpoint with additional configuration info for debugging, including all of the env variables the container accepts
+  (aside from secret values).
+- Traces will properly show up in the WhyLabs platforms as having errors when using custom policy files (without rulesets)
+- The injection metric has been internally overhauled. It used to consist of a sole cos similarity to the nearest neighbor in our vector
+  database of injections. Now it uses several nearest neightbors to cut down on false positive rates, along with an updated store of prompts
+  to compare against.
+- Removed support for the `prompt.stats.syllable_count` and `response.stats.syllable_count` metrics.
+- Update to the latest textstat version. This impacts a lot of the `stats` metric values. For example, the `*.stats.flesch_reading_ease` for
+  some of our test prompts can vary as much as 20 (going from 70 to 50). It should be more accurate though.
 # 1.0.22 Release Notes
 
 - Make all rulesets the default when no policy is configured

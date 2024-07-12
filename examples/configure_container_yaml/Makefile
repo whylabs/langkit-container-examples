@@ -2,7 +2,7 @@
 .PHONY: test-no-secure run-no-secure ci-install
 
 CONTAINER_NAME = langkit_example_configure_container_yaml
-version := 1.0.22
+version := 1.0.23
 
 
 all: build

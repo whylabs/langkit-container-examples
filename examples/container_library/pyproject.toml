@@ -7,12 +7,12 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.10"
-whylogs-container = {version = "1.0.22", extras = ["llm"], source = "whylabs_container_gitlab"}
+whylogs-container = {version = "1.0.23", extras = ["llm"], source = "whylabs_container_gitlab"}
 
 [tool.poetry.group.dev.dependencies]
 pyright = "^1.1.367"
 ruff = "^0.4.9"
-whylogs-container-client = "1.0.22"
+whylogs-container-client = "1.0.23"
 
 [build-system]
 requires = ["poetry-core"]
@@ -26,7 +26,7 @@ priority = "explicit"
 [[tool.poetry.source]]
 name = "whylabs_container_gitlab"
 url = "https://gitlab.com/api/v4/projects/55361491/packages/pypi/simple"
-priority = "explicit"
+priority = "supplemental"
 
 [tool.pyright]
 include = ["./demo/**/*.py", "./test/**/*.py"]

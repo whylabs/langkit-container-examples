@@ -8,7 +8,7 @@ from whylogs_container_client import AuthenticatedClient
 from whylogs_container_client.models.evaluation_result import EvaluationResult
 from whylogs_container_client.models.evaluation_result_metrics_item import EvaluationResultMetricsItem
 from whylogs_container_client.models.llm_validate_request import LLMValidateRequest
-from whylogs_container_client.models.process_logger_status_response import ProcessLoggerStatusResponse
+from whylogs_container_client.models.status_response import StatusResponse
 from whylogs_container_client.models.validation_failure import ValidationFailure
 from whylogs_container_client.models.validation_result import ValidationResult
 
@@ -128,14 +128,14 @@ def test_sqs(client: AuthenticatedClient):
     time.sleep(3)
 
     import whylogs_container_client.api.manage.status as Status
-    from whylogs_container_client.models.process_logger_status_response import ProcessLoggerStatusResponse
+    from whylogs_container_client.models.status_response import StatusResponse
 
     response = Status.sync_detailed(client=client)
 
     if response.parsed is None:
         raise Exception("Unexpected response type")
 
-    result: ProcessLoggerStatusResponse = response.parsed
+    result: StatusResponse = response.parsed
 
     profiles = get_profile_list(result)
 
@@ -158,12 +158,12 @@ def test_sqs(client: AuthenticatedClient):
     assert df["distribution/max"]["prompt.stats.char_count"] == len(prompt_chars)
 
 
-def get_profile_list(response: ProcessLoggerStatusResponse) -> List[DatasetProfileView]:
+def get_profile_list(response: StatusResponse) -> List[DatasetProfileView]:
     """
     Returns a single list of all dataset profile views.
     """
     views: List[DatasetProfileView] = []
-    for v in response.statuses.additional_properties.values():
+    for v in response.whylogs_logger_status.additional_properties.values():
         views.extend([DatasetProfileView.deserialize(b64decode(x)) for x in v.views])
         views.extend([DatasetProfileView.deserialize(b64decode(x)) for x in v.pending_views])
     return views

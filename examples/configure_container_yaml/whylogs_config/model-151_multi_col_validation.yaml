@@ -22,7 +22,7 @@ validators:
         - target_metric: prompt.topics.computer_code
           upper_threshold: .5
         - target_metric: prompt.similarity.injection
-          upper_threshold: .4
+          upper_threshold: .3
 
   - validator: multi_column_constraint
     options:
