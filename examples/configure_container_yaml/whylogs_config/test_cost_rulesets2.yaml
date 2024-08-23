@@ -1,0 +1,15 @@
+id: my_id
+policy_version: 1
+schema_version: 0.0.1
+whylabs_dataset_id: test_cost_rulesets2
+
+# DOCSUB_START ruleset_example_cost_metrics
+metrics:
+    - metric: prompt.pca.coordinates
+    - metric: response.pca.coordinates
+    - metric: prompt.stats.char_count
+    - metric: prompt.stats.token_count
+    - metric: response.stats.char_count
+    - metric: response.stats.token_count
+# DOCSUB_END
+

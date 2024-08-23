@@ -1,0 +1,36 @@
+id: 9294f3fa-4f4b-4363-397-87d3499fce28
+policy_version: 1
+schema_version: 0.0.1
+whylabs_dataset_id: test_meta_ruleset_synatx
+
+rulesets:
+  - ruleset: score.misuse
+    options:
+      behavior: block
+      sensitivity: medium
+      topics:
+        - medicine
+        - legal
+        - finance
+
+  - ruleset: score.bad_actors
+    options:
+      behavior: block
+      sensitivity: medium
+
+  - ruleset: score.truthfulness
+    options:
+      behavior: block
+      sensitivity: medium
+      rag_enabled: false
+      hallucinations_enabled: false
+
+  - ruleset: score.customer_experience
+    options:
+      behavior: block
+      sensitivity: medium
+
+  - ruleset: score.cost
+    options:
+      behavior: block
+      sensitivity: medium

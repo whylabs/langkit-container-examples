@@ -66,31 +66,44 @@ def create_server(port: int) -> subprocess.Popen[bytes]:
 
 @pytest.fixture(scope="module")
 def client() -> Generator[AC, None, None]:
-    port = random.randint(10000, 11000)
-    proc = create_server(port=port)
+    USE_EXTERNAL = os.environ.get("USE_EXTERNAL", "false").lower() == "true"
+    if USE_EXTERNAL:
+        yield from _client_external()
+    else:
+        port = random.randint(10000, 11000)
+        proc = create_server(port=port)
 
-    # DOCSUB_START create_client
-    from whylogs_container_client import AuthenticatedClient
+        # DOCSUB_START create_client
+        from whylogs_container_client import AuthenticatedClient
 
-    client = AuthenticatedClient(base_url=f"http://localhost:{port}", token="password", prefix="", auth_header_name="X-API-Key")  # type: ignore[reportGeneralTypeIssues]
-    # DOCSUB_END
-
-    def _check_health():
-        # DOCSUB_START llm_health_check_example
-        import whylogs_container_client.api.manage.health as Health
-
-        Health.sync_detailed(client=client)
+        client = AuthenticatedClient(base_url=f"http://localhost:{port}", token="password", prefix="", auth_header_name="X-API-Key")  # type: ignore[reportGeneralTypeIssues]
         # DOCSUB_END
 
-    try:
-        retry(_check_health)
-        yield client
-    finally:
-        os.killpg(os.getpgid(proc.pid), signal.SIGINT)
-        proc.wait()
+        def _check_health():
+            print("Checking health")
+            # DOCSUB_START llm_health_check_example
+            import whylogs_container_client.api.manage.health as Health
+
+            response = Health.sync_detailed(client=client)
+
+            if not response.status_code == 200:
+                raise Exception(f"Failed health check. Status code: {response.status_code}. {response.parsed}")
+            # DOCSUB_END
+            print("Health check passed")
+
+        try:
+            retry(_check_health)
+            yield client
+        finally:
+            os.killpg(os.getpgid(proc.pid), signal.SIGINT)
+            proc.wait()
 
 
 @pytest.fixture(scope="module")
 def client_external() -> Generator[AC, None, None]:
+    yield from _client_external()
+
+
+def _client_external() -> Generator[AC, None, None]:
     port = 8000
     yield AC(base_url=f"http://localhost:{port}", token="password", prefix="", auth_header_name="X-API-Key")  # type: ignore[reportGeneralTypeIssues]

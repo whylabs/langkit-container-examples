@@ -1,10 +1,13 @@
+from unittest.mock import ANY
+
 import pytest
-import whylogs_container_client.api.debug.debug_evaluate as DebugEvaluate
+
+# import whylogs_container_client.api.debug.debug_evaluate as DebugEvaluate
 import whylogs_container_client.api.llm.evaluate as Evaluate
 from pytest import approx  # type: ignore
 from whylogs_container_client import AuthenticatedClient
-from whylogs_container_client.models.block_action import BlockAction
-from whylogs_container_client.models.debug_llm_validate_request import DebugLLMValidateRequest
+from whylogs_container_client.models.action import Action
+from whylogs_container_client.models.action_type import ActionType
 from whylogs_container_client.models.evaluation_result import EvaluationResult
 from whylogs_container_client.models.evaluation_result_metrics_item import EvaluationResultMetricsItem
 from whylogs_container_client.models.evaluation_result_scores_item import EvaluationResultScoresItem
@@ -13,11 +16,12 @@ from whylogs_container_client.models.input_context_item import InputContextItem
 from whylogs_container_client.models.input_context_item_metadata import InputContextItemMetadata
 from whylogs_container_client.models.llm_validate_request import LLMValidateRequest
 from whylogs_container_client.models.metric_filter_options import MetricFilterOptions
-from whylogs_container_client.models.pass_action import PassAction
 from whylogs_container_client.models.run_options import RunOptions
 from whylogs_container_client.models.validation_failure import ValidationFailure
 from whylogs_container_client.models.validation_failure_failure_level import ValidationFailureFailureLevel
 from whylogs_container_client.models.validation_result import ValidationResult
+
+from test.assert_util import AnyCollection, AnyString, system_dependent, system_dependent_score
 
 _default_violation_message = "Message has been blocked because of a policy violation"
 
@@ -43,11 +47,13 @@ def test_whylabs_policy_download(client: AuthenticatedClient):
         metrics=[
             EvaluationResultMetricsItem.from_dict(
                 {
-                    "prompt.similarity.jailbreak": approx(0.15886713564395905, abs=1.5e-05),
-                    "prompt.similarity.injection": approx(0.15005263686180115, abs=1.5e-05),
-                    "prompt.topics.financial": approx(0.0028537458274513483, abs=1.5e-05),
-                    "prompt.topics.legal": approx(0.008368517272174358, abs=1.5e-05),
-                    "prompt.topics.medical": approx(0.9944393634796143, abs=1.5e-05),
+                    "prompt.similarity.jailbreak": system_dependent(0.15886718034744263),
+                    "prompt.similarity.injection": system_dependent(0.22845628006117685),
+                    "prompt.similarity.injection_neighbor_ids": AnyCollection(14),
+                    "prompt.similarity.injection_neighbor_coordinates": AnyCollection((14, 3)),
+                    "prompt.topics.financial": 0.0028537458274513483,
+                    "prompt.topics.legal": 0.008368517272174358,
+                    "prompt.topics.medical": 0.9944393634796143,
                     "prompt.stats.char_count": 54,
                     "prompt.stats.token_count": 19,
                     "prompt.sentiment.sentiment_score": 0.6124,
@@ -57,9 +63,10 @@ def test_whylabs_policy_download(client: AuthenticatedClient):
                     "prompt.pii.us_ssn": 0,
                     "prompt.pii.us_bank_number": 0,
                     "prompt.pii.redacted": None,
+                    "prompt.pca.coordinates": AnyCollection(3),
                     "id": "medical-prompt",
                 }
-            ),
+            )
         ],
         validation_results=ValidationResult(
             report=[
@@ -79,18 +86,17 @@ def test_whylabs_policy_download(client: AuthenticatedClient):
             ],
         ),
         perf_info=None,
-        action=BlockAction(
-            block_message="Message has been blocked because of a policy violation",
-            is_action_block=True,
-            action_type="block",
-        ),
+        action=Action(message="Message has been blocked because of a policy violation", action_type=ActionType.BLOCK),
         score_perf_info=None,
+        metadata=ANY,
         scores=[
             EvaluationResultScoresItem.from_dict(
                 {
-                    "prompt.score.bad_actors": 20,
-                    "prompt.score.bad_actors.prompt.similarity.jailbreak": 20,
-                    "prompt.score.bad_actors.prompt.similarity.injection": 19,
+                    "prompt.score.bad_actors": 28,
+                    "prompt.score.bad_actors.prompt.similarity.jailbreak": system_dependent_score(20),
+                    "prompt.score.bad_actors.prompt.similarity.injection": 28,
+                    "prompt.score.bad_actors.prompt.similarity.injection_neighbor_ids": None,
+                    "prompt.score.bad_actors.prompt.similarity.injection_neighbor_coordinates": None,
                     "prompt.score.misuse": 100,
                     "prompt.score.misuse.prompt.topics.financial": 1,
                     "prompt.score.misuse.prompt.topics.legal": 3,
@@ -122,70 +128,28 @@ def test_whylabs_policy_download(client: AuthenticatedClient):
                     "response.score.customer_experience.response.regex.refusal": None,
                     "response.score.truthfulness": None,
                     "response.score.truthfulness.response.similarity.prompt": None,
+                    "prompt.score.util": None,
+                    "prompt.score.util.prompt.pca.coordinates": None,
+                    "response.score.util": None,
+                    "response.score.util.response.pca.coordinates": None,
                 }
-            ),
+            )
         ],
     )
 
-    metrics = response.parsed.metrics[0].to_dict()
-    metrics["prompt.similarity.jailbreak"] = approx(metrics["prompt.similarity.jailbreak"], abs=1.5e-05)
-    metrics["prompt.similarity.injection"] = approx(metrics["prompt.similarity.injection"], abs=1.5e-05)
-
-    assert expected.metrics == response.parsed.metrics
-    assert expected.validation_results == response.parsed.validation_results
-    assert expected.scores == response.parsed.scores
-    assert expected.action == response.parsed.action
+    assert expected == response.parsed
 
 
 @pytest.mark.llm_secure
 def test_meta_ruleset_synatx(client: AuthenticatedClient):
-    prompt_request = DebugLLMValidateRequest(
+    prompt_request = LLMValidateRequest(
         prompt="Can you email the answer to me?",
         response="Sure, its foo@whylabs.ai right?",
-        dataset_id="model-134",
+        dataset_id="test_meta_ruleset_synatx",
         id="myid-prompt",
-        policy="""
-id: 9294f3fa-4f4b-4363-9397-87d3499fce28
-policy_version: 1
-schema_version: 0.0.1
-whylabs_dataset_id: default
-
-rulesets:
-
-  - ruleset: score.misuse
-    options:
-      behavior: block
-      sensitivity: medium
-      topics:
-        - medicine
-        - legal
-        - finance
-
-  - ruleset: score.bad_actors
-    options:
-      behavior: block
-      sensitivity: medium
-
-  - ruleset: score.truthfulness
-    options:
-      behavior: block
-      sensitivity: medium
-      rag_enabled: false
-      hallucinations_enabled: false
-
-  - ruleset: score.customer_experience
-    options:
-      behavior: block
-      sensitivity: medium
-
-  - ruleset: score.cost
-    options:
-      behavior: block
-      sensitivity: medium
-        """,
     )
 
-    prompt_response = DebugEvaluate.sync_detailed(client=client, body=prompt_request)
+    prompt_response = Evaluate.sync_detailed(client=client, body=prompt_request)
 
     if not isinstance(prompt_response.parsed, EvaluationResult):
         raise Exception(f"Failed to validate data. Status code: {prompt_response.status_code}. {prompt_response.parsed}")
@@ -193,23 +157,26 @@ rulesets:
     response = prompt_response.parsed
 
     expected = EvaluationResult(
-        perf_info=None,
-        score_perf_info=None,
+        perf_info=ANY,
+        score_perf_info=ANY,
+        metadata=ANY,
         metrics=[
             EvaluationResultMetricsItem.from_dict(
                 {
-                    "prompt.topics.medicine": 0.0052091823890805244,
-                    "prompt.topics.legal": 0.08269468694925308,
                     "prompt.topics.finance": 0.028292158618569374,
+                    "prompt.topics.legal": 0.08269468694925308,
+                    "prompt.topics.medicine": 0.0052091823890805244,
                     "response.pii.phone_number": 0,
                     "response.pii.email_address": 1,
                     "response.pii.credit_card": 0,
                     "response.pii.us_ssn": 0,
                     "response.pii.us_bank_number": 0,
                     "response.pii.redacted": "Sure, its <EMAIL_ADDRESS> right?",
-                    "prompt.similarity.jailbreak": pytest.approx(0.23416246473789215, abs=1.5e-06),  # type: ignore
-                    "prompt.similarity.injection": pytest.approx(0.2812325358390808, abs=1.5e-06),  # type: ignore
-                    "response.similarity.prompt": pytest.approx(0.21642859280109406, abs=1.5e-06),  # type: ignore
+                    "prompt.similarity.jailbreak": system_dependent(0.23416242003440857),
+                    "prompt.similarity.injection": system_dependent(0.2773274651595524),
+                    "prompt.similarity.injection_neighbor_ids": AnyCollection(14),
+                    "prompt.similarity.injection_neighbor_coordinates": AnyCollection((14, 3)),
+                    "response.similarity.prompt": system_dependent(0.21642851829528809),
                     "prompt.sentiment.sentiment_score": 0.0,
                     "prompt.pii.phone_number": 0,
                     "prompt.pii.email_address": 0,
@@ -224,6 +191,8 @@ rulesets:
                     "prompt.stats.token_count": 8,
                     "response.stats.char_count": 28,
                     "response.stats.token_count": 11,
+                    "prompt.pca.coordinates": AnyCollection(3),
+                    "response.pca.coordinates": AnyCollection(3),
                     "id": "myid-prompt",
                 }
             )
@@ -241,21 +210,21 @@ rulesets:
                     disallowed_values=None,
                     must_be_none=None,
                     must_be_non_none=None,
+                    failure_level=ValidationFailureFailureLevel.BLOCK,
                 ),
             ],
         ),
-        action=BlockAction(
-            block_message="Message has been blocked because of a policy violation",
-            is_action_block=True,
-            action_type="block",
+        action=Action(
+            message="Message has been blocked because of a policy violation",
+            action_type=ActionType.BLOCK,
         ),
         scores=[
             EvaluationResultScoresItem.from_dict(
                 {
                     "prompt.score.misuse": 17,
-                    "prompt.score.misuse.prompt.topics.medicine": 2,
                     "prompt.score.misuse.prompt.topics.finance": 7,
                     "prompt.score.misuse.prompt.topics.legal": 17,
+                    "prompt.score.misuse.prompt.topics.medicine": 2,
                     "response.score.misuse": 70,
                     "response.score.misuse.response.pii.phone_number": 1,
                     "response.score.misuse.response.pii.email_address": 70,
@@ -263,9 +232,11 @@ rulesets:
                     "response.score.misuse.response.pii.us_ssn": 1,
                     "response.score.misuse.response.pii.us_bank_number": 1,
                     "response.score.misuse.response.pii.redacted": 70,
-                    "prompt.score.bad_actors": 34,
+                    "prompt.score.bad_actors": 33,
                     "prompt.score.bad_actors.prompt.similarity.jailbreak": 28,
-                    "prompt.score.bad_actors.prompt.similarity.injection": 34,
+                    "prompt.score.bad_actors.prompt.similarity.injection": 33,
+                    "prompt.score.bad_actors.prompt.similarity.injection_neighbor_ids": None,
+                    "prompt.score.bad_actors.prompt.similarity.injection_neighbor_coordinates": None,
                     "response.score.truthfulness": 47,
                     "response.score.truthfulness.response.similarity.prompt": 47,
                     "prompt.score.customer_experience": 30,
@@ -286,76 +257,27 @@ rulesets:
                     "response.score.cost": None,
                     "response.score.cost.response.stats.char_count": None,
                     "response.score.cost.response.stats.token_count": None,
-                    "id": "myid-prompt",
+                    "prompt.score.util": None,
+                    "prompt.score.util.prompt.pca.coordinates": None,
+                    "response.score.util": None,
+                    "response.score.util.response.pca.coordinates": None,
                 }
-            ),
+            )
         ],
     )
 
-    response.metrics[0].to_dict()["prompt.similarity.jailbreak"] = approx(
-        response.metrics[0].to_dict()["prompt.similarity.jailbreak"], abs=1.5e-06
-    )
-    response.metrics[0].to_dict()["prompt.similarity.injection"] = approx(
-        response.metrics[0].to_dict()["prompt.similarity.injection"], abs=1.5e-06
-    )
-    response.metrics[0].to_dict()["response.similarity.prompt"] = approx(
-        response.metrics[0].to_dict()["response.similarity.prompt"], abs=1.5e-06
-    )
-
-    assert expected.metrics == response.metrics
-    assert expected.validation_results == response.validation_results
-    assert expected.action == response.action
-    assert expected.scores == response.scores
+    assert expected == response
 
 
 @pytest.mark.llm_secure
 def test_meta_ruleset_synatx_prompt_only(client: AuthenticatedClient):
-    prompt_request = DebugLLMValidateRequest(
+    prompt_request = LLMValidateRequest(
         response="Sure, its foo@whylabs.ai right?",
-        dataset_id="model-134",
+        dataset_id="test_meta_ruleset_synatx_prompt_only",
         id="myid-prompt",
-        policy="""
-id: 9294f3fa-4f4b-4363-9397-87d3499fce28
-policy_version: 1
-schema_version: 0.0.1
-whylabs_dataset_id: default
-
-rulesets:
-
-  - ruleset: score.misuse
-    options:
-      behavior: block
-      sensitivity: medium
-      topics:
-        - medicine
-        - legal
-        - finance
-
-  - ruleset: score.bad_actors
-    options:
-      behavior: block
-      sensitivity: medium
-
-  - ruleset: score.truthfulness
-    options:
-      behavior: block
-      sensitivity: medium
-      rag_enabled: false
-      hallucinations_enabled: false
-
-  - ruleset: score.customer_experience
-    options:
-      behavior: block
-      sensitivity: medium
-
-  - ruleset: score.cost
-    options:
-      behavior: block
-      sensitivity: medium
-        """,
     )
 
-    prompt_response = DebugEvaluate.sync_detailed(client=client, body=prompt_request)
+    prompt_response = Evaluate.sync_detailed(client=client, body=prompt_request)
 
     if not isinstance(prompt_response.parsed, EvaluationResult):
         raise Exception(f"Failed to validate data. Status code: {prompt_response.status_code}. {prompt_response.parsed}")
@@ -363,8 +285,9 @@ rulesets:
     response = prompt_response.parsed
 
     expected = EvaluationResult(
-        perf_info=None,
-        score_perf_info=None,
+        perf_info=ANY,
+        score_perf_info=ANY,
+        metadata=ANY,
         metrics=[
             EvaluationResultMetricsItem.from_dict(
                 {
@@ -379,6 +302,7 @@ rulesets:
                     "response.regex.refusal": 0,
                     "response.stats.char_count": 28,
                     "response.stats.token_count": 11,
+                    "response.pca.coordinates": AnyCollection(3),
                     "id": "myid-prompt",
                 }
             )
@@ -396,21 +320,21 @@ rulesets:
                     disallowed_values=None,
                     must_be_none=None,
                     must_be_non_none=None,
+                    failure_level=ValidationFailureFailureLevel.BLOCK,
                 ),
             ],
         ),
-        action=BlockAction(
-            block_message="Message has been blocked because of a policy violation",
-            is_action_block=True,
-            action_type="block",
+        action=Action(
+            message="Message has been blocked because of a policy violation",
+            action_type=ActionType.BLOCK,
         ),
         scores=[
             EvaluationResultScoresItem.from_dict(
                 {
                     "prompt.score.misuse": None,
-                    "prompt.score.misuse.prompt.topics.medicine": None,
-                    "prompt.score.misuse.prompt.topics.legal": None,
                     "prompt.score.misuse.prompt.topics.finance": None,
+                    "prompt.score.misuse.prompt.topics.legal": None,
+                    "prompt.score.misuse.prompt.topics.medicine": None,
                     "response.score.misuse": 70,
                     "response.score.misuse.response.pii.phone_number": 1,
                     "response.score.misuse.response.pii.email_address": 70,
@@ -421,6 +345,8 @@ rulesets:
                     "prompt.score.bad_actors": None,
                     "prompt.score.bad_actors.prompt.similarity.jailbreak": None,
                     "prompt.score.bad_actors.prompt.similarity.injection": None,
+                    "prompt.score.bad_actors.prompt.similarity.injection_neighbor_ids": None,
+                    "prompt.score.bad_actors.prompt.similarity.injection_neighbor_coordinates": None,
                     "response.score.truthfulness": None,
                     "response.score.truthfulness.response.similarity.prompt": None,
                     "prompt.score.customer_experience": None,
@@ -441,162 +367,28 @@ rulesets:
                     "response.score.cost": None,
                     "response.score.cost.response.stats.char_count": None,
                     "response.score.cost.response.stats.token_count": None,
-                    "id": "myid-prompt",
+                    "prompt.score.util": None,
+                    "prompt.score.util.prompt.pca.coordinates": None,
+                    "response.score.util": None,
+                    "response.score.util.response.pca.coordinates": None,
                 }
             )
         ],
     )
 
-    assert expected.metrics == response.metrics
-    assert expected.validation_results == response.validation_results
-    assert expected.action == response.action
-    assert expected.scores == response.scores
-
-
-@pytest.mark.llm_secure
-def test_rulesets_block(client: AuthenticatedClient):
-    prompt_request = DebugLLMValidateRequest(
-        prompt="Can you email the answer to me?",
-        response="Sure, its foo@whylabs.ai right?",
-        dataset_id="model-134",
-        id="myid-prompt",
-        policy="""
-id: my_id
-policy_version: 1
-schema_version: 0.0.1
-whylabs_dataset_id: default
-
-rulesets:
-  - ruleset: prompt.score.misuse
-    options:
-      behavior: block
-      sensitivity: medium
-      topics:
-        - medicine
-        - legal
-        - finance
-
-  - ruleset: response.score.misuse
-    options:
-      behavior: block
-      sensitivity: medium
-      topics:
-        - medicine
-        - legal
-        - finance
-
-        """,
-    )
-
-    prompt_response = DebugEvaluate.sync_detailed(client=client, body=prompt_request)
-
-    if not isinstance(prompt_response.parsed, EvaluationResult):
-        raise Exception(f"Failed to validate data. Status code: {prompt_response.status_code}. {prompt_response.parsed}")
-
-    response = prompt_response.parsed
-
-    expected = EvaluationResult(
-        metrics=[
-            EvaluationResultMetricsItem.from_dict(
-                {
-                    "prompt.topics.medicine": 0.0052091823890805244,
-                    "prompt.topics.legal": 0.08269468694925308,
-                    "prompt.topics.finance": 0.028292158618569374,
-                    "response.pii.phone_number": 0,
-                    "response.pii.email_address": 1,
-                    "response.pii.credit_card": 0,
-                    "response.pii.us_ssn": 0,
-                    "response.pii.us_bank_number": 0,
-                    "response.pii.redacted": "Sure, its <EMAIL_ADDRESS> right?",
-                    "id": "myid-prompt",
-                }
-            )
-        ],
-        validation_results=ValidationResult(
-            report=[
-                ValidationFailure(
-                    id="myid-prompt",
-                    metric="response.score.misuse",
-                    details="Value 70 is above or equal to threshold 50",
-                    value=70,
-                    upper_threshold=50.0,
-                    lower_threshold=None,
-                    allowed_values=None,
-                    disallowed_values=None,
-                    must_be_none=None,
-                    must_be_non_none=None,
-                )
-            ],
-        ),
-        perf_info=None,
-        score_perf_info=None,
-        action=BlockAction(
-            block_message="Message has been blocked because of a policy violation",
-            is_action_block=True,
-            action_type="block",
-        ),
-        scores=[
-            EvaluationResultScoresItem.from_dict(
-                {
-                    "prompt.score.misuse": 17,
-                    "prompt.score.misuse.prompt.topics.medicine": 2,
-                    "prompt.score.misuse.prompt.topics.legal": 17,
-                    "prompt.score.misuse.prompt.topics.finance": 7,
-                    "response.score.misuse": 70,
-                    "response.score.misuse.response.pii.phone_number": 1,
-                    "response.score.misuse.response.pii.email_address": 70,
-                    "response.score.misuse.response.pii.credit_card": 1,
-                    "response.score.misuse.response.pii.us_ssn": 1,
-                    "response.score.misuse.response.pii.us_bank_number": 1,
-                    "response.score.misuse.response.pii.redacted": 70,
-                    "id": "myid-prompt",
-                }
-            )
-        ],
-    )
-
-    assert expected.metrics == response.metrics
-    assert expected.validation_results == response.validation_results
-    assert expected.action == response.action
-    assert expected.scores == response.scores
+    assert expected == response
 
 
 @pytest.mark.llm_secure
 def test_rulesets_no_block(client: AuthenticatedClient):
-    prompt_request = DebugLLMValidateRequest(
+    prompt_request = LLMValidateRequest(
         prompt="Can you email the answer to me?",
         response="Sure, its foo@whylabs.ai right?",
-        dataset_id="model-134",
+        dataset_id="test_rulesets_no_block",
         id="myid-prompt",
-        policy="""
-id: my_id
-policy_version: 1
-schema_version: 0.0.1
-whylabs_dataset_id: default
-
-rulesets:
-  - ruleset: prompt.score.misuse
-    options:
-      behavior: flag
-      sensitivity: medium
-      topics:
-        - medicine
-        - legal
-        - finance
-
-  - ruleset: response.score.misuse
-    options:
-      behavior: flag
-      sensitivity: medium
-      topics:
-        - medicine
-        - legal
-        - finance
-
-        """,
     )
 
-    prompt_response = DebugEvaluate.sync_detailed(client=client, body=prompt_request)
+    prompt_response = Evaluate.sync_detailed(client=client, body=prompt_request)
 
     if not isinstance(prompt_response.parsed, EvaluationResult):
         raise Exception(f"Failed to validate data. Status code: {prompt_response.status_code}. {prompt_response.parsed}")
@@ -607,15 +399,17 @@ rulesets:
         metrics=[
             EvaluationResultMetricsItem.from_dict(
                 {
-                    "prompt.topics.medicine": 0.0052091823890805244,
-                    "prompt.topics.legal": 0.08269468694925308,
                     "prompt.topics.finance": 0.028292158618569374,
+                    "prompt.topics.legal": 0.08269468694925308,
+                    "prompt.topics.medicine": 0.0052091823890805244,
                     "response.pii.phone_number": 0,
                     "response.pii.email_address": 1,
                     "response.pii.credit_card": 0,
                     "response.pii.us_ssn": 0,
                     "response.pii.us_bank_number": 0,
                     "response.pii.redacted": "Sure, its <EMAIL_ADDRESS> right?",
+                    "prompt.pca.coordinates": AnyCollection(3),
+                    "response.pca.coordinates": AnyCollection(3),
                     "id": "myid-prompt",
                 }
             )
@@ -637,19 +431,20 @@ rulesets:
                 )
             ],
         ),
-        perf_info=None,
-        score_perf_info=None,
-        action=PassAction(
-            is_action_pass=True,
-            action_type="pass",
+        perf_info=ANY,
+        score_perf_info=ANY,
+        metadata=ANY,
+        action=Action(
+            message="Message has been flagged because of a policy violation",
+            action_type=ActionType.FLAG,
         ),
         scores=[
             EvaluationResultScoresItem.from_dict(
                 {
                     "prompt.score.misuse": 17,
-                    "prompt.score.misuse.prompt.topics.medicine": 2,
-                    "prompt.score.misuse.prompt.topics.legal": 17,
                     "prompt.score.misuse.prompt.topics.finance": 7,
+                    "prompt.score.misuse.prompt.topics.legal": 17,
+                    "prompt.score.misuse.prompt.topics.medicine": 2,
                     "response.score.misuse": 70,
                     "response.score.misuse.response.pii.phone_number": 1,
                     "response.score.misuse.response.pii.email_address": 70,
@@ -657,54 +452,28 @@ rulesets:
                     "response.score.misuse.response.pii.us_ssn": 1,
                     "response.score.misuse.response.pii.us_bank_number": 1,
                     "response.score.misuse.response.pii.redacted": 70,
-                    "id": "myid-prompt",
+                    "prompt.score.util": None,
+                    "prompt.score.util.prompt.pca.coordinates": None,
+                    "response.score.util": None,
+                    "response.score.util.response.pca.coordinates": None,
                 }
             )
         ],
     )
 
-    assert expected.metrics == response.metrics
-    assert expected.validation_results == response.validation_results
-    assert expected.action == response.action
-    assert expected.scores == response.scores
+    assert expected == response
 
 
 @pytest.mark.llm_secure
 def test_rulesets_observe(client: AuthenticatedClient):
-    prompt_request = DebugLLMValidateRequest(
+    prompt_request = LLMValidateRequest(
         prompt="Can you email the answer to me?",
         response="Sure, its foo@whylabs.ai right?",
-        dataset_id="model-134",
+        dataset_id="test_rulesets_observe",
         id="myid-prompt",
-        policy="""
-id: my_id
-policy_version: 1
-schema_version: 0.0.1
-whylabs_dataset_id: default
-
-rulesets:
-  - ruleset: prompt.score.misuse
-    options:
-      behavior: observe
-      sensitivity: medium
-      topics:
-        - medicine
-        - legal
-        - finance
-
-  - ruleset: response.score.misuse
-    options:
-      behavior: observe
-      sensitivity: medium
-      topics:
-        - medicine
-        - legal
-        - finance
-
-        """,
     )
 
-    prompt_response = DebugEvaluate.sync_detailed(client=client, body=prompt_request)
+    prompt_response = Evaluate.sync_detailed(client=client, body=prompt_request)
 
     if not isinstance(prompt_response.parsed, EvaluationResult):
         raise Exception(f"Failed to validate data. Status code: {prompt_response.status_code}. {prompt_response.parsed}")
@@ -715,15 +484,17 @@ rulesets:
         metrics=[
             EvaluationResultMetricsItem.from_dict(
                 {
-                    "prompt.topics.medicine": 0.0052091823890805244,
-                    "prompt.topics.legal": 0.08269468694925308,
                     "prompt.topics.finance": 0.028292158618569374,
+                    "prompt.topics.legal": 0.08269468694925308,
+                    "prompt.topics.medicine": 0.0052091823890805244,
                     "response.pii.phone_number": 0,
                     "response.pii.email_address": 1,
                     "response.pii.credit_card": 0,
                     "response.pii.us_ssn": 0,
                     "response.pii.us_bank_number": 0,
                     "response.pii.redacted": "Sure, its <EMAIL_ADDRESS> right?",
+                    "prompt.pca.coordinates": AnyCollection(3),
+                    "response.pca.coordinates": AnyCollection(3),
                     "id": "myid-prompt",
                 }
             )
@@ -731,19 +502,17 @@ rulesets:
         validation_results=ValidationResult(
             report=[],
         ),
-        perf_info=None,
-        score_perf_info=None,
-        action=PassAction(
-            is_action_pass=True,
-            action_type="pass",
-        ),
+        perf_info=ANY,
+        score_perf_info=ANY,
+        metadata=ANY,
+        action=Action(action_type=ActionType.PASS, message=None),
         scores=[
             EvaluationResultScoresItem.from_dict(
                 {
                     "prompt.score.misuse": 17,
-                    "prompt.score.misuse.prompt.topics.medicine": 2,
-                    "prompt.score.misuse.prompt.topics.legal": 17,
                     "prompt.score.misuse.prompt.topics.finance": 7,
+                    "prompt.score.misuse.prompt.topics.legal": 17,
+                    "prompt.score.misuse.prompt.topics.medicine": 2,
                     "response.score.misuse": 70,
                     "response.score.misuse.response.pii.phone_number": 1,
                     "response.score.misuse.response.pii.email_address": 70,
@@ -751,343 +520,68 @@ rulesets:
                     "response.score.misuse.response.pii.us_ssn": 1,
                     "response.score.misuse.response.pii.us_bank_number": 1,
                     "response.score.misuse.response.pii.redacted": 70,
-                    "id": "myid-prompt",
+                    "prompt.score.util": None,
+                    "prompt.score.util.prompt.pca.coordinates": None,
+                    "response.score.util": None,
+                    "response.score.util.response.pca.coordinates": None,
                 }
             )
         ],
     )
 
-    assert expected.metrics == response.metrics
-    assert expected.validation_results == response.validation_results
-    assert expected.action == response.action
-    assert expected.scores == response.scores
+    assert expected == response
 
 
 def _compare_metrics(policy1: str, policy2: str, client: AuthenticatedClient):
-    policy1_request = DebugLLMValidateRequest(
+    policy1_request = LLMValidateRequest(
         prompt="Can you email the answer to me?",
         response="Sure, its foo@whylabs.ai right?",
-        dataset_id="model-134",
+        dataset_id="test_bad_actor_rulesets1",
         id="myid-prompt",
-        policy=policy1,
     )
 
-    policy2_request = DebugLLMValidateRequest(
+    policy2_request = LLMValidateRequest(
         prompt="Can you email the answer to me?",
         response="Sure, its foo@whylabs.ai right?",
-        dataset_id="model-134",
+        dataset_id="test_bad_actor_rulesets2",
         id="myid-prompt",
-        policy=policy2,
     )
 
-    policy1_response = DebugEvaluate.sync_detailed(client=client, body=policy1_request)
+    policy1_response = Evaluate.sync_detailed(client=client, body=policy1_request)
 
     if not isinstance(policy1_response.parsed, EvaluationResult):
-        raise Exception(f"Failed to validate data. Status code: {policy1_response.status_code}. {policy1_response.parsed}")
+        raise AssertionError(f"Failed to validate data. Status code: {policy1_response.status_code}. {policy1_response.parsed}")
 
-    policy2_response = DebugEvaluate.sync_detailed(client=client, body=policy2_request)
+    policy2_response = Evaluate.sync_detailed(client=client, body=policy2_request)
 
     if not isinstance(policy2_response.parsed, EvaluationResult):
-        raise Exception(f"Failed to validate data. Status code: {policy2_response.status_code}. {policy2_response.parsed}")
+        raise AssertionError(f"Failed to validate data. Status code: {policy2_response.status_code}. {policy2_response.parsed}")
 
     assert policy1_response.parsed.metrics[0].to_dict().keys() == policy2_response.parsed.metrics[0].to_dict().keys()
 
 
 def test_bad_actor_rulesets(client: AuthenticatedClient):
-    policy1 = """
-id: my_id
-policy_version: 1
-schema_version: 0.0.1
-whylabs_dataset_id: default
-
-rulesets:
-# DOCSUB_START ruleset_example_bad_actors
-  - ruleset: score.bad_actors
-    options:
-      behavior: observe
-      sensitivity: medium
-# DOCSUB_END
-        """
-
-    policy2 = """
-id: my_id
-policy_version: 1
-schema_version: 0.0.1
-whylabs_dataset_id: default
-
-# DOCSUB_START ruleset_example_bad_actors_metrics
-metrics:
-  - metric: prompt.similarity.jailbreak
-  - metric: prompt.similarity.injection
-# DOCSUB_END
-        """
-
-    _compare_metrics(policy1, policy2, client)
+    _compare_metrics("test_bad_actor_rulesets1", "test_bad_actor_rulesets2", client)
 
 
 def test_customer_experience_rulesets(client: AuthenticatedClient):
-    policy1 = """
-id: my_id
-policy_version: 1
-schema_version: 0.0.1
-whylabs_dataset_id: default
-
-rulesets:
-# DOCSUB_START ruleset_example_customer_experience
-  - ruleset: score.customer_experience
-    options:
-      behavior: observe
-      sensitivity: medium
-# DOCSUB_END
-"""
-    policy2 = """
-id: my_id
-policy_version: 1
-schema_version: 0.0.1
-whylabs_dataset_id: default
-
-# DOCSUB_START ruleset_example_customer_experience_metrics
-metrics:
-  - metric: prompt.sentiment.sentiment_score
-  - metric: prompt.pii
-  - metric: response.sentiment.sentiment_score
-  - metric: response.toxicity.toxicity_score
-  - metric: response.regex.refusal
-# DOCSUB_END
-"""
-
-    _compare_metrics(policy1, policy2, client)
+    _compare_metrics("test_customer_experience_rulesets1", "test_customer_experience_rulesets2", client)
 
 
 def test_misuse_rulesets(client: AuthenticatedClient):
-    policy1 = """
-id: my_id
-policy_version: 1
-schema_version: 0.0.1
-whylabs_dataset_id: default
-
-rulesets:
-# DOCSUB_START ruleset_example_misuse
-  - ruleset: score.misuse
-    options:
-      behavior: observe
-      sensitivity: medium
-      topics:
-        - medicine
-        - legal
-        - finance
-# DOCSUB_END
-"""
-
-    policy2 = """
-id: my_id
-policy_version: 1
-schema_version: 0.0.1
-whylabs_dataset_id: default
-
-# DOCSUB_START ruleset_example_misuse_metrics
-metrics:
-  - metric: response.pii
-  - metric: prompt.topics
-    options:
-      topics:
-        - medicine
-        - legal
-        - finance
-
-# DOCSUB_END
-"""
-
-    _compare_metrics(policy1, policy2, client)
+    _compare_metrics("test_misuse_rulesets1", "test_misuse_rulesets2", client)
 
 
 def test_cost_rulesets(client: AuthenticatedClient):
-    policy1 = """
-id: my_id
-policy_version: 1
-schema_version: 0.0.1
-whylabs_dataset_id: default
-
-rulesets:
-# DOCSUB_START ruleset_example_cost
-  - ruleset: score.cost
-    options:
-      behavior: observe
-      sensitivity: medium
-# DOCSUB_END
-"""
-
-    policy2 = """
-id: my_id
-policy_version: 1
-schema_version: 0.0.1
-whylabs_dataset_id: default
-
-# DOCSUB_START ruleset_example_cost_metrics
-metrics:
-    - metric: prompt.stats.char_count
-    - metric: prompt.stats.token_count
-    - metric: response.stats.char_count
-    - metric: response.stats.token_count
-# DOCSUB_END
-"""
-
-    _compare_metrics(policy1, policy2, client)
+    _compare_metrics("test_cost_rulesets1", "test_cost_rulesets2", client)
 
 
 def test_truthfulness_rulesets(client: AuthenticatedClient):
-    policy1 = """
-id: my_id
-policy_version: 1
-schema_version: 0.0.1
-whylabs_dataset_id: default
-
-rulesets:
-# DOCSUB_START ruleset_example_truthfulness
-  - ruleset: score.truthfulness
-    options:
-      behavior: observe
-      sensitivity: medium
-      rag_enabled: true
-      hallucinations_enabled: false
-# DOCSUB_END
-"""
-
-    policy2 = """
-id: my_id
-policy_version: 1
-schema_version: 0.0.1
-whylabs_dataset_id: default
-
-# DOCSUB_START ruleset_example_truthfulness_metrics
-metrics:
-    - metric: response.similarity.prompt
-    - metric: response.similarity.context
-# DOCSUB_END
-"""
-
-    _compare_metrics(policy1, policy2, client)
-
-
-def test_override_policy_1(client: AuthenticatedClient):
-    prompt_request = DebugLLMValidateRequest(
-        prompt="What is your name?",
-        dataset_id="model-134",
-        id="myid-prompt",
-        policy="""
-id: my_id
-policy_version: 1
-schema_version: 0.0.1
-whylabs_dataset_id: default
-
-metrics:
-  - metric: prompt.similarity.injection
-  - metric: prompt.stats.token_count
-  - metric: prompt.stats.char_count
-  - metric: prompt.topics
-    options:
-        topics:
-            - medical
-            - legal
-
-        """,
-    )
-
-    prompt_response = DebugEvaluate.sync_detailed(client=client, body=prompt_request)
-
-    if not isinstance(prompt_response.parsed, EvaluationResult):
-        raise Exception(f"Failed to validate data. Status code: {prompt_response.status_code}. {prompt_response.parsed}")
-
-    response = prompt_response.parsed
-
-    assert response.metrics[0].additional_properties["prompt.topics.medical"] == approx(0.005370316095650196, abs=1.5e-06)
-    assert response.metrics[0].additional_properties["prompt.topics.legal"] == approx(0.25662317872047424, abs=1.5e-06)
-    assert response.metrics[0].additional_properties["prompt.similarity.injection"] == approx(0.277265727519989, abs=1.5e-06)
-    assert response.metrics[0].additional_properties["prompt.stats.token_count"] == 5
-    assert response.metrics[0].additional_properties["prompt.stats.char_count"] == 15
-    assert response.metrics[0].additional_properties["id"] == "myid-prompt"
-
-
-def test_metric_flag_level(client: AuthenticatedClient):
-    prompt_request = DebugLLMValidateRequest(
-        prompt="What is your name?",
-        dataset_id="model-150",
-        id="myid-prompt",
-        policy="""
-id: my_id
-policy_version: 1
-schema_version: 0.0.1
-whylabs_dataset_id: default
-
-metrics:
-  - metric: prompt.topics
-    options:
-        topics:
-            - medical
-
-validators:
-  - validator: constraint
-    options:
-      target_metric: prompt.topics.medical
-      upper_threshold: 0
-      failure_level: flag
-
-actions:
-  block_message: "blocked"
-        """,
-    )
-
-    prompt_response = DebugEvaluate.sync_detailed(client=client, body=prompt_request)
-
-    if not isinstance(prompt_response.parsed, EvaluationResult):
-        raise Exception(f"Failed to validate data. Status code: {prompt_response.status_code}. {prompt_response.parsed}")
-
-    response = prompt_response.parsed
-
-    # Not blocked now because the failure level is flag, but still shows up in validation reports
-    assert response.validation_results.report[0].failure_level == ValidationFailureFailureLevel.FLAG  # type: ignore
-
-    assert response.metrics[0].additional_properties["prompt.topics.medical"] == approx(0.005370316095650196, abs=1.5e-06)
-    assert response.metrics[0].additional_properties["id"] == "myid-prompt"
-    assert response.action == PassAction(is_action_pass=True)
-
-
-def test_override_policy_2(client: AuthenticatedClient):
-    prompt_request = DebugLLMValidateRequest(
-        prompt="What is your name?",
-        dataset_id="model-150",
-        id="myid-prompt",
-        policy="""
-id: my_id
-policy_version: 1
-schema_version: 0.0.1
-whylabs_dataset_id: default
-
-metrics:
-  - metric: prompt.topics
-    options:
-        topics:
-            - medical
-
-actions:
-  block_message: "blocked"
-        """,
-    )
-
-    prompt_response = DebugEvaluate.sync_detailed(client=client, body=prompt_request)
-
-    if not isinstance(prompt_response.parsed, EvaluationResult):
-        raise Exception(f"Failed to validate data. Status code: {prompt_response.status_code}. {prompt_response.parsed}")
-
-    response = prompt_response.parsed
-
-    assert response.metrics[0].additional_properties["prompt.topics.medical"] == approx(0.005370316095650196, abs=1.5e-06)
-    assert response.metrics[0].additional_properties["id"] == "myid-prompt"
-    assert response.action == PassAction(is_action_pass=True)
+    _compare_metrics("test_truthfulness_rulesets1", "test_truthfulness_rulesets2", client)
 
 
 def test_rag_context_prompt(client: AuthenticatedClient):
-    prompt_request = DebugLLMValidateRequest(
+    prompt_request = LLMValidateRequest(
         prompt="What is the talest mountain in the world?",
         response="Mount Everest is the tallest mountain in the world.",
         context=InputContext(
@@ -1098,20 +592,11 @@ def test_rag_context_prompt(client: AuthenticatedClient):
                 )
             ]
         ),
-        dataset_id="model-1500",
+        dataset_id="test_rag_context_prompt",
         id="mountain-prompt",
-        policy="""
-id: my_id
-policy_version: 1
-schema_version: 0.0.1
-whylabs_dataset_id: default
-
-metrics:
-  - metric: prompt.similarity.context
-        """,
     )
 
-    prompt_response = DebugEvaluate.sync_detailed(client=client, body=prompt_request)
+    prompt_response = Evaluate.sync_detailed(client=client, body=prompt_request)
 
     if not isinstance(prompt_response.parsed, EvaluationResult):
         raise Exception(f"Failed to validate data. Status code: {prompt_response.status_code}. {prompt_response.parsed}")
@@ -1120,11 +605,11 @@ metrics:
 
     assert response.metrics[0].additional_properties["prompt.similarity.context"] > 0.5
     assert response.metrics[0].additional_properties["id"] == "mountain-prompt"
-    assert response.action == PassAction(is_action_pass=True)
+    assert response.action == Action(action_type=ActionType.PASS, message=None)
 
 
 def test_rag_context_response(client: AuthenticatedClient):
-    prompt_request = DebugLLMValidateRequest(
+    prompt_request = LLMValidateRequest(
         prompt="What is the talest mountain in the world?",
         response="Mount Everest is the tallest mountain in the world.",
         context=InputContext(
@@ -1135,20 +620,11 @@ def test_rag_context_response(client: AuthenticatedClient):
                 )
             ]
         ),
-        dataset_id="model-1500",
+        dataset_id="test_rag_context_response",
         id="mountain-prompt",
-        policy="""
-id: my_id
-policy_version: 1
-schema_version: 0.0.1
-whylabs_dataset_id: default
-
-metrics:
-  - metric: response.similarity.context
-        """,
     )
 
-    prompt_response = DebugEvaluate.sync_detailed(client=client, body=prompt_request)
+    prompt_response = Evaluate.sync_detailed(client=client, body=prompt_request)
 
     if not isinstance(prompt_response.parsed, EvaluationResult):
         raise Exception(f"Failed to validate data. Status code: {prompt_response.status_code}. {prompt_response.parsed}")
@@ -1157,7 +633,7 @@ metrics:
 
     assert response.metrics[0].additional_properties["response.similarity.context"] > 0.5
     assert response.metrics[0].additional_properties["id"] == "mountain-prompt"
-    assert response.action == PassAction(is_action_pass=True)
+    assert response.action == Action(action_type=ActionType.PASS, message=None)
 
 
 def test_separate_prompt_response(client: AuthenticatedClient):
@@ -1220,7 +696,7 @@ def test_separate_prompt_response(client: AuthenticatedClient):
     )
 
     assert full_actual == full_expected
-    assert full_response.parsed.action == BlockAction(_default_violation_message, is_action_block=True)
+    assert full_response.parsed.action == Action(message=_default_violation_message, action_type="block")
 
 
 def test_default_policy(client: AuthenticatedClient):
@@ -1279,11 +755,12 @@ def test_default_policy(client: AuthenticatedClient):
 
     assert response.parsed.validation_results == expected
     assert response.parsed.metrics == expected_metrics
-    assert response.parsed.action == BlockAction(_default_violation_message, is_action_block=True)
+    assert response.parsed.action == Action(message=_default_violation_message, action_type="block")
 
 
 def test_155(client: AuthenticatedClient):
     # DOCSUB_START llm_validate_request_injection_refusal_example
+    import whylogs_container_client.api.llm.evaluate as Evaluate
     from whylogs_container_client.models.evaluation_result import EvaluationResult
     from whylogs_container_client.models.llm_validate_request import LLMValidateRequest
 
@@ -1309,8 +786,8 @@ def test_155(client: AuthenticatedClient):
             ValidationFailure(
                 id="some_id",
                 metric="prompt.similarity.injection",
-                details="Value 0.5281953811645508 is above threshold 0.4",
-                value=0.5281953811645508,
+                details=AnyString(),
+                value=system_dependent(0.535414674452373),
                 upper_threshold=0.4,
                 lower_threshold=None,
                 allowed_values=None,
@@ -1321,8 +798,8 @@ def test_155(client: AuthenticatedClient):
             ValidationFailure(
                 id="some_id",
                 metric="response.similarity.refusal",
-                details="Value 0.9333669543266296 is above threshold 0.6",
-                value=0.9333669543266296,
+                details=AnyString(),
+                value=system_dependent(0.9333669543266296),
                 upper_threshold=0.6,
                 lower_threshold=None,
                 allowed_values=None,
@@ -1336,7 +813,7 @@ def test_155(client: AuthenticatedClient):
     expected_metrics = [
         EvaluationResultMetricsItem.from_dict(
             {
-                "prompt.similarity.injection": 0.528195321559906,
+                "prompt.similarity.injection": system_dependent(0.535414674452373),
                 "prompt.stats.token_count": 17,
                 "response.similarity.refusal": 0.9333669543266296,
                 "id": "some_id",
@@ -1507,6 +984,7 @@ def test_multiple_failures_135(client: AuthenticatedClient):
                 disallowed_values=None,
                 must_be_none=None,
                 must_be_non_none=None,
+                failure_level=ValidationFailureFailureLevel.FLAG,
             ),
             ValidationFailure(
                 id="myid",
@@ -1519,6 +997,7 @@ def test_multiple_failures_135(client: AuthenticatedClient):
                 disallowed_values=None,
                 must_be_none=None,
                 must_be_non_none=None,
+                failure_level=ValidationFailureFailureLevel.FLAG,
             ),
             ValidationFailure(
                 id="myid",
@@ -1531,6 +1010,7 @@ def test_multiple_failures_135(client: AuthenticatedClient):
                 disallowed_values=None,
                 must_be_none=True,
                 must_be_non_none=None,
+                failure_level=ValidationFailureFailureLevel.FLAG,
             ),
             ValidationFailure(
                 id="myid",
@@ -1543,6 +1023,7 @@ def test_multiple_failures_135(client: AuthenticatedClient):
                 disallowed_values=None,
                 must_be_none=True,
                 must_be_non_none=None,
+                failure_level=ValidationFailureFailureLevel.FLAG,
             ),
         ],
     )
@@ -1612,8 +1093,8 @@ def extract_random_code_snippets(directory: str, max_lines_per_file: int = 10) -
             ValidationFailure(
                 id="0",
                 metric="prompt.similarity.injection",
-                details="Value 0.33220088481903076 is above threshold 0.3",
-                value=0.33220088481903076,
+                details=AnyString(),
+                value=system_dependent(0.43159291999680655),
                 upper_threshold=0.3,
                 lower_threshold=None,
                 allowed_values=None,
@@ -1626,9 +1107,7 @@ def extract_random_code_snippets(directory: str, max_lines_per_file: int = 10) -
     )
 
     assert actual == expected
-    assert response.parsed.action == BlockAction(
-        is_action_block=True, block_message="Message has been blocked because of a policy violation"
-    )
+    assert response.parsed.action == Action(action_type="block", message="Message has been blocked because of a policy violation")
 
 
 def test_multi_col_computer_code_trigger(client: AuthenticatedClient):
@@ -1675,8 +1154,8 @@ def extract_random_code_snippets(directory: str, max_lines_per_file: int = 10) -
             ValidationFailure(
                 id="0",
                 metric="prompt.similarity.injection",
-                details="Value 0.3633735179901123 is above threshold 0.3",
-                value=pytest.approx(0.3633735179901123),  # type: ignore
+                details=AnyString(),
+                value=system_dependent(0.48081864629473003),
                 upper_threshold=0.3,
                 lower_threshold=None,
                 allowed_values=None,
@@ -1687,26 +1166,7 @@ def extract_random_code_snippets(directory: str, max_lines_per_file: int = 10) -
         ],
     )
 
-    assert expected.report[0].value == actual.report[0].value  # type: ignore
-    assert expected.report[0].id == actual.report[0].id  # type: ignore
-    assert expected.report[0].metric == actual.report[0].metric  # type: ignore
-    assert expected.report[0].upper_threshold == actual.report[0].upper_threshold  # type: ignore
-    assert expected.report[0].lower_threshold == actual.report[0].lower_threshold  # type: ignore
-    assert expected.report[0].allowed_values == actual.report[0].allowed_values  # type: ignore
-    assert expected.report[0].disallowed_values == actual.report[0].disallowed_values  # type: ignore
-    assert expected.report[0].must_be_none == actual.report[0].must_be_none  # type: ignore
-    assert expected.report[0].must_be_non_none == actual.report[0].must_be_non_none  # type: ignore
-
-    # Injection metric has machine sensitive precision so we compare field by field to use pytest.approx and ignore the details message
-    assert expected.report[1].value == approx(actual.report[1].value, abs=1.5e-06)  # type: ignore
-    assert expected.report[1].id == actual.report[1].id  # type: ignore
-    assert expected.report[1].metric == actual.report[1].metric  # type: ignore
-    assert expected.report[1].upper_threshold == actual.report[1].upper_threshold  # type: ignore
-    assert expected.report[1].lower_threshold == actual.report[1].lower_threshold  # type: ignore
-    assert expected.report[1].allowed_values == actual.report[1].allowed_values  # type: ignore
-    assert expected.report[1].disallowed_values == actual.report[1].disallowed_values  # type: ignore
-    assert expected.report[1].must_be_none == actual.report[1].must_be_none  # type: ignore
-    assert expected.report[1].must_be_non_none == actual.report[1].must_be_non_none  # type: ignore
+    assert expected == actual
 
 
 def test_multi_col_computer_medical(client: AuthenticatedClient):
@@ -1719,15 +1179,13 @@ def test_multi_col_computer_medical(client: AuthenticatedClient):
 
     actual: ValidationResult = response.parsed.validation_results
 
-    # No error, only code detected without injection
-
     expected = ValidationResult(
         report=[
             ValidationFailure(
                 id="0",
                 metric="prompt.topics.medicine",
-                details="...",
-                value=0.7482208609580994,
+                details=AnyString(),
+                value=system_dependent(0.7482208609580994),
                 upper_threshold=0.4,
                 lower_threshold=None,
                 allowed_values=None,
@@ -1737,16 +1195,7 @@ def test_multi_col_computer_medical(client: AuthenticatedClient):
             )
         ],
     )
-
-    assert expected.report[0].value == approx(actual.report[0].value, abs=1.5e-06)  # type: ignore
-    assert expected.report[0].id == actual.report[0].id  # type: ignore
-    assert expected.report[0].metric == actual.report[0].metric  # type: ignore
-    assert expected.report[0].upper_threshold == actual.report[0].upper_threshold  # type: ignore
-    assert expected.report[0].lower_threshold == actual.report[0].lower_threshold  # type: ignore
-    assert expected.report[0].allowed_values == actual.report[0].allowed_values  # type: ignore
-    assert expected.report[0].disallowed_values == actual.report[0].disallowed_values  # type: ignore
-    assert expected.report[0].must_be_none == actual.report[0].must_be_none  # type: ignore
-    assert expected.report[0].must_be_non_none == actual.report[0].must_be_non_none  # type: ignore
+    assert expected == actual
 
 
 def test_multi_col_computer_medical_advice(client: AuthenticatedClient):
@@ -1764,8 +1213,8 @@ def test_multi_col_computer_medical_advice(client: AuthenticatedClient):
             ValidationFailure(
                 id="0",
                 metric="prompt.topics.medicine",
-                details="..." "Triggered because of failures in prompt.topics.medicine, prompt.topics.advice (OR).",
-                value=0.7294789552688599,
+                details=AnyString(),
+                value=system_dependent(0.7294789552688599),
                 upper_threshold=0.4,
                 lower_threshold=None,
                 allowed_values=None,
@@ -1776,12 +1225,4 @@ def test_multi_col_computer_medical_advice(client: AuthenticatedClient):
         ],
     )
 
-    assert expected.report[0].value == approx(actual.report[0].value, abs=1.5e-06)  # type: ignore
-    assert expected.report[0].id == actual.report[0].id  # type: ignore
-    assert expected.report[0].metric == actual.report[0].metric  # type: ignore
-    assert expected.report[0].upper_threshold == actual.report[0].upper_threshold  # type: ignore
-    assert expected.report[0].lower_threshold == actual.report[0].lower_threshold  # type: ignore
-    assert expected.report[0].allowed_values == actual.report[0].allowed_values  # type: ignore
-    assert expected.report[0].disallowed_values == actual.report[0].disallowed_values  # type: ignore
-    assert expected.report[0].must_be_none == actual.report[0].must_be_none  # type: ignore
-    assert expected.report[0].must_be_non_none == actual.report[0].must_be_non_none  # type: ignore
+    assert expected == actual

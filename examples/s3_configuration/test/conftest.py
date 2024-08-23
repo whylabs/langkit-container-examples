@@ -112,7 +112,10 @@ def client() -> Generator[AuthenticatedClient, None, None]:
 
     def _check_health():
         print("Checking health", flush=True)
-        Health.sync_detailed(client=client)
+        response = Health.sync_detailed(client=client)
+
+        if not response.status_code == 200:
+            raise Exception(f"Failed health check. Status code: {response.status_code}. {response.parsed}")
 
     try:
         retry(_check_health)

@@ -67,23 +67,34 @@ def create_server(port: int) -> subprocess.Popen[bytes]:
 
 @pytest.fixture(scope="module")
 def client() -> Generator[AuthenticatedClient, None, None]:
-    port = random.randint(10000, 11000)
-    proc = create_server(port=port)
-    client = AuthenticatedClient(base_url=f"http://localhost:{port}", token="password", prefix="", auth_header_name="X-API-Key")  # type: ignore[reportGeneralTypeIssues]
+    USE_EXTERNAL = os.environ.get("USE_EXTERNAL", "false").lower() == "true"
+    if USE_EXTERNAL:
+        yield from _client_external()
+    else:
+        port = random.randint(10000, 11000)
+        proc = create_server(port=port)
+        client = AuthenticatedClient(base_url=f"http://localhost:{port}", token="password", prefix="", auth_header_name="X-API-Key")  # type: ignore[reportGeneralTypeIssues]
 
-    def _check_health():
-        print("Checking health", flush=True)
-        Health.sync_detailed(client=client)
+        def _check_health():
+            print("Checking health", flush=True)
+            response = Health.sync_detailed(client=client)
 
-    try:
-        retry(_check_health)
-        yield client
-    finally:
-        os.killpg(os.getpgid(proc.pid), signal.SIGINT)
-        proc.wait()
+            if not response.status_code == 200:
+                raise Exception(f"Failed health check. Status code: {response.status_code}. {response.parsed}")
+
+        try:
+            retry(_check_health)
+            yield client
+        finally:
+            os.killpg(os.getpgid(proc.pid), signal.SIGINT)
+            proc.wait()
 
 
 @pytest.fixture(scope="module")
 def client_external() -> Generator[AuthenticatedClient, None, None]:
+    yield from _client_external()
+
+
+def _client_external() -> Generator[AuthenticatedClient, None, None]:
     port = 8000
     yield AuthenticatedClient(base_url=f"http://localhost:{port}", token="password", prefix="", auth_header_name="X-API-Key")  # type: ignore[reportGeneralTypeIssues]

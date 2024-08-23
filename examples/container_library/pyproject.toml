@@ -6,13 +6,20 @@ authors = ["Anthony Naddeo <anthony@whylabs.ai>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.10"
-whylogs-container = {version = "1.0.23", extras = ["llm"], source = "whylabs_container_gitlab"}
+python = ">=3.9,<3.12"
+whylogs = "^1.4.4"
+
+whylogs-container = {version = "2.0.0", extras = ["llm"], source = "whylabs_container_gitlab"}
+whylabs-llm-toolkit = {version = "0.1.20", extras = ["infer"], source = "whylabs_container_gitlab"}
+torch = { version = "2.2.1+cpu", source = "torch" }
+
+# Just here to work around a runtime bug in a later version of transformers, may not be necessary in the future
+transformers = "4.39.3"
 
 [tool.poetry.group.dev.dependencies]
 pyright = "^1.1.367"
-ruff = "^0.4.9"
-whylogs-container-client = "1.0.23"
+ruff = "0.6.2"
+whylogs-container-client = "2.0.0"
 
 [build-system]
 requires = ["poetry-core"]
@@ -21,12 +28,12 @@ build-backend = "poetry.core.masonry.api"
 [[tool.poetry.source]]
 name = "torch"
 url = "https://download.pytorch.org/whl/cpu"
-priority = "explicit"
+priority = "explicit" # The container uses the cpu build of torch by default and this is where it is hosted
 
 [[tool.poetry.source]]
 name = "whylabs_container_gitlab"
 url = "https://gitlab.com/api/v4/projects/55361491/packages/pypi/simple"
-priority = "supplemental"
+priority = "explicit"
 
 [tool.pyright]
 include = ["./demo/**/*.py", "./test/**/*.py"]

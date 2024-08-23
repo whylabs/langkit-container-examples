@@ -1,0 +1,8 @@
+id: my_id
+policy_version: 1
+schema_version: 0.0.1
+whylabs_dataset_id: test_rag_context_prompt
+
+metrics:
+  - metric: prompt.similarity.context
+

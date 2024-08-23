@@ -56,7 +56,10 @@ def client() -> Generator[AC, None, None]:
         # DOCSUB_START llm_health_check_example
         import whylogs_container_client.api.manage.health as Health
 
-        Health.sync_detailed(client=client)
+        response = Health.sync_detailed(client=client)
+
+        if not response.status_code == 200:
+            raise Exception(f"Failed health check. Status code: {response.status_code}. {response.parsed}")
         # DOCSUB_END
 
     try:

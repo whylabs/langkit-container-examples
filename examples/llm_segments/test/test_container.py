@@ -1,5 +1,4 @@
 import time
-from test.assert_util import get_profile_list
 
 import whylogs_container_client.api.llm.evaluate as Evaluate
 import whylogs_container_client.api.llm.log_llm as LogLLM
@@ -10,6 +9,8 @@ from whylogs_container_client.models.llm_validate_request import LLMValidateRequ
 from whylogs_container_client.models.llm_validate_request_additional_data import LLMValidateRequestAdditionalData
 from whylogs_container_client.models.status_response import StatusResponse
 from whylogs_container_client.models.validation_result import ValidationResult
+
+from test.assert_util import get_profile_list
 
 
 def test_segmented_request_170(client: AuthenticatedClient):
@@ -56,6 +57,8 @@ def test_segmented_request_170(client: AuthenticatedClient):
             "prompt.pii.us_bank_number",
             "prompt.pii.us_ssn",
             "prompt.similarity.injection",
+            "prompt.similarity.injection_neighbor_coordinates",
+            "prompt.similarity.injection_neighbor_ids",
             "response.similarity.refusal",
             "version",
         ]
@@ -111,6 +114,8 @@ def test_segmented_request_async_171(client: AuthenticatedClient):
             "prompt.pii.us_bank_number",
             "prompt.pii.us_ssn",
             "prompt.similarity.injection",
+            "prompt.similarity.injection_neighbor_coordinates",
+            "prompt.similarity.injection_neighbor_ids",
             "response.refusal.is_refusal",
             "response.sentiment.sentiment_score",
             "response.similarity.refusal",

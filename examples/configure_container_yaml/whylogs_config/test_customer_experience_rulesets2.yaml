@@ -1,0 +1,15 @@
+id: my_id
+policy_version: 1
+schema_version: 0.0.1
+whylabs_dataset_id: test_customer_experience_rulesets2
+
+# DOCSUB_START ruleset_example_customer_experience_metrics
+metrics:
+  - metric: prompt.sentiment.sentiment_score
+  - metric: prompt.pii
+  - metric: response.sentiment.sentiment_score
+  - metric: response.toxicity.toxicity_score
+  - metric: response.regex.refusal
+  - metric: prompt.pca.coordinates
+  - metric: response.pca.coordinates
+# DOCSUB_END

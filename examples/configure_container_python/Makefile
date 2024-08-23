@@ -3,7 +3,7 @@
 
 CONTAINER_NAME = langkit_example_configure_container_python
 
-version := 1.0.23
+version := 2.0.0
 
 all: build
 

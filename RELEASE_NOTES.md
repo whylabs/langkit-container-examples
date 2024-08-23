@@ -1,3 +1,160 @@
+# 2.0.0 Release Notes
+
+- New metrics for computing a set of 3d coordinates that the WhyLabs platform can interpret to visualize the prompt/response data relative
+  to the data that we can detect in our metrics. These show up automatically for anyone using a ruleset and can be manually added if using
+  custom policies.
+  - `prompt.pca.coordinates`
+  - `response.pca.coordinates`
+- New additional sub metrics. These come along with the `prompt.similarity.injection` metric and report the nearest neighbors within our
+  injections database. This should help add some transparancy when paired with the WhyLabs platform's ability to visualize this information.
+  - `prompt.similarity.injection_neighbor_ids`
+  - `prompt.similarity.injection_neighbor_coordinates`
+- Default policy is less aggressive. There were too many things being blocked out of the box when the primary use case was testing.
+- Performance improvements to the `prompt.similarity.injection` metric in terms of both latency and accuracy. Times should be more
+  consistently around the 5ms-10ms range.
+- Additional metadata about version metric versions included in traces. The platform will consume this information to enable embedding
+  visualizations but its also useful when creating custom policies and comparing traces over time to ensure nothing has changed.
+- The action type can now be `flag`, indicating that there was a flagged message. Previously there was only `block` and `pass`.
+- Empty policies are now allowed. Really only useful to overwrite the built in default policy in the container.
+- Scores are now calculated for the `*.similarity.context` metrics.
+
+## Experimental Topics Model
+
+We have a new topic classifier with the following categories:
+
+- harmful
+- injection
+- code
+- medical
+- financial
+- hate
+- toxic
+- innocuous
+
+You can test these out by using the following metrics in your custom policy file. They aren't available through rulesets yet in the WhyLabs
+platform.
+
+```yaml
+id: v2
+policy_version: 1
+schema_version: 0.0.1
+whylabs_dataset_id: model-x
+
+metrics:
+  - metric: prompt.topics
+    options:
+      use_experimental_models: true
+      topics:
+        - harmful
+        - injection
+        - code
+        - medical
+        - financial
+        - hate
+        - toxic
+        - innocuous
+
+  - metric: response.topics
+    options:
+      use_experimental_models: true
+      topics:
+        - harmful
+        - injection
+        - code
+        - medical
+        - financial
+        - hate
+        - toxic
+        - innocuous
+```
+
+These classifiers allow us to quickly detect hand picked topics, but we have to train for each topic that we detect. If you pick a topic
+that isn't in this list then it will end up falling back to a heavier zero shot model for that topic. As we improve the performance of these
+over time we'll be making them the defaults for certain topics and using them inside of other metrics to improve their performance. For
+example, we can use the `innocuous` detection in various metrics to reduce false positive rates by short circuiting for innocuous prompts.
+work.
+
+## Innocuous Prompt Filtering for Injection Metric
+
+Building ontop of the new classifiers, we have a flag that lets you try innocuous prompt filtering for the injection metric. This will
+return a score of `0.0` for injections if the prompt was detected to be innocuous, otherwise it will do the normal injection metric
+calculation. You can try this with the following policy.
+
+```yaml
+id: v2
+policy_version: 1
+schema_version: 0.0.1
+whylabs_dataset_id: setfit
+
+metrics:
+  - metric: prompt.similarity.injection
+    options:
+      filter_innocuous: true
+```
+
+If the prompt is classified as innocuous then the injection score will be overriden to `0.0`.
+
+```json
+{
+  // ...
+  "prompt.similarity.injection.is_innocuous": true,
+  "prompt.similarity.injection": 0
+}
+```
+
+## Breaking Client Changes
+
+The `action` field has been reworked to not use enums in the generated client. Doing this is nice when client and server versions align but
+it means that adding any new fields to the enum breaks older clients. Now it's a generic object that has an `action_type` and `message`
+field.
+
+```javascript
+{
+  // ...
+  "action": {
+    "action_type": "block", // or flag, pass
+    "message": "..."
+  }
+  // ...
+}
+```
+
+## Additional Data Propagation
+
+The additional data fields optionally sent with requests now flow through to traces and they are sent along with callbacks when configured
+to do so. Give the following policy
+
+```yaml
+id: test
+policy_version: 1
+schema_version: 0.0.1
+whylabs_dataset_id: model-123
+
+metrics:
+  - metric: prompt.similarity.injection
+    validation:
+      upper_threshold: 0 # always triggers
+
+callbacks:
+  - callback: webhook.static_bearer_auth_validation_failure
+    options:
+      url: http://localhost:8001/failures
+      auth_token: password
+      include_input: true # Include the prompt/response and additional columns
+```
+
+And the following request
+
+```python
+LLMValidateRequest(
+    prompt="...",
+    response="...",
+    dataset_id="model-170",
+    additional_data=LLMValidateRequestAdditionalData.from_dict({"foo": "bar", "a": 2}),
+)
+```
+
+The trace and callback will container the additional data fields `foo` and `a` with values `bar` and `2` respectively.
 # 1.0.23 Release Notes
 
 - Update the `/status` endpoint with additional configuration info for debugging, including all of the env variables the container accepts

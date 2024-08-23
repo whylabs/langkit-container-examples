@@ -1,0 +1,18 @@
+id: my_id
+policy_version: 1
+schema_version: 0.0.1
+whylabs_dataset_id: test_misuse_rulesets2
+
+# DOCSUB_START ruleset_example_misuse_metrics
+metrics:
+  - metric: prompt.pca.coordinates
+  - metric: response.pca.coordinates
+  - metric: response.pii
+  - metric: prompt.topics
+    options:
+      topics:
+        - medicine
+        - legal
+        - finance
+
+# DOCSUB_END

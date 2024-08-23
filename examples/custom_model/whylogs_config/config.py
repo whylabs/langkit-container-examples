@@ -108,20 +108,24 @@ class MyCallback(Callback):
         print(results.transpose())  # pyright: ignore[reportUnknownMemberType]
 
 
+options = LangkitOptions(
+    metrics=[
+        lib.prompt.sentiment.sentiment_score(),
+        lib.response.sentiment.sentiment_score(),
+        custom_presidio_metric("prompt"),
+    ],
+    validators=[
+        validators_lib.constraint("prompt.pii.phone_number", upper_threshold=0),
+        validators_lib.constraint("prompt.pii.email_address", upper_threshold=0),
+        validators_lib.constraint("prompt.pii.credit_card", upper_threshold=0),
+    ],
+    callbacks=[MyCallback()],
+)
+
+
 langkit_config: Dict[str, LangkitOptions] = {
-    "model-131": LangkitOptions(
-        metrics=[
-            lib.prompt.sentiment.sentiment_score(),
-            lib.response.sentiment.sentiment_score(),
-            custom_presidio_metric("prompt"),
-        ],
-        validators=[
-            validators_lib.constraint("prompt.pii.phone_number", upper_threshold=0),
-            validators_lib.constraint("prompt.pii.email_address", upper_threshold=0),
-            validators_lib.constraint("prompt.pii.credit_card", upper_threshold=0),
-        ],
-        callbacks=[MyCallback()],
-    ),
+    "model-131": options,
+    "model-180": options,
 }
 
 

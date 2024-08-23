@@ -1,0 +1,12 @@
+id: my_id
+policy_version: 1
+schema_version: 0.0.1
+whylabs_dataset_id: test_customer_experience_rulesets1
+
+rulesets:
+# DOCSUB_START ruleset_example_customer_experience
+  - ruleset: score.customer_experience
+    options:
+      behavior: observe
+      sensitivity: medium
+# DOCSUB_END

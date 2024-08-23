@@ -48,4 +48,4 @@ metrics:
   - metric: prompt.similarity.injection
     options:
       # This uses our internal model and follows a different versioning scheme
-      version: v2
+      version: 2

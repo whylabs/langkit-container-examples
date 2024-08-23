@@ -1,4 +1,4 @@
-id: my-id 
+id: my-id
 policy_version: 1
 schema_version: 0.0.1
 whylabs_dataset_id: model-135
@@ -12,21 +12,25 @@ metrics:
 validators:
   - validator: constraint
     options:
+      failure_level: flag
       target_metric: prompt.pii.email_address
       upper_threshold: 0
 
   - validator: constraint
     options:
       target_metric: prompt.pii.credit_card
+      failure_level: flag
       upper_threshold: 0
 
   - validator: constraint
     options:
+      failure_level: flag
       target_metric: prompt.pii.redacted
       must_be_none: True
 
   - validator: constraint
     options:
+      failure_level: flag
       target_metric: response.pii.redacted
       must_be_none: True
 

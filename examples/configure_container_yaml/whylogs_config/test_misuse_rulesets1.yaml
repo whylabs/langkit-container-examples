@@ -1,0 +1,17 @@
+id: my_id
+policy_version: 1
+schema_version: 0.0.1
+whylabs_dataset_id: test_misuse_rulesets1
+
+rulesets:
+# DOCSUB_START ruleset_example_misuse
+  - ruleset: score.misuse
+    options:
+      behavior: observe
+      sensitivity: medium
+      topics:
+        - medicine
+        - legal
+        - finance
+# DOCSUB_END
+

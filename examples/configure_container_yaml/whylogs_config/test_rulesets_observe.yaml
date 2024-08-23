@@ -1,0 +1,24 @@
+id: my_id
+policy_version: 1
+schema_version: 0.0.1
+whylabs_dataset_id: test_rulesets_observe
+
+rulesets:
+  - ruleset: prompt.score.misuse
+    options:
+      behavior: observe
+      sensitivity: medium
+      topics:
+        - medicine
+        - legal
+        - finance
+
+  - ruleset: response.score.misuse
+    options:
+      behavior: observe
+      sensitivity: medium
+      topics:
+        - medicine
+        - legal
+        - finance
+

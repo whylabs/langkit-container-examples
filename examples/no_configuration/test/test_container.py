@@ -1,8 +1,9 @@
 import time
-from test.assert_util import get_profile_list
 
 from whylogs_container_client import AuthenticatedClient
 from whylogs_container_client.models.llm_validate_request import LLMValidateRequest
+
+from test.assert_util import get_profile_list
 
 
 def test_log(client: AuthenticatedClient):
@@ -42,10 +43,8 @@ def test_log(client: AuthenticatedClient):
 
     result: StatusResponse = response.parsed
 
-    print(f">>> {result}")
     profiles = get_profile_list(result)
 
-    print(f">>> {profiles}")
     assert len(profiles) == 1
 
     # The first response after startup will take a little bit longer with this many metrics
@@ -94,6 +93,7 @@ def test_llm_log(client: AuthenticatedClient):
 
     assert list(profile.get_columns().keys()) == [
         "id",
+        "prompt.pca.coordinates",
         "prompt.pii.credit_card",
         "prompt.pii.email_address",
         "prompt.pii.phone_number",
@@ -102,6 +102,8 @@ def test_llm_log(client: AuthenticatedClient):
         "prompt.pii.us_ssn",
         "prompt.score.bad_actors",
         "prompt.score.bad_actors.prompt.similarity.injection",
+        "prompt.score.bad_actors.prompt.similarity.injection_neighbor_coordinates",
+        "prompt.score.bad_actors.prompt.similarity.injection_neighbor_ids",
         "prompt.score.bad_actors.prompt.similarity.jailbreak",
         "prompt.score.cost",
         "prompt.score.cost.prompt.stats.char_count",
@@ -115,19 +117,22 @@ def test_llm_log(client: AuthenticatedClient):
         "prompt.score.customer_experience.prompt.pii.us_ssn",
         "prompt.score.customer_experience.prompt.sentiment.sentiment_score",
         "prompt.score.misuse",
-        "prompt.score.misuse.prompt.topics.code",
         "prompt.score.misuse.prompt.topics.financial",
         "prompt.score.misuse.prompt.topics.legal",
         "prompt.score.misuse.prompt.topics.medical",
+        "prompt.score.util",
+        "prompt.score.util.prompt.pca.coordinates",
         "prompt.sentiment.sentiment_score",
         "prompt.similarity.injection",
+        "prompt.similarity.injection_neighbor_coordinates",
+        "prompt.similarity.injection_neighbor_ids",
         "prompt.similarity.jailbreak",
         "prompt.stats.char_count",
         "prompt.stats.token_count",
-        "prompt.topics.code",
         "prompt.topics.financial",
         "prompt.topics.legal",
         "prompt.topics.medical",
+        "response.pca.coordinates",
         "response.pii.credit_card",
         "response.pii.email_address",
         "response.pii.phone_number",
@@ -153,6 +158,8 @@ def test_llm_log(client: AuthenticatedClient):
         "response.score.truthfulness.prompt.similarity.context",
         "response.score.truthfulness.response.similarity.context",
         "response.score.truthfulness.response.similarity.prompt",
+        "response.score.util",
+        "response.score.util.response.pca.coordinates",
         "response.sentiment.sentiment_score",
         "response.similarity.prompt",
         "response.stats.char_count",

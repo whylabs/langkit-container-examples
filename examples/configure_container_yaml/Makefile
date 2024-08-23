@@ -2,7 +2,7 @@
 .PHONY: test-no-secure run-no-secure ci-install
 
 CONTAINER_NAME = langkit_example_configure_container_yaml
-version := 1.0.23
+version := 2.0.0
 
 
 all: build
@@ -14,7 +14,7 @@ build:
 	docker build --platform=linux/amd64 . -t $(CONTAINER_NAME)
 
 test:
-	poetry run pytest -vvv -s ./test
+	poetry run pytest -vvv ./test
 
 test-no-secure:
 	AUTO_PULL_WHYLABS_POLICY_MODEL_IDS= poetry run pytest -vvv -s -m "not llm_secure" ./test

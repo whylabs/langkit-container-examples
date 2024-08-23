@@ -1,0 +1,15 @@
+id: my_id
+policy_version: 1
+schema_version: 0.0.1
+whylabs_dataset_id: test_truthfulness_rulesets1
+
+rulesets:
+# DOCSUB_START ruleset_example_truthfulness
+  - ruleset: score.truthfulness
+    options:
+      behavior: observe
+      sensitivity: medium
+      rag_enabled: true
+      hallucinations_enabled: false
+# DOCSUB_END
+

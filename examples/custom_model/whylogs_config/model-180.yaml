@@ -1,0 +1,10 @@
+id: model-180 policy
+policy_version: 1
+schema_version: 0.0.1
+whylabs_dataset_id: model-180
+
+rulesets:
+  - ruleset: score.customer_experience
+    options:
+      behavior: flag
+      sensitivity: medium
