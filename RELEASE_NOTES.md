@@ -18,6 +18,23 @@
 - Empty policies are now allowed. Really only useful to overwrite the built in default policy in the container.
 - Scores are now calculated for the `*.similarity.context` metrics.
 
+## New Image Variants
+
+This release publishes additional tags that reflect new variants of the container.
+
+- `2.0.0`
+- `2.0.0_AllMiniLML6V2`
+- `2.0.0_BGESmallEn_V1_5`
+- `2.0.0_ParaphraseMultilingualMiniLML12V2`
+- `latest`
+- `latest_AllMiniLML6V2`
+- `latest_BGESmallEn_V1_5`
+- `latest_ParaphraseMultilingualMiniLML12V2`
+
+The plain `latest` and `2.0.0` tags are points to the `AllMiniLML6V2` variant of the container. These images use different default encoder
+models for all of the metrics that support custom enocoder models. Some models don't actually consume embeddings currently (like the zero
+shot topic classifier) so it doesn't change those at all.
+
 ## Experimental Topics Model
 
 We have a new topic classifier with the following categories:
