@@ -31,7 +31,7 @@ This release publishes additional tags that reflect new variants of the containe
 - `latest_BGESmallEn_V1_5`
 - `latest_ParaphraseMultilingualMiniLML12V2`
 
-The plain `latest` and `2.0.0` tags are points to the `AllMiniLML6V2` variant of the container. These images use different default encoder
+The plain `latest` and `2.0.0` tags point to the `AllMiniLML6V2` variant of the container. These images use different default encoder
 models for all of the metrics that support custom enocoder models. Some models don't actually consume embeddings currently (like the zero
 shot topic classifier) so it doesn't change those at all.
 
