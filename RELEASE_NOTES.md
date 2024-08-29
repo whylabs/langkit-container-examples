@@ -14,7 +14,7 @@ default after additional tuning.
 id: policy-id
 policy_version: 1
 schema_version: 0.0.1
-whylabs_dataset_id: injection
+whylabs_dataset_id: model-1
 
 metrics:
   - metric: prompt.similarity.injection
@@ -58,7 +58,7 @@ innocuous filtering off when using this feature if it ends up classifying your e
 id: policy-id
 policy_version: 1
 schema_version: 0.0.1
-whylabs_dataset_id: injection
+whylabs_dataset_id: model-1
 
 metrics:
   - metric: prompt.similarity.injection
