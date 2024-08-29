@@ -433,13 +433,13 @@ files = [
 
 [[package]]
 name = "whylogs-container-client"
-version = "2.0.0"
+version = "2.0.1"
 description = "A client library for accessing FastAPI"
 optional = false
 python-versions = "<4.0,>=3.8"
 files = [
-    {file = "whylogs_container_client-2.0.0-py3-none-any.whl", hash = "sha256:87a94c76d10705f46057da4a671d047886e75cd2056c84f9729e8b2938560c0b"},
-    {file = "whylogs_container_client-2.0.0.tar.gz", hash = "sha256:e9d6fe0824b1e63f88ade17371858ef741cba0c2e9053dc0cf09afae257276c1"},
+    {file = "whylogs_container_client-2.0.1-py3-none-any.whl", hash = "sha256:6c1844a253528384cb286f6e6cc1ce64b40c5d813128a6d78e7c6c0223e94c26"},
+    {file = "whylogs_container_client-2.0.1.tar.gz", hash = "sha256:f75672d21b5292ef2d49eacd730bec202b2b4f8a5dc50ed385acb66c20df3812"},
 ]
 
 [package.dependencies]
@@ -450,4 +450,4 @@ python-dateutil = ">=2.8.0,<3.0.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "dbbe2e0ba350a87387080b7016d029031cb8480e3c06a2e2a870c1ac61f4d1c3"
+content-hash = "a0ede4bce9faa9edb8809d4ccf7bc9cee5c977ea617655da497a48568eb5973d"

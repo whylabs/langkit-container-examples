@@ -5116,13 +5116,13 @@ urllib3 = ">=1.25.3"
 
 [[package]]
 name = "whylabs-llm-toolkit"
-version = "0.1.20"
+version = "0.1.21"
 description = "Utilities for harm dataset generation"
 optional = false
 python-versions = ">=3.9,<3.12"
 files = [
-    {file = "whylabs_llm_toolkit-0.1.20-py3-none-any.whl", hash = "sha256:98b3ac462add72e78ab9182fb3af4a14259d5afbabf8a2ea61c17403eb6268f7"},
-    {file = "whylabs_llm_toolkit-0.1.20.tar.gz", hash = "sha256:882d56ef48734a9388cf073eaf65c7e3017a6d00fbc7bf2dd60d08c990c61453"},
+    {file = "whylabs_llm_toolkit-0.1.21-py3-none-any.whl", hash = "sha256:e219a3f3dc4daee6f39aa09b9b987c2c4dab14ede134eaf6bb5490c681d4e1a7"},
+    {file = "whylabs_llm_toolkit-0.1.21.tar.gz", hash = "sha256:6d49e497de5ffd50b28efbea84563a991d27b50e0f84dda136e329c9c95ef599"},
 ]
 
 [package.dependencies]
@@ -5146,7 +5146,6 @@ tiktoken = {version = "0.6.0", optional = true, markers = "extra == \"infer\""}
 whylabs-client = ">=0.6.6,<0.7.0"
 whylabs-textstat = {version = ">=0.7.4,<0.8.0", optional = true, markers = "extra == \"infer\""}
 whylogs = ">=1.4.4,<2.0.0"
-xformers = {version = "*", markers = "python_full_version >= \"3.8.0\" and python_version < \"4\" and sys_platform == \"!macos\""}
 
 [package.extras]
 eval = ["chromadb (==0.5.5)", "databricks-sdk (>=0.25.1,<0.26.0)", "matplotlib (>=3.8.4,<4.0.0)", "mlflow (>=2.11.3,<3.0.0)", "optimum[exporters,onnxruntime] (==1.21.2)", "pandas", "python-dotenv (>=1.0.1,<2.0.0)", "scikit-learn (>=1.4.1.post1,<2.0.0)", "sentence-transformers (==2.6.1)", "songbird-client (==0.1.816)"]
@@ -5221,13 +5220,13 @@ viz = ["Pillow (>=10.1.0,<11)", "Pillow (>=9.2.0)", "ipython", "numpy", "numpy (
 
 [[package]]
 name = "whylogs-container"
-version = "2.0.0"
+version = "2.0.1"
 description = ""
 optional = false
 python-versions = ">=3.9,<3.12"
 files = [
-    {file = "whylogs_container-2.0.0-py3-none-any.whl", hash = "sha256:e9917d6538c47de27dc393d80f16d0bcc8530025e8e7c34a119e5c7a4ab5d18f"},
-    {file = "whylogs_container-2.0.0.tar.gz", hash = "sha256:f53de8cbb314ca34d43c7a53ff792d7e0010ca8d9765141b311f4a33974ba09a"},
+    {file = "whylogs_container-2.0.1-py3-none-any.whl", hash = "sha256:f805b87b96e6b6c36265346399f29e48e2bab33023650720c1e3a9c84ee1e96d"},
+    {file = "whylogs_container-2.0.1.tar.gz", hash = "sha256:23c225392fd8ef4f19aaed7b632a954f8003feecade8c6a99b7bc76f3bac2afb"},
 ]
 
 [package.dependencies]
@@ -5253,11 +5252,11 @@ torch = [
 urllib3 = "1.26.19"
 uvicorn = {version = ">=0.24.0.post1,<0.25.0", extras = ["standard"]}
 whylabs-client = ">=0.6.7,<0.7.0"
-whylabs-llm-toolkit = {version = "0.1.20", extras = ["infer"], optional = true, markers = "extra == \"llm\""}
+whylabs-llm-toolkit = {version = "0.1.21", extras = ["infer"], optional = true, markers = "extra == \"llm\""}
 whylogs = {version = "1.4.4", extras = ["embeddings", "proc"]}
 
 [package.extras]
-llm = ["torch (==2.2.1)", "torch (==2.2.1+cpu)", "whylabs-llm-toolkit[infer] (==0.1.20)"]
+llm = ["torch (==2.2.1)", "torch (==2.2.1+cpu)", "whylabs-llm-toolkit[infer] (==0.1.21)"]
 
 [package.source]
 type = "legacy"
@@ -5266,13 +5265,13 @@ reference = "whylabs_container_gitlab"
 
 [[package]]
 name = "whylogs-container-client"
-version = "2.0.0"
+version = "2.0.1"
 description = "A client library for accessing FastAPI"
 optional = false
 python-versions = "<4.0,>=3.8"
 files = [
-    {file = "whylogs_container_client-2.0.0-py3-none-any.whl", hash = "sha256:87a94c76d10705f46057da4a671d047886e75cd2056c84f9729e8b2938560c0b"},
-    {file = "whylogs_container_client-2.0.0.tar.gz", hash = "sha256:e9d6fe0824b1e63f88ade17371858ef741cba0c2e9053dc0cf09afae257276c1"},
+    {file = "whylogs_container_client-2.0.1-py3-none-any.whl", hash = "sha256:6c1844a253528384cb286f6e6cc1ce64b40c5d813128a6d78e7c6c0223e94c26"},
+    {file = "whylogs_container_client-2.0.1.tar.gz", hash = "sha256:f75672d21b5292ef2d49eacd730bec202b2b4f8a5dc50ed385acb66c20df3812"},
 ]
 
 [package.dependencies]
@@ -5398,28 +5397,6 @@ files = [
     {file = "wrapt-1.16.0-py3-none-any.whl", hash = "sha256:6906c4100a8fcbf2fa735f6059214bb13b97f75b1a61777fcf6432121ef12ef1"},
     {file = "wrapt-1.16.0.tar.gz", hash = "sha256:5f370f952971e7d17c7d1ead40e49f32345a7f7a5373571ef44d800d06b1899d"},
 ]
-
-[[package]]
-name = "xformers"
-version = "0.0.25"
-description = "XFormers: A collection of composable Transformer building blocks."
-optional = false
-python-versions = ">=3.7"
-files = [
-    {file = "xformers-0.0.25-cp310-cp310-manylinux2014_x86_64.whl", hash = "sha256:aff69fb8708e0500ecbb2174e9b9533948bf126e7daa59e5d784c1fc37e9d46c"},
-    {file = "xformers-0.0.25-cp310-cp310-win_amd64.whl", hash = "sha256:ef3dc7f65d0b25148570172647759eb3b6032c24d696b52dabd6b55164a4a1ab"},
-    {file = "xformers-0.0.25-cp311-cp311-manylinux2014_x86_64.whl", hash = "sha256:4a58e42aea10eea9c68121afd9880c914d4512c76f9236c66fe853abab602e52"},
-    {file = "xformers-0.0.25-cp311-cp311-win_amd64.whl", hash = "sha256:a62666f27a10e4e2aff49edce369bbf1f5218ff8d7f9580d33706950ddb992d7"},
-    {file = "xformers-0.0.25-cp38-cp38-manylinux2014_x86_64.whl", hash = "sha256:4218e995f8953050b4f702d0dd79abf4d6247889efeda4c7077ab7d8fd41b65a"},
-    {file = "xformers-0.0.25-cp38-cp38-win_amd64.whl", hash = "sha256:b72fc7f7222184421b63c794e1896424482ee5579d9f1d088b582560eefc3f58"},
-    {file = "xformers-0.0.25-cp39-cp39-manylinux2014_x86_64.whl", hash = "sha256:4df5c35536f820c96b90c2aa40444f84947c6c7ebfbdacb2789a9aca526d3be7"},
-    {file = "xformers-0.0.25-cp39-cp39-win_amd64.whl", hash = "sha256:669adb8955585f0c30d7c1b0f6d757216c9ea0c62d625f79ebea8aa17665c8f0"},
-    {file = "xformers-0.0.25.tar.gz", hash = "sha256:63f74d96c82d6b9bf3daf38f53cf173a29370ee6bd1dfde15836d0d598b6f82f"},
-]
-
-[package.dependencies]
-numpy = "*"
-torch = "2.2.1"
 
 [[package]]
 name = "xxhash"
@@ -5674,4 +5651,4 @@ test = ["big-O", "importlib-resources", "jaraco.functools", "jaraco.itertools", 
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.9,<3.12"
-content-hash = "d92a45fbd222b55fa11a68094619fbe1122e09e4cf228c15f8c6c71d1581949b"
+content-hash = "89334e2be950462dc92b67604a7575245630b14ca259b02c0b154fe8805d8170"

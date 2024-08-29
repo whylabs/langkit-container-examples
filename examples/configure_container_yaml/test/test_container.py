@@ -8,6 +8,7 @@ from pytest import approx  # type: ignore
 from whylogs_container_client import AuthenticatedClient
 from whylogs_container_client.models.action import Action
 from whylogs_container_client.models.action_type import ActionType
+from whylogs_container_client.models.embedding_request import EmbeddingRequest
 from whylogs_container_client.models.evaluation_result import EvaluationResult
 from whylogs_container_client.models.evaluation_result_metrics_item import EvaluationResultMetricsItem
 from whylogs_container_client.models.evaluation_result_scores_item import EvaluationResultScoresItem
@@ -1226,3 +1227,23 @@ def test_multi_col_computer_medical_advice(client: AuthenticatedClient):
     )
 
     assert expected == actual
+
+
+def test_embedding_creation(client: AuthenticatedClient):
+    import whylogs_container_client.api.debug.debug_embeddings as DebugEmbeddings
+    from whylogs_container_client.models.evaluation_result import EvaluationResult
+
+    request = EmbeddingRequest(prompt="my prompt", response="my response")
+
+    response = DebugEmbeddings.sync_detailed(client=client, body=request)
+
+    if not isinstance(response.parsed, EvaluationResult):
+        raise Exception(f"Failed to generate embeddings. Status code: {response.status_code}. {response.parsed}")
+
+    actual: EvaluationResult = response.parsed
+
+    metrics = actual.metrics[0]
+
+    # These are embeddings of shape 384 by default
+    assert metrics["prompt.util.embedding"] == AnyCollection(384)
+    assert metrics["response.util.embedding"] == AnyCollection(384)

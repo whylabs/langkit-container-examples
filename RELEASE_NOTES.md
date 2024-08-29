@@ -1,3 +1,105 @@
+# 2.0.1 Release Notes
+
+- The `/debug/evaluate` endpoint is now disabled by default. You can enable it by setting the `DEBUG_ENDPOINT_ENABLED` environment variable
+  to `True`. It has a large performance impact and should only be used for debugging and prototyping policies.
+
+## Innocuous Prompt Filtering
+
+The newest injection metric has an option to filter out innocuous prompts using our internal classifier. This can help reduce false
+positives by first checking to see if the prompt is innocuous before running the injection metric. If it is then the metric value will end
+up being `0.0`. You can enable it on the policy by setting the `filter_innocuous` option to `true`. We'll eventually be making this the
+default after additional tuning.
+
+```yaml
+id: policy-id
+policy_version: 1
+schema_version: 0.0.1
+whylabs_dataset_id: injection
+
+metrics:
+  - metric: prompt.similarity.injection
+    options:
+      filter_innocuous: true
+```
+
+## New Embedding Creation API
+
+There is a new `/debug/embeddings` endpoint that allows you to create embeddings for a prompt and response. This is useful when paired with
+the injection metric customization feature, allowing you to generate pre computed embeddings using the correct embedding model for the
+version of the container you're using.
+
+```python
+import whylogs_container_client.api.debug.debug_embeddings as DebugEmbeddings
+from whylogs_container_client.models.evaluation_result import EvaluationResult
+
+request = EmbeddingRequest(prompt="my prompt", response="my response")
+
+response = DebugEmbeddings.sync_detailed(client=client_external, body=request)
+
+if not isinstance(response.parsed, EvaluationResult):
+    raise Exception(f"Failed to generate embeddings. Status code: {response.status_code}. {response.parsed}")
+
+actual: EvaluationResult = response.parsed
+
+metrics = actual.metrics[0]
+
+# These are embeddings of shape 384 by default
+assert metrics["prompt.util.embedding"] == AnyCollection(384)
+assert metrics["response.util.embedding"] == AnyCollection(384)
+```
+
+## Customizing Injection Metric
+
+The injection metric can now be customized with pre-computed parquet/numpy embeddings. The injection metric is a vector store under the hood
+and these embeddings will be used in nearest neighbor calculations. Not available via rulesets yet. You might want to disable leave
+innocuous filtering off when using this feature if it ends up classifying your embeddings as innocuous.
+
+```yaml
+id: policy-id
+policy_version: 1
+schema_version: 0.0.1
+whylabs_dataset_id: injection
+
+metrics:
+  - metric: prompt.similarity.injection
+    options:
+      filter_innocuous: false
+      additional_data_url: s3://anthony-test-bucket-2/data/embeddings.parquet
+      neighbors_num: 10
+      return_neighbors: true
+```
+
+## Remote Metric Support
+
+Metrics in the underlying workflow framework that the container uses can now be remote, which is a synonym for IO bound. For now, this only
+applies to the custom python configuration path because metrics have to be defined from scratch in order to signal that they're actually IO
+bound, and none of the standard metrics that we ship are actually IO bound yet, they're all CPU bound. See the python configuration examples
+for defining a custom metric. The following is a simple example.
+
+```python
+def remote_metric(id: str, work_time: float = 0.01) -> MetricCreator:
+    def _metric():
+        def udf(text: pd.DataFrame) -> SingleMetricResult:
+            try:
+                # Insert api call or any io bound work here
+                # Use the results of that work to return metric values
+                metrics = [1 for _ in range(len(text))]
+                return SingleMetricResult(metrics)
+            except Exception as e:
+                # return None for any errors
+                return SingleMetricResult([None for _ in range(len(text))])
+
+        return SingleMetric(
+            name="remote_metric_name",
+            input_names=["prompt"],
+            evaluate=udf,
+            remote=True, # This marks the metric as remote
+        )
+
+    return _metric
+```
+
+All remote metrics are executed upfront and in parallel, then the rest of the configured metrics are run in serial, if there are any.
 # 2.0.0 Release Notes
 
 - New metrics for computing a set of 3d coordinates that the WhyLabs platform can interpret to visualize the prompt/response data relative

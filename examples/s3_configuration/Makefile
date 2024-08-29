@@ -1,8 +1,8 @@
 .PHONY: help requirements build run all clean lint lint-fix format format-fix fix test pip-install-python-client pull install
 
 CONTAINER_NAME = langkit_example_s3_sync_configure
-DOCKER_IMAGE = registry.gitlab.com/whylabs/langkit-container:2.0.0
-version := 2.0.0
+DOCKER_IMAGE = registry.gitlab.com/whylabs/langkit-container:2.0.1
+version := 2.0.1
 
 all: build
 

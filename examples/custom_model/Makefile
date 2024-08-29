@@ -1,7 +1,7 @@
 .PHONY: help build run all clean lint lint-fix format format-fix fix test pip-install-python-client
 
 CONTAINER_NAME = langkit_example_custom_model
-version := 2.0.0
+version := 2.0.1
 
 all: build
 
