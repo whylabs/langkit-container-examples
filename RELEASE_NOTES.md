@@ -1,6 +1,6 @@
 # 2.0.2 Release Notes
 
-- Add a `DISABLE_PROFILING` env option. This env option allows you to disable profiling at the container level, which leads to no whylogs
+- Add a `DISABLE_PROFILING` env variable. This env variable allows you to disable profiling at the container level, which leads to no whylogs
   profile generation or uploads. The primary use case for this is a trace-only container.
 - The `prompt.similarity.jailbreak` metric has been removed. It was superseded by the `prompt.similarity.injection` metric.
 
@@ -28,8 +28,8 @@ metrics:
 Keep in mind that this metric essentially checks to see if a given response is consistent with the response that an LLM would generate. It
 can't be used to determine if any given string is true or false. This means that a technically false statement can have a low hallucination
 score. To mitigate this, you can use a bigger LLM or increase the `num_samples` parameter, which uses more response samples when computing
-the metric, the logic being that the a prompt that results in many valid responses is more likely to be a hallucination. If the LLM always
-returns a very similar answer for a prompt then its probably not a hallucination (even if it might indicate an issue with the data the LLM
+the metric, the logic being that a prompt that results in widely varied responses is more likely to be a hallucination. If the LLM always
+returns a very similar answer for a prompt then it's probably not a hallucination (even if it might indicate an issue with the data the LLM
 was trained on).
 
 ## Alternate Secret Configuration Methods
@@ -50,7 +50,7 @@ $ tree /var/run/secrets/whylabs.ai/env
 └── any_other_env_vars
 ```
 
-Alternatively, for only the secrets keys `whylabs_api_key` and `container_password`, set the env variable `secrets_path_json` (or use its
+Alternatively, for only the secret key names `whylabs_api_key` and `container_password`, set the env variable `secrets_path_json` (or use its
 default value of `/var/run/secrets/whylabs.ai/env/guardrails.json`) and write a json file there with these secrets, which looks like:
 
 ```json
