@@ -54,6 +54,8 @@ class ServerCommands:
             f"AUTO_PULL_WHYLABS_POLICY_MODEL_IDS={os.getenv('AUTO_PULL_WHYLABS_POLICY_MODEL_IDS', 'model-68')}",
             "--env",
             "DEFAULT_WHYLABS_UPLOAD_INTERVAL=5",
+            "--env",
+            f"OPENAI_API_KEY={os.environ['OPENAI_API_KEY']}",
             image_name,
         ]
 

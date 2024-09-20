@@ -1,0 +1,10 @@
+id: my-id
+policy_version: 1
+schema_version: 0.0.1
+whylabs_dataset_id: metric_regex_pii_groups
+
+# DOCSUB_START metric_library_regex_pii_groups
+metrics:
+  - metric: prompt.regex
+  - metric: response.regex
+# DOCSUB_END

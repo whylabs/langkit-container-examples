@@ -18,12 +18,6 @@ metrics:
         # https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/commits/main
         revision: 8b3219a92973c328a8e22fadcfa821b5dc75636a
 
-  - metric: prompt.similarity.jailbreak
-    options:
-      embedding:
-        name: all-MiniLM-L6-v2
-        revision: 8b3219a92973c328a8e22fadcfa821b5dc75636a
-
   - metric: response.similarity.context
     options:
       embedding:

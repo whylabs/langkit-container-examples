@@ -5,7 +5,6 @@ whylabs_dataset_id: test_bad_actor_rulesets2
 
 # DOCSUB_START ruleset_example_bad_actors_metrics
 metrics:
-  - metric: prompt.similarity.jailbreak
   - metric: prompt.similarity.injection
   - metric: prompt.pca.coordinates
   - metric: response.pca.coordinates

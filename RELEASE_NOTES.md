@@ -1,3 +1,66 @@
+# 2.0.2 Release Notes
+
+- Add a `DISABLE_PROFILING` env option. This env option allows you to disable profiling at the container level, which leads to no whylogs
+  profile generation or uploads. The primary use case for this is a trace-only container.
+- The `prompt.similarity.jailbreak` metric has been removed. It was superseded by the `prompt.similarity.injection` metric.
+
+## New Hallucination Metric
+
+This version introduces a new metric that computes hallucination scores. This metric is different from existing metrics in that it depends
+on making network calls to either OpenAI (or Azure OpenAI) to use an llm to judge whether or not the response is a hallucination. It
+requires both a prompt and a response, and you need to match the OpenAI model to the model that you originally used to generate the
+response. You can enable it in rulesets by checking the "Validate with LLM as a judge" option in the WhyLabs Observatory policy page, under
+the Truthfulness section. You can also use it as a custom metric in a yaml policy file like this:
+
+```yaml
+id: policy-id
+policy_version: 1
+schema_version: 0.0.1
+whylabs_dataset_id: model-1
+
+metrics:
+  - metric: response.hallucination.hallucination_score
+    options:
+      num_samples: 5 # How many times the LLM is called
+      openai_model: gpt-3.5-turbo # defaults to gpt-4o-mini
+```
+
+Keep in mind that this metric essentially checks to see if a given response is consistent with the response that an LLM would generate. It
+can't be used to determine if any given string is true or false. This means that a technically false statement can have a low hallucination
+score. To mitigate this, you can use a bigger LLM or increase the `num_samples` parameter, which uses more response samples when computing
+the metric, the logic being that the a prompt that results in many valid responses is more likely to be a hallucination. If the LLM always
+returns a very similar answer for a prompt then its probably not a hallucination (even if it might indicate an issue with the data the LLM
+was trained on).
+
+## Alternate Secret Configuration Methods
+
+The container depended on passing secrets like `whylabs_api_key` and `container_password` as env variables. This release supports additional
+methods that don't require directly setting secrets in env variables.
+
+You can set the env variable `secrets_path_files`, or just use the default value of `/var/run/secrets/whylabs.ai/env/`, to create files
+with the name of secrets or other env based config as the file names, and the values as the file content. For example, you would have a
+file structure like this if you wanted to specify both `whylabs_api_key` and `container_password` using this method:
+
+```bash
+$ tree /var/run/secrets/whylabs.ai/env
+
+/var/run/secrets/whylabs.ai/env
+├── whylabs_api_key
+├── container_password
+└── any_other_env_vars
+```
+
+Alternatively, for only the secrets keys `whylabs_api_key` and `container_password`, set the env variable `secrets_path_json` (or use its
+default value of `/var/run/secrets/whylabs.ai/env/guardrails.json`) and write a json file there with these secrets, which looks like:
+
+```json
+{
+  "whylabs_api_key": "your_api_key",
+  "container_password": "your_password"
+}
+```
+
+You can specify only the ones you care about. This method only supports explicit secrets (these values) as opposed to all env config vars.
 # 2.0.1 Release Notes
 
 - The `/debug/evaluate` endpoint is now disabled by default. You can enable it by setting the `DEBUG_ENDPOINT_ENABLED` environment variable

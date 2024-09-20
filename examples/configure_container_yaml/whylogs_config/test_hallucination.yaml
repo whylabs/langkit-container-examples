@@ -1,0 +1,10 @@
+id: policy-id
+policy_version: 1
+schema_version: 0.0.1
+whylabs_dataset_id: hallucination
+
+metrics:
+  - metric: response.hallucination.hallucination_score
+    options:
+      num_samples: 1 # How many times the LLM is called
+      openai_model: gpt-3.5-turbo # defaults to gpt-4o-mini

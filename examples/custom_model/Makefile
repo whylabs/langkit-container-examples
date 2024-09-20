@@ -1,7 +1,7 @@
 .PHONY: help build run all clean lint lint-fix format format-fix fix test pip-install-python-client
 
 CONTAINER_NAME = langkit_example_custom_model
-version := 2.0.1
+version := 2.0.2
 
 all: build
 
@@ -21,7 +21,7 @@ debug:
 	docker run -it --platform=linux/amd64 --entrypoint /bin/bash $(CONTAINER_NAME)
 
 requirements.txt: pyproject.toml
-	poetry export -f requirements.txt --without dev --output requirements.txt
+	poetry export -f requirements.txt --without dev --output requirements.txt --without-hashes
 
 clean:
 	rm -rf requirements.txt dist

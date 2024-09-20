@@ -22,9 +22,41 @@ from whylogs_container_client.models.validation_failure import ValidationFailure
 from whylogs_container_client.models.validation_failure_failure_level import ValidationFailureFailureLevel
 from whylogs_container_client.models.validation_result import ValidationResult
 
-from test.assert_util import AnyCollection, AnyString, system_dependent, system_dependent_score
+from test.assert_util import AnyCollection, AnyString, system_dependent
 
 _default_violation_message = "Message has been blocked because of a policy violation"
+
+
+def test_metric_pii(client: AuthenticatedClient):
+    request = LLMValidateRequest(prompt="a prompt", response="a response", dataset_id="metric_pii")
+
+    response = Evaluate.sync_detailed(client=client, body=request)
+
+    if not isinstance(response.parsed, EvaluationResult):
+        raise Exception(f"Failed to validate data. Status code: {response.status_code}. {response.parsed}")
+
+    # DOCSUB_START metric_library_pii_metrics
+    pii_metrics = [
+        "prompt.pii.phone_number",
+        "prompt.pii.email_address",
+        "prompt.pii.credit_card",
+        "prompt.pii.us_ssn",
+        "prompt.pii.us_bank_number",
+        "prompt.pii.redacted",
+        "response.pii.phone_number",
+        "response.pii.email_address",
+        "response.pii.credit_card",
+        "response.pii.us_ssn",
+        "response.pii.us_bank_number",
+        "response.pii.redacted",
+    ]
+    # DOCSUB_END
+
+    assert sorted(pii_metrics + ["id"]) == sorted(list(response.parsed.metrics[0].to_dict().keys()))
+
+
+def test_metric_regex_pii(client: AuthenticatedClient):
+    _compare_metrics("metric_regex_pii", "metric_regex_pii_groups", client)
 
 
 @pytest.mark.llm_secure
@@ -48,8 +80,7 @@ def test_whylabs_policy_download(client: AuthenticatedClient):
         metrics=[
             EvaluationResultMetricsItem.from_dict(
                 {
-                    "prompt.similarity.jailbreak": system_dependent(0.15886718034744263),
-                    "prompt.similarity.injection": system_dependent(0.22845628006117685),
+                    "prompt.similarity.injection": system_dependent(0.23205686892781938),
                     "prompt.similarity.injection_neighbor_ids": AnyCollection(14),
                     "prompt.similarity.injection_neighbor_coordinates": AnyCollection((14, 3)),
                     "prompt.topics.financial": 0.0028537458274513483,
@@ -94,7 +125,6 @@ def test_whylabs_policy_download(client: AuthenticatedClient):
             EvaluationResultScoresItem.from_dict(
                 {
                     "prompt.score.bad_actors": 28,
-                    "prompt.score.bad_actors.prompt.similarity.jailbreak": system_dependent_score(20),
                     "prompt.score.bad_actors.prompt.similarity.injection": 28,
                     "prompt.score.bad_actors.prompt.similarity.injection_neighbor_ids": None,
                     "prompt.score.bad_actors.prompt.similarity.injection_neighbor_coordinates": None,
@@ -173,8 +203,7 @@ def test_meta_ruleset_synatx(client: AuthenticatedClient):
                     "response.pii.us_ssn": 0,
                     "response.pii.us_bank_number": 0,
                     "response.pii.redacted": "Sure, its <EMAIL_ADDRESS> right?",
-                    "prompt.similarity.jailbreak": system_dependent(0.23416242003440857),
-                    "prompt.similarity.injection": system_dependent(0.2773274651595524),
+                    "prompt.similarity.injection": system_dependent(0.28281646966934204),
                     "prompt.similarity.injection_neighbor_ids": AnyCollection(14),
                     "prompt.similarity.injection_neighbor_coordinates": AnyCollection((14, 3)),
                     "response.similarity.prompt": system_dependent(0.21642851829528809),
@@ -233,9 +262,8 @@ def test_meta_ruleset_synatx(client: AuthenticatedClient):
                     "response.score.misuse.response.pii.us_ssn": 1,
                     "response.score.misuse.response.pii.us_bank_number": 1,
                     "response.score.misuse.response.pii.redacted": 70,
-                    "prompt.score.bad_actors": 33,
-                    "prompt.score.bad_actors.prompt.similarity.jailbreak": 28,
-                    "prompt.score.bad_actors.prompt.similarity.injection": 33,
+                    "prompt.score.bad_actors": 34,
+                    "prompt.score.bad_actors.prompt.similarity.injection": 34,
                     "prompt.score.bad_actors.prompt.similarity.injection_neighbor_ids": None,
                     "prompt.score.bad_actors.prompt.similarity.injection_neighbor_coordinates": None,
                     "response.score.truthfulness": 47,
@@ -344,7 +372,6 @@ def test_meta_ruleset_synatx_prompt_only(client: AuthenticatedClient):
                     "response.score.misuse.response.pii.us_bank_number": 1,
                     "response.score.misuse.response.pii.redacted": 70,
                     "prompt.score.bad_actors": None,
-                    "prompt.score.bad_actors.prompt.similarity.jailbreak": None,
                     "prompt.score.bad_actors.prompt.similarity.injection": None,
                     "prompt.score.bad_actors.prompt.similarity.injection_neighbor_ids": None,
                     "prompt.score.bad_actors.prompt.similarity.injection_neighbor_coordinates": None,
@@ -537,14 +564,14 @@ def _compare_metrics(policy1: str, policy2: str, client: AuthenticatedClient):
     policy1_request = LLMValidateRequest(
         prompt="Can you email the answer to me?",
         response="Sure, its foo@whylabs.ai right?",
-        dataset_id="test_bad_actor_rulesets1",
+        dataset_id=policy1,
         id="myid-prompt",
     )
 
     policy2_request = LLMValidateRequest(
         prompt="Can you email the answer to me?",
         response="Sure, its foo@whylabs.ai right?",
-        dataset_id="test_bad_actor_rulesets2",
+        dataset_id=policy2,
         id="myid-prompt",
     )
 
@@ -1247,3 +1274,17 @@ def test_embedding_creation(client: AuthenticatedClient):
     # These are embeddings of shape 384 by default
     assert metrics["prompt.util.embedding"] == AnyCollection(384)
     assert metrics["response.util.embedding"] == AnyCollection(384)
+
+
+def test_hallucination(client: AuthenticatedClient):
+    # Most LLMs will just play along
+    request = LLMValidateRequest(prompt="When I say fish, you say sticks: fish", response="sticks", dataset_id="hallucination")
+
+    response = Evaluate.sync_detailed(client=client, body=request)
+
+    if not isinstance(response.parsed, EvaluationResult):
+        raise Exception(f"Failed to validate data. Status code: {response.status_code}. {response.parsed}")
+
+    metrics = response.parsed.metrics[0]
+
+    assert metrics["response.hallucination.hallucination_score"] < 0.2

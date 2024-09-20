@@ -9,9 +9,8 @@ readme = "README.md"
 python = ">=3.9,<3.12"
 whylogs = "^1.4.4"
 
-whylogs-container = {version = "2.0.1", extras = ["llm"], source = "whylabs_container_gitlab"}
-whylabs-llm-toolkit = {version = "*", extras = ["infer"], source = "whylabs_container_gitlab"}
-torch = { version = "2.2.1+cpu", source = "torch" }
+whylogs-container = {version = "2.0.2", extras = ["llm"], source = "whylabs_container_gitlab"}
+torch = { version = "2.2.1+cpu" }
 
 # Just here to work around a runtime bug in a later version of transformers, may not be necessary in the future
 transformers = "4.39.3"
@@ -19,7 +18,7 @@ transformers = "4.39.3"
 [tool.poetry.group.dev.dependencies]
 pyright = "^1.1.367"
 ruff = "0.6.2"
-whylogs-container-client = "2.0.1"
+whylogs-container-client = "2.0.2"
 
 [build-system]
 requires = ["poetry-core"]
@@ -28,12 +27,12 @@ build-backend = "poetry.core.masonry.api"
 [[tool.poetry.source]]
 name = "torch"
 url = "https://download.pytorch.org/whl/cpu"
-priority = "explicit" # The container uses the cpu build of torch by default and this is where it is hosted
+priority = "supplemental" # The container uses the cpu build of torch by default and this is where it is hosted
 
 [[tool.poetry.source]]
 name = "whylabs_container_gitlab"
 url = "https://gitlab.com/api/v4/projects/55361491/packages/pypi/simple"
-priority = "explicit"
+priority = "supplemental"
 
 [tool.pyright]
 include = ["./demo/**/*.py", "./test/**/*.py"]
@@ -47,14 +46,14 @@ reportMissingTypeArgumet = false
 line-length = 140
 indent-width = 4
 include = ["./demo/**/*.py", "./test/**/*.py"]
-select = ["E", "F", "I", "W"]
 
-[tool.ruff.isort]
+[tool.ruff.lint.isort]
 known-first-party = ["whylogs"]
 
 [tool.ruff.lint]
 fixable = ["ALL"]
 dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+select = ["E", "F", "I", "W"]
 
 [tool.ruff.format]
 quote-style = "double"
