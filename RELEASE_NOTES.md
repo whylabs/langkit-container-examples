@@ -1,3 +1,127 @@
+# 2.0.3 Release Notes
+
+- The container now properly blocks if you mix custom policy rules with rulesets within the same yaml file, or in the WhyLabs platform
+  advanced view. In previous builds, it would prefer the block decision of our normalized rule metrics over that of the raw metrics that
+  went into those rules, even if a validation rule on one of the raw metrics triggered.
+- Tuning to the `prompt.similarity.injection` metric to improve accuracy will also slightly change the scores that we assign, where most
+  scores will decrease a few points from previous releases.
+
+## Customizing Similarity Metrics
+
+You can now customize the inputs into the similarity metrics without having to drop back to Python and custom images. For example, the
+following policy shows how you can customize which columns are used to compute the similarity metrics, instead of the default `prompt` and
+`response` in the current `response.similarity.prompt` metric, and then validate them.
+
+```yaml
+id: my-id
+policy_version: 1
+schema_version: 0.0.1
+whylabs_dataset_id: model-x
+
+metrics:
+  - metric: response.similarity.prompt
+
+  - metric: prompt.similarity.CUSTOM_COLUMN
+    options:
+      CUSTOM_COLUMN: b
+
+  - metric: response.similarity.CUSTOM_COLUMN
+    options:
+      CUSTOM_COLUMN: b
+
+  - metric: CUSTOM_COLUMN.similarity.CUSTOM_COLUMN_2
+    options:
+      CUSTOM_COLUMN: a
+      CUSTOM_COLUMN_2: b
+
+validators:
+  - validator: constraint
+    options:
+      target_metric: response.similarity.prompt
+      upper_threshold: .5
+
+  - validator: constraint
+    options:
+      target_metric: prompt.similarity.b
+      upper_threshold: .5
+
+  - validator: constraint
+    options:
+      target_metric: response.similarity.b
+      upper_threshold: .5
+
+  - validator: constraint
+    options:
+      target_metric: a.similarity.b
+      upper_threshold: .5
+```
+
+This policy will have output like the following.
+
+```json
+{
+  "metrics": [
+    {
+      "response.similarity.prompt": 0.39770185947418213,
+      "prompt.similarity.b": 0.32806673645973206,
+      "response.similarity.b": 0.21193937957286835,
+      "a.similarity.b": 0.8054156303405762,
+      "id": "id"
+    }
+  ],
+  "validation_results": {
+    "report": [
+      {
+        "id": "id",
+        "metric": "a.similarity.b",
+        "details": "Value 0.8054156303405762 is above threshold 0.5",
+        "value": 0.8054156303405762,
+        "upper_threshold": 0.5,
+        "lower_threshold": null,
+        "allowed_values": null,
+        "disallowed_values": null,
+        "must_be_none": null,
+        "must_be_non_none": null,
+        "failure_level": "block"
+      }
+    ]
+  }
+}
+```
+
+This lets you create multiple variants of similarity metrics and upload them all to the WhyLabs platform without having to use Python or
+custom images. It also lets you use data besides the prompt and response, while still sending the prompt and response for other metrics that
+happen to use it. This is useful when creating custom metrics that only your company cares about. You would call the container like this:
+
+```python
+from whylogs_container_client.models.llm_validate_request_additional_data import LLMValidateRequestAdditionalData
+from whylogs_container_client.models.llm_validate_request import LLMValidateRequest
+import whylogs_container_client.api.llm.evaluate as Evaluate
+
+additional_data = LLMValidateRequestAdditionalData.from_dict({"a": "something", "b": "something"})
+
+request = LLMValidateRequest(
+    prompt="a prompt",
+    response="a response",
+    dataset_id="test_custom_similarity_metrics",
+    additional_data=additional_data
+)
+
+response = Evaluate.sync_detailed(client=client, body=request)
+
+if not isinstance(response.parsed, EvaluationResult):
+    raise Exception(f"Failed to validate data. Status code: {response.status_code}. {response.parsed}")
+
+# These metrics are computed given the yaml above
+metrics = [
+    "a.similarity.b",
+    "prompt.similarity.b",
+    "response.similarity.b",
+    "response.similarity.prompt",
+]
+
+assert metrics == list(response.parsed.metrics[0].to_dict().keys())
+```
 # 2.0.2 Release Notes
 
 - Add a `DISABLE_PROFILING` env variable. This env variable allows you to disable profiling at the container level, which leads to no whylogs

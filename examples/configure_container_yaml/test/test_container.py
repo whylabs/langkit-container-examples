@@ -16,6 +16,7 @@ from whylogs_container_client.models.input_context import InputContext
 from whylogs_container_client.models.input_context_item import InputContextItem
 from whylogs_container_client.models.input_context_item_metadata import InputContextItemMetadata
 from whylogs_container_client.models.llm_validate_request import LLMValidateRequest
+from whylogs_container_client.models.llm_validate_request_additional_data import LLMValidateRequestAdditionalData
 from whylogs_container_client.models.metric_filter_options import MetricFilterOptions
 from whylogs_container_client.models.run_options import RunOptions
 from whylogs_container_client.models.validation_failure import ValidationFailure
@@ -80,7 +81,7 @@ def test_whylabs_policy_download(client: AuthenticatedClient):
         metrics=[
             EvaluationResultMetricsItem.from_dict(
                 {
-                    "prompt.similarity.injection": system_dependent(0.23205686892781938),
+                    "prompt.similarity.injection": system_dependent(0.1856454951422555),
                     "prompt.similarity.injection_neighbor_ids": AnyCollection(14),
                     "prompt.similarity.injection_neighbor_coordinates": AnyCollection((14, 3)),
                     "prompt.topics.financial": 0.0028537458274513483,
@@ -124,8 +125,8 @@ def test_whylabs_policy_download(client: AuthenticatedClient):
         scores=[
             EvaluationResultScoresItem.from_dict(
                 {
-                    "prompt.score.bad_actors": 28,
-                    "prompt.score.bad_actors.prompt.similarity.injection": 28,
+                    "prompt.score.bad_actors": 23,
+                    "prompt.score.bad_actors.prompt.similarity.injection": 23,
                     "prompt.score.bad_actors.prompt.similarity.injection_neighbor_ids": None,
                     "prompt.score.bad_actors.prompt.similarity.injection_neighbor_coordinates": None,
                     "prompt.score.misuse": 100,
@@ -203,7 +204,7 @@ def test_meta_ruleset_synatx(client: AuthenticatedClient):
                     "response.pii.us_ssn": 0,
                     "response.pii.us_bank_number": 0,
                     "response.pii.redacted": "Sure, its <EMAIL_ADDRESS> right?",
-                    "prompt.similarity.injection": system_dependent(0.28281646966934204),
+                    "prompt.similarity.injection": system_dependent(0.22625317573547366),
                     "prompt.similarity.injection_neighbor_ids": AnyCollection(14),
                     "prompt.similarity.injection_neighbor_coordinates": AnyCollection((14, 3)),
                     "response.similarity.prompt": system_dependent(0.21642851829528809),
@@ -262,8 +263,8 @@ def test_meta_ruleset_synatx(client: AuthenticatedClient):
                     "response.score.misuse.response.pii.us_ssn": 1,
                     "response.score.misuse.response.pii.us_bank_number": 1,
                     "response.score.misuse.response.pii.redacted": 70,
-                    "prompt.score.bad_actors": 34,
-                    "prompt.score.bad_actors.prompt.similarity.injection": 34,
+                    "prompt.score.bad_actors": 27,
+                    "prompt.score.bad_actors.prompt.similarity.injection": 27,
                     "prompt.score.bad_actors.prompt.similarity.injection_neighbor_ids": None,
                     "prompt.score.bad_actors.prompt.similarity.injection_neighbor_coordinates": None,
                     "response.score.truthfulness": 47,
@@ -815,7 +816,7 @@ def test_155(client: AuthenticatedClient):
                 id="some_id",
                 metric="prompt.similarity.injection",
                 details=AnyString(),
-                value=system_dependent(0.535414674452373),
+                value=system_dependent(0.42833175318581723),
                 upper_threshold=0.4,
                 lower_threshold=None,
                 allowed_values=None,
@@ -841,7 +842,7 @@ def test_155(client: AuthenticatedClient):
     expected_metrics = [
         EvaluationResultMetricsItem.from_dict(
             {
-                "prompt.similarity.injection": system_dependent(0.535414674452373),
+                "prompt.similarity.injection": system_dependent(0.42833175318581723),
                 "prompt.stats.token_count": 17,
                 "response.similarity.refusal": 0.9333669543266296,
                 "id": "some_id",
@@ -1122,7 +1123,7 @@ def extract_random_code_snippets(directory: str, max_lines_per_file: int = 10) -
                 id="0",
                 metric="prompt.similarity.injection",
                 details=AnyString(),
-                value=system_dependent(0.43159291999680655),
+                value=system_dependent(0.34527431896754673),
                 upper_threshold=0.3,
                 lower_threshold=None,
                 allowed_values=None,
@@ -1183,7 +1184,7 @@ def extract_random_code_snippets(directory: str, max_lines_per_file: int = 10) -
                 id="0",
                 metric="prompt.similarity.injection",
                 details=AnyString(),
-                value=system_dependent(0.48081864629473003),
+                value=system_dependent(0.3846549340656826),
                 upper_threshold=0.3,
                 lower_threshold=None,
                 allowed_values=None,
@@ -1288,3 +1289,24 @@ def test_hallucination(client: AuthenticatedClient):
     metrics = response.parsed.metrics[0]
 
     assert metrics["response.hallucination.hallucination_score"] < 0.2
+
+
+def test_custom_simlarity_metrics(client: AuthenticatedClient):
+    additional_data = LLMValidateRequestAdditionalData.from_dict({"a": "something", "b": "something"})
+    request = LLMValidateRequest(
+        prompt="a prompt", response="a response", dataset_id="test_custom_similarity_metrics", additional_data=additional_data
+    )
+
+    response = Evaluate.sync_detailed(client=client, body=request)
+
+    if not isinstance(response.parsed, EvaluationResult):
+        raise Exception(f"Failed to validate data. Status code: {response.status_code}. {response.parsed}")
+
+    metrics = [
+        "a.similarity.b",
+        "prompt.similarity.b",
+        "response.similarity.b",
+        "response.similarity.prompt",
+    ]
+
+    assert sorted(metrics + ["id"]) == sorted(list(response.parsed.metrics[0].to_dict().keys()))

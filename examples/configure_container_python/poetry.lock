@@ -5565,13 +5565,13 @@ reference = "whylabs_container_gitlab"
 
 [[package]]
 name = "whylogs-container-client"
-version = "2.0.2"
+version = "2.0.3"
 description = "A client library for accessing FastAPI"
 optional = false
 python-versions = "<4.0,>=3.8"
 files = [
-    {file = "whylogs_container_client-2.0.2-py3-none-any.whl", hash = "sha256:06ba1360bc4b064f9664761f7e5d13845f06dd1f08ddf931f5d11b8531bed5b9"},
-    {file = "whylogs_container_client-2.0.2.tar.gz", hash = "sha256:59e18e3a063f4ac4704517e0b619d61b51c3f91b0f0776428fe98db2189ea05f"},
+    {file = "whylogs_container_client-2.0.3-py3-none-any.whl", hash = "sha256:6bfbd2682e9e27b46e84c0fdb8aac46bdd370cf716a711154af2d8edb2070b3b"},
+    {file = "whylogs_container_client-2.0.3.tar.gz", hash = "sha256:929f9e0de5263f25f06c13b247bf87b8f14018725703dea3a52b7631ac566fdd"},
 ]
 
 [package.dependencies]
@@ -5957,4 +5957,4 @@ type = ["pytest-mypy"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.9,<3.12"
-content-hash = "9ab92ee6ed5c1b7de84414180374fd7cbddd74e0ed73a8759a7d9d4abb62165e"
+content-hash = "e4fb2422dcc98e58e65682f51ed428f40e473cc3afb9fd9215fd73de2102bb2a"

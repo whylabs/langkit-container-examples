@@ -2157,13 +2157,13 @@ test = ["pytest (>=7.2)", "pytest-cov (>=4.0)"]
 
 [[package]]
 name = "nltk"
-version = "3.8"
+version = "3.9.1"
 description = "Natural Language Toolkit"
 optional = false
-python-versions = ">=3.7"
+python-versions = ">=3.8"
 files = [
-    {file = "nltk-3.8-py3-none-any.whl", hash = "sha256:3306502f487aa9fb0566e23443fa287a85a8d8d0821e2ef1655b4e3f0ea4aeee"},
-    {file = "nltk-3.8.zip", hash = "sha256:74b30826a37d78d53427105bbd037dd880251be269fca64ee530838a46ed55fc"},
+    {file = "nltk-3.9.1-py3-none-any.whl", hash = "sha256:4fa26829c5b00715afe3061398a8989dc643b92ce7dd93fb4585a70930d168a1"},
+    {file = "nltk-3.9.1.tar.gz", hash = "sha256:87d127bd3de4bd89a4f81265e5fa59cb1b199b27440175370f7417d2bc7ae868"},
 ]
 
 [package.dependencies]
@@ -2338,13 +2338,13 @@ sympy = "*"
 
 [[package]]
 name = "openai"
-version = "1.46.1"
+version = "1.51.0"
 description = "The official Python library for the openai API"
 optional = false
 python-versions = ">=3.7.1"
 files = [
-    {file = "openai-1.46.1-py3-none-any.whl", hash = "sha256:7517f07117cf66012bbc55c49fd6b983eaac0f3d2a09c90cba1140d4455e4290"},
-    {file = "openai-1.46.1.tar.gz", hash = "sha256:e5cf7f268bf516de23686d496c9dae7f0dcdcd0e87af4d288deeab8329fcbbaf"},
+    {file = "openai-1.51.0-py3-none-any.whl", hash = "sha256:d9affafb7e51e5a27dce78589d4964ce4d6f6d560307265933a94b2e3f3c5d2c"},
+    {file = "openai-1.51.0.tar.gz", hash = "sha256:8dc4f9d75ccdd5466fc8c99a952186eddceb9fd6ba694044773f3736a847149d"},
 ]
 
 [package.dependencies]
@@ -3998,18 +3998,18 @@ tests = ["hummingbird-ml (<0.4.9)", "onnx", "onnxruntime", "openvino (==2022.3.0
 
 [[package]]
 name = "setuptools"
-version = "74.1.2"
+version = "75.1.0"
 description = "Easily download, build, install, upgrade, and uninstall Python packages"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "setuptools-74.1.2-py3-none-any.whl", hash = "sha256:5f4c08aa4d3ebcb57a50c33b1b07e94315d7fc7230f7115e47fc99776c8ce308"},
-    {file = "setuptools-74.1.2.tar.gz", hash = "sha256:95b40ed940a1c67eb70fc099094bd6e99c6ee7c23aa2306f4d2697ba7916f9c6"},
+    {file = "setuptools-75.1.0-py3-none-any.whl", hash = "sha256:35ab7fd3bcd95e6b7fd704e4a1539513edad446c097797f2985e0e4b960772f2"},
+    {file = "setuptools-75.1.0.tar.gz", hash = "sha256:d59a21b17a275fb872a9c3dae73963160ae079f1049ed956880cd7c09b120538"},
 ]
 
 [package.extras]
 check = ["pytest-checkdocs (>=2.4)", "pytest-ruff (>=0.2.1)", "ruff (>=0.5.2)"]
-core = ["importlib-metadata (>=6)", "importlib-resources (>=5.10.2)", "jaraco.text (>=3.7)", "more-itertools (>=8.8)", "packaging (>=24)", "platformdirs (>=2.6.2)", "tomli (>=2.0.1)", "wheel (>=0.43.0)"]
+core = ["importlib-metadata (>=6)", "importlib-resources (>=5.10.2)", "jaraco.collections", "jaraco.functools", "jaraco.text (>=3.7)", "more-itertools", "more-itertools (>=8.8)", "packaging", "packaging (>=24)", "platformdirs (>=2.6.2)", "tomli (>=2.0.1)", "wheel (>=0.43.0)"]
 cover = ["pytest-cov"]
 doc = ["furo", "jaraco.packaging (>=9.3)", "jaraco.tidelift (>=1.4)", "pygments-github-lexers (==0.0.5)", "pyproject-hooks (!=1.1)", "rst.linker (>=1.9)", "sphinx (>=3.5)", "sphinx-favicon", "sphinx-inline-tabs", "sphinx-lint", "sphinx-notfound-page (>=1,<2)", "sphinx-reredirects", "sphinxcontrib-towncrier", "towncrier (<24.7)"]
 enabler = ["pytest-enabler (>=2.2)"]
@@ -5225,20 +5225,20 @@ urllib3 = ">=1.25.3"
 
 [[package]]
 name = "whylabs-llm-toolkit"
-version = "0.1.25"
+version = "0.1.29"
 description = "Utilities for harm dataset generation"
 optional = false
 python-versions = ">=3.9,<3.12"
 files = [
-    {file = "whylabs_llm_toolkit-0.1.25-py3-none-any.whl", hash = "sha256:b2a0c14f15488ce567d93b1557b9e09d8a3a6af5c52e1f9a39999aa68253a22c"},
-    {file = "whylabs_llm_toolkit-0.1.25.tar.gz", hash = "sha256:4dd5375ac90034c7eb619f0b0b6dad049a74aac14132a8649c60073921585b33"},
+    {file = "whylabs_llm_toolkit-0.1.29-py3-none-any.whl", hash = "sha256:3cfedbede976f862e213fd46d9b5e42212f50a881470fb5a47b8adf13df003c7"},
+    {file = "whylabs_llm_toolkit-0.1.29.tar.gz", hash = "sha256:68093cfd09b6ed27c3c64b642fbebf4f7f5325ce4280cf46e3b81f6fcac9f973"},
 ]
 
 [package.dependencies]
 chromadb = {version = "0.5.5", optional = true, markers = "extra == \"eval\" or extra == \"infer\""}
 evaluate = {version = ">=0.4.0,<0.5.0", optional = true, markers = "extra == \"infer\""}
 huggingface-hub = {version = "0.23.5", optional = true, markers = "extra == \"infer\""}
-nltk = {version = "3.8", optional = true, markers = "extra == \"infer\""}
+nltk = {version = ">=3.9,<4.0", optional = true, markers = "extra == \"infer\""}
 numpy = {version = "*", optional = true, markers = "extra == \"infer\""}
 onnx = {version = ">=1.16.2,<2.0.0", optional = true, markers = "extra == \"infer\""}
 openai = {version = ">=0.27.6,<2.0.0", optional = true, markers = "extra == \"infer\""}
@@ -5259,7 +5259,7 @@ whylogs = ">=1.4.4,<2.0.0"
 
 [package.extras]
 eval = ["chromadb (==0.5.5)", "databricks-sdk (>=0.25.1,<0.26.0)", "matplotlib (>=3.8.4,<4.0.0)", "mlflow (>=2.11.3,<3.0.0)", "optimum[exporters,onnxruntime] (==1.21.2)", "pandas", "python-dotenv (>=1.0.1,<2.0.0)", "scikit-learn (>=1.4.1.post1,<2.0.0)", "sentence-transformers (==2.6.1)", "songbird-client (==0.1.816)"]
-infer = ["chromadb (==0.5.5)", "evaluate (>=0.4.0,<0.5.0)", "huggingface-hub (==0.23.5)", "nltk (==3.8)", "numpy", "onnx (>=1.16.2,<2.0.0)", "openai (>=0.27.6,<2.0.0)", "optimum[exporters,onnxruntime] (==1.21.2)", "pandas", "presidio-analyzer (==2.2.352)", "presidio-anonymizer (==2.2.352)", "sentence-transformers (==2.6.1)", "setfit (==1.0.3)", "tiktoken (==0.6.0)", "whylabs-textstat (>=0.7.4,<0.8.0)"]
+infer = ["chromadb (==0.5.5)", "evaluate (>=0.4.0,<0.5.0)", "huggingface-hub (==0.23.5)", "nltk (>=3.9,<4.0)", "numpy", "onnx (>=1.16.2,<2.0.0)", "openai (>=0.27.6,<2.0.0)", "optimum[exporters,onnxruntime] (==1.21.2)", "pandas", "presidio-analyzer (==2.2.352)", "presidio-anonymizer (==2.2.352)", "sentence-transformers (==2.6.1)", "setfit (==1.0.3)", "tiktoken (==0.6.0)", "whylabs-textstat (>=0.7.4,<0.8.0)"]
 torch = ["torch (==2.2.1)"]
 
 [package.source]
@@ -5330,13 +5330,13 @@ viz = ["Pillow (>=10.1.0,<11)", "Pillow (>=9.2.0)", "ipython", "numpy", "numpy (
 
 [[package]]
 name = "whylogs-container"
-version = "2.0.2"
+version = "2.0.3"
 description = ""
 optional = false
 python-versions = ">=3.9,<3.12"
 files = [
-    {file = "whylogs_container-2.0.2-py3-none-any.whl", hash = "sha256:de19341471ea2480c6a24e1a57575680c25ebfe7156520b3a14ea98065dfe4fe"},
-    {file = "whylogs_container-2.0.2.tar.gz", hash = "sha256:1d158e2b1a9b84ea423b95378daf371bfecfe0376d3789b6dce424a5235e7818"},
+    {file = "whylogs_container-2.0.3-py3-none-any.whl", hash = "sha256:abbf81c7240abefe50972b865207826e86e98233360539d5219a54bbfb315ae6"},
+    {file = "whylogs_container-2.0.3.tar.gz", hash = "sha256:3f33d1bab61fa56bb62e9a5cb59bd1c29cb640a55b7b7657c1cb7c937f76b3ba"},
 ]
 
 [package.dependencies]
@@ -5354,6 +5354,7 @@ pydantic = "2.6.1"
 pydantic-core = "2.16.2"
 pydantic-settings = "2.2.1"
 requests = ">=2.31.0,<3.0.0"
+setuptools = ">=75.1.0,<76.0.0"
 tenacity = ">=8.2.3,<9.0.0"
 torch = [
     {version = "2.2.1", optional = true, markers = "platform_system == \"Darwin\" and extra == \"llm\""},
@@ -5362,11 +5363,11 @@ torch = [
 urllib3 = "1.26.19"
 uvicorn = {version = ">=0.24.0.post1,<0.25.0", extras = ["standard"]}
 whylabs-client = ">=0.6.8,<0.7.0"
-whylabs-llm-toolkit = {version = "0.1.25", extras = ["infer"], optional = true, markers = "extra == \"llm\""}
+whylabs-llm-toolkit = {version = "0.1.29", extras = ["infer"], optional = true, markers = "extra == \"llm\""}
 whylogs = {version = "1.4.4", extras = ["embeddings", "proc"]}
 
 [package.extras]
-llm = ["torch (==2.2.1)", "torch (==2.2.1+cpu)", "whylabs-llm-toolkit[infer] (==0.1.25)"]
+llm = ["torch (==2.2.1)", "torch (==2.2.1+cpu)", "whylabs-llm-toolkit[infer] (==0.1.29)"]
 
 [package.source]
 type = "legacy"
@@ -5375,13 +5376,13 @@ reference = "whylabs_container_gitlab"
 
 [[package]]
 name = "whylogs-container-client"
-version = "2.0.2"
+version = "2.0.3"
 description = "A client library for accessing FastAPI"
 optional = false
 python-versions = "<4.0,>=3.8"
 files = [
-    {file = "whylogs_container_client-2.0.2-py3-none-any.whl", hash = "sha256:06ba1360bc4b064f9664761f7e5d13845f06dd1f08ddf931f5d11b8531bed5b9"},
-    {file = "whylogs_container_client-2.0.2.tar.gz", hash = "sha256:59e18e3a063f4ac4704517e0b619d61b51c3f91b0f0776428fe98db2189ea05f"},
+    {file = "whylogs_container_client-2.0.3-py3-none-any.whl", hash = "sha256:6bfbd2682e9e27b46e84c0fdb8aac46bdd370cf716a711154af2d8edb2070b3b"},
+    {file = "whylogs_container_client-2.0.3.tar.gz", hash = "sha256:929f9e0de5263f25f06c13b247bf87b8f14018725703dea3a52b7631ac566fdd"},
 ]
 
 [package.dependencies]
@@ -5767,4 +5768,4 @@ type = ["pytest-mypy"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.9,<3.12"
-content-hash = "d02594c7b604e7fdcba9ade90d7f1ac33cf1694d6b2c0680e554e12b586a951d"
+content-hash = "e7cf2838664424bcd70d295acabbd03574717e7feff2d2346a407c5cb309757a"

@@ -1,0 +1,43 @@
+id: my_id
+policy_version: 1
+schema_version: 0.0.1
+whylabs_dataset_id: test_custom_similarity_metrics
+
+# DOCSUB_START custom_similarity_metrics
+metrics:
+  - metric: response.similarity.prompt
+
+  - metric: prompt.similarity.CUSTOM_COLUMN
+    options:
+      CUSTOM_COLUMN: b
+
+  - metric: response.similarity.CUSTOM_COLUMN
+    options:
+      CUSTOM_COLUMN: b
+
+  - metric: CUSTOM_COLUMN.similarity.CUSTOM_COLUMN_2
+    options:
+      CUSTOM_COLUMN: a
+      CUSTOM_COLUMN_2: b
+
+validators:
+  - validator: constraint
+    options:
+      target_metric: response.similarity.prompt
+      upper_threshold: .5
+
+  - validator: constraint
+    options:
+      target_metric: prompt.similarity.b
+      upper_threshold: .5
+
+  - validator: constraint
+    options:
+      target_metric: response.similarity.b
+      upper_threshold: .5
+
+  - validator: constraint
+    options:
+      target_metric: a.similarity.b
+      upper_threshold: .5
+# DOCSUB_END
