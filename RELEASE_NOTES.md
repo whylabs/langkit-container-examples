@@ -103,7 +103,7 @@ additional_data = LLMValidateRequestAdditionalData.from_dict({"a": "something", 
 request = LLMValidateRequest(
     prompt="a prompt",
     response="a response",
-    dataset_id="test_custom_similarity_metrics",
+    dataset_id="model-x",
     additional_data=additional_data
 )
 
