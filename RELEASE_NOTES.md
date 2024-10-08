@@ -1,3 +1,6 @@
+# 2.0.4 Release Notes
+
+- Make the request parsing logic looser to retain more compatibility with older/newer generated client versions.
 # 2.0.3 Release Notes
 
 - The container now properly blocks if you mix custom policy rules with rulesets within the same yaml file, or in the WhyLabs platform

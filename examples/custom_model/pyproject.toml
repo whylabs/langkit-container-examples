@@ -29,7 +29,7 @@ transformers = "4.39.3"
 pandas = "2.2.1"
 whylogs-container-types = "0.4.16"
 langkit = "0.0.28-dev16"
-whylogs-container-client = "2.0.3"
+whylogs-container-client = "2.0.4"
 
 
 # Actual dev dependencies
