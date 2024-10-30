@@ -41,7 +41,7 @@ There is a new example dedicated to multi tenancy use cases in the examples fold
 This update adds new metrics that are available under `prompt.similarity.<name>` and `response.similarity.<name>`, where the name can be one
 of the following:
 
-- finanical
+- financial
 - code
 - hate
 - medical
