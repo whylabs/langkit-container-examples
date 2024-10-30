@@ -1,4 +1,4 @@
-# Zero-Configuration langkit Metrics
+# Multi Tenant Mode
 
 This sample project shows how you use the langkit contianer in multi tenant mode, which allows you to use a single container instance to
 process requests for multiple WhyLabs orgs. This mode changes a few behaviors about the container, specifically:
