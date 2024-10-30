@@ -1,5 +1,41 @@
 # 2.1.0 Release Notes
 
+## Preliminary Multi Tenant Support
+
+This version of the container adds the foundation for using a single container instance to handle data for multiple orgs at once. This works
+by using WhyLabs "parent orgs", which is an enterprise feature of the platform. In order to use multiple orgs a few things will change:
+
+- You need a parent org that has at least one child. This is something we typically provision for you.
+- The container has to be configured with a WhyLabs API key for the parent org. This is typically set as the env var `WHYLABS_API_KEY`.
+- Requests now need to include API keys for one of the child orgs.
+
+The request API keys are set as a header. For a curl request, it would look like this
+
+```bash
+curl -X 'POST' \
+       -H "X-API-Key: password" \ # this is the container password, which is still present in this release
+       -H "X-Whylabs-API-Key: xxxxx.xxxxxxx:org-abc" \ # this is the child api key
+       -H "Content-Type: application/json" \
+        'http://localhost:8000/evaluate' \
+        --data-raw '{
+            "prompt": "What is the speed of light",
+            "id": "id",
+            "datasetId": "model-10"
+        }'
+```
+
+And this is how it looks using the generated python client.
+
+```python
+client: AuthenticatedClient = ....
+request = LLMValidateRequest(prompt="a prompt", response="a response", dataset_id="model-1")
+child_org_key = "xxxxxxxxxx.xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx:org-nonChildOrg"
+result = Evaluate.sync_detailed(client=client, body=request, x_whylabs_api_key=child_org_key)
+```
+
+There is a new example dedicated to multi tenancy use cases in the examples folder as well.
+
+
 ## New Experimental Vector DB Metrics
 
 This update adds new metrics that are available under `prompt.similarity.<name>` and `response.similarity.<name>`, where the name can be one
