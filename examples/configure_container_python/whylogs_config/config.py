@@ -49,9 +49,9 @@ langkit_config: Dict[str, LangkitOptions] = {
             upper_case_char_count("response"),
         ],
         validators=[
-            validators_lib.constraint("response.toxicity.toxicity_score", upper_threshold=0.4),
+            validators_lib.constraint(target_metric="response.toxicity.toxicity_score", upper_threshold=0.4),
             # DOCSUB_START ex_python_constraint
-            validators_lib.constraint("prompt.upper_case_char_count", lower_threshold=1),
+            validators_lib.constraint(target_metric="prompt.upper_case_char_count", lower_threshold=1),
             # DOCSUB_END
         ],
     ),
@@ -63,8 +63,8 @@ langkit_config: Dict[str, LangkitOptions] = {
             lower_case_char_count("response"),
         ],
         validators=[
-            validators_lib.constraint("prompt.sentiment.sentiment_score", lower_threshold=0),
-            validators_lib.constraint("response.lower_case_char_count", lower_threshold=10),
+            validators_lib.constraint(target_metric="prompt.sentiment.sentiment_score", lower_threshold=0),
+            validators_lib.constraint(target_metric="response.lower_case_char_count", lower_threshold=10),
         ],
     ),
 }

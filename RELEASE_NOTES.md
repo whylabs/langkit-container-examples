@@ -1,3 +1,76 @@
+# 2.1.0 Release Notes
+
+## New Experimental Vector DB Metrics
+
+This update adds new metrics that are available under `prompt.similarity.<name>` and `response.similarity.<name>`, where the name can be one
+of the following:
+
+- finanical
+- code
+- hate
+- medical
+- innocuous
+- toxic
+
+We're still tuning these metrics so they're not the default options yet, but they'll start to replace some of our existing default metric
+choices soon, particularly the metrics under `prompt/response.topics` and `prompt/response.toxicity`, which will help to reduce the size of
+the container, increase the requests per second, and improve score precision.
+
+## Breaking Changes
+
+There are some breaking changes when using python directly to customize the container.
+
+If you're using Python to customize the container and creating validation rules then you'll have to use keywords for the target metric. For
+example, the following rule
+
+```python
+validators_lib.constraint("prompt.sentiment.sentiment_score", lower_threshold=0),
+```
+
+Would need to start specifying the kwarg instead of using positional args.
+
+```python
+validators_lib.constraint(target_metric="prompt.sentiment.sentiment_score", lower_threshold=0),
+```
+
+This is a side effect of how the overall policy is being validated because they now share types under the hood.
+
+## Interactive Policy Editor
+
+This release revamps JSON schema that defines the yaml policy files to make them much more comprehensive. Previously, the metric definition
+was mostly a generic dictionary validing structure. Now, all metrics are exhaustively defined in the schema which makes validating
+functionality up front possible. This also enables downstream tooling that makes it easier to write the policy files in the first place.
+There are a few places we're going to be using this ability in the form of an embedded VS Code (monaco) editor.
+
+First, the container has a new endpoint `/ui/policy` that you can visit directly and get an editor view for writing policy files. This will
+always use the version of the policy that will work with the version of the container that you're using.
+
+Second, you can visit a version specific url to edit a policy file staticly hosted on our s3 bucket. This is the link for `2.0.5` for
+example: [click here](https://policy-editor-demo.s3.us-west-2.amazonaws.com/2.0.5/index.html). You can also replace the version in the url
+with `latest` to bookmark whatever the [latest version](https://policy-editor-demo.s3.us-west-2.amazonaws.com/latest/index.html) is.
+
+Finally, we'll be embedding that same editor into the doc site and WhyLabs Observatory soon with the same view to make it more convenient
+with smarter suggestions and templates. The editor can easily be embedded in web pages as well with an iframe.
+
+```html
+<iframe
+  src="https://policy-editor-demo.s3.us-west-2.amazonaws.com/latest/index.html"
+  width="100%"
+  height="500px"
+/>
+```
+
+For now, the editor primarily helps you write via auto complete (triggered by ctrl-space) and lets you copy the content out to use in our
+policy apis or our policy UI in WhyLabs Observatory.
+
+<p align="center">
+  <a target="_blank" href="https://policy-editor-demo.s3.us-west-2.amazonaws.com/2.0.5/index.html">
+    <image src="https://policy-editor-demo.s3.us-west-2.amazonaws.com/static/editor.jpg" />
+  </a>
+</p>
+
+This change also has better error message in the logs when policy files fail to parse, as well as a link that you can use to view it in the
+policy editor, which is much easier to debug.
 # 2.0.4 Release Notes
 
 - Make the request parsing logic looser to retain more compatibility with older/newer generated client versions.

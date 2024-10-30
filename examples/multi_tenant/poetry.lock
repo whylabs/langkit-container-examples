@@ -675,13 +675,13 @@ urllib3 = ">=1.25.3"
 
 [[package]]
 name = "whylogs"
-version = "1.5.1"
+version = "1.4.5"
 description = "Profile and monitor your ML data pipeline end-to-end"
 optional = false
 python-versions = "<4,>=3.7.1"
 files = [
-    {file = "whylogs-1.5.1-py3-none-any.whl", hash = "sha256:b52a32c132a21323a5757bfbddb96a3e7d8c8e1136e16e1b6751d67be6661e93"},
-    {file = "whylogs-1.5.1.tar.gz", hash = "sha256:68c50c507be579c97fbddb095eb72c9b2b4d8a6eb492cdfc9a6c7438dcc34774"},
+    {file = "whylogs-1.4.5-py3-none-any.whl", hash = "sha256:86d61a536f57e0b06ac6561612f3bf738cf53e150a7a5701dffdd7e296e2de36"},
+    {file = "whylogs-1.4.5.tar.gz", hash = "sha256:0dca850bfd87bb2c13b2e98c25f182887bf705ba172a65745aa1e1b51ff3a104"},
 ]
 
 [package.dependencies]
@@ -770,4 +770,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "833bf4a1d74606ee3c4d37cb45818f151a01f57b190a293cb2e8d22cb1940b91"
+content-hash = "f82cb33a9ac85f4e431e12070fc702b224aefa06efc9819eda599ce5bfc44d9f"

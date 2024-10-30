@@ -28,9 +28,6 @@ def retry(func: Callable[[], T], max_retries=40, interval=2) -> T:
     raise Exception(f"Failed to run function after {retry_count} retries")
 
 
-_fake_key = "xxxxxxxxxx.xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx:xxx-xxxxxx"
-
-
 class ServerCommands:
     @staticmethod
     def docker(port: str) -> List[str]:
@@ -41,7 +38,7 @@ class ServerCommands:
             "-p",
             f"127.0.0.1:{port}:8000",
             "--env",
-            f"WHYLABS_API_KEY={os.getenv('WHYLABS_API_KEY', _fake_key )}",
+            f"WHYLABS_API_KEY={os.environ['WHYLABS_API_KEY']}",
             "--env",
             "DEFAULT_MODEL_ID=model-62",
             "--env",

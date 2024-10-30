@@ -115,9 +115,9 @@ options = LangkitOptions(
         custom_presidio_metric("prompt"),
     ],
     validators=[
-        validators_lib.constraint("prompt.pii.phone_number", upper_threshold=0),
-        validators_lib.constraint("prompt.pii.email_address", upper_threshold=0),
-        validators_lib.constraint("prompt.pii.credit_card", upper_threshold=0),
+        validators_lib.constraint(target_metric="prompt.pii.phone_number", upper_threshold=0),
+        validators_lib.constraint(target_metric="prompt.pii.email_address", upper_threshold=0),
+        validators_lib.constraint(target_metric="prompt.pii.credit_card", upper_threshold=0),
     ],
     callbacks=[MyCallback()],
 )

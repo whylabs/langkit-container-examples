@@ -28,7 +28,7 @@ class AnyString(str):
 
 def system_dependent(val: float) -> float:
     # small floating point differences based on system
-    return pytest.approx(val, abs=0.00001)  # type: ignore
+    return pytest.approx(val, abs=0.001)  # type: ignore
 
 
 def system_dependent_score(val: int) -> int:

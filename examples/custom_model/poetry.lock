@@ -2555,13 +2555,13 @@ viz = ["Pillow (>=10.1.0,<11)", "Pillow (>=9.2.0)", "ipython", "numpy", "numpy (
 
 [[package]]
 name = "whylogs-container-client"
-version = "2.0.4"
+version = "2.1.0"
 description = "A client library for accessing FastAPI"
 optional = false
 python-versions = "<4.0,>=3.8"
 files = [
-    {file = "whylogs_container_client-2.0.4-py3-none-any.whl", hash = "sha256:79297abf3aca1459455cfd8b7a8f1e1ebe2f04bf56f41927c3094ac05d04a40a"},
-    {file = "whylogs_container_client-2.0.4.tar.gz", hash = "sha256:2d9d44a19dae113bee8ef8d489fa86da473992a94a0e4e73d4ddc42dfc2fbbbe"},
+    {file = "whylogs_container_client-2.1.0-py3-none-any.whl", hash = "sha256:83e1aeda4ef077d62df75b1e184fc6c1def40a384fe20e23cb667e2145723726"},
+    {file = "whylogs_container_client-2.1.0.tar.gz", hash = "sha256:8fbdd8b03ad36054be916694aa0cf411d947d554c91d45a81ae19453304a8ce8"},
 ]
 
 [package.dependencies]
@@ -2602,6 +2602,9 @@ files = [
     {file = "whylogs_sketching-3.4.1.dev3-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:0ba536fca5f9578fa34d106c243fdccfef7d75b9d1fffb9d93df0debfe8e3ebc"},
     {file = "whylogs_sketching-3.4.1.dev3-cp311-cp311-musllinux_1_1_x86_64.whl", hash = "sha256:afa843c68cafa08e82624e6a33d13ab7f00ad0301101960872fe152d5af5ab53"},
     {file = "whylogs_sketching-3.4.1.dev3-cp311-cp311-win_amd64.whl", hash = "sha256:303d55c37565340c2d21c268c64a712fad612504cc4b98b1d1df848cac6d934f"},
+    {file = "whylogs_sketching-3.4.1.dev3-cp312-cp312-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:4b636cebf5f4d7724437616368199c8e7b153f89dfd396f9e8279a95bf55d817"},
+    {file = "whylogs_sketching-3.4.1.dev3-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:ba4519780defebb35c4718ecc13d1b8c38894be722147a047e67b953cd2430ab"},
+    {file = "whylogs_sketching-3.4.1.dev3-cp312-cp312-musllinux_1_2_aarch64.whl", hash = "sha256:b4606e5360ce922e6ad770e845c75038d873300fd8a54ea856e99003b3254fc9"},
     {file = "whylogs_sketching-3.4.1.dev3-cp36-cp36m-macosx_10_9_x86_64.whl", hash = "sha256:9d65fcf8dade1affe50181582b8894929993e37d7daa922d973a811790cd0208"},
     {file = "whylogs_sketching-3.4.1.dev3-cp36-cp36m-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:c4845e77c208ae64ada9170e1b92ed0abe28fe311c0fc35f9d8efa6926211ca2"},
     {file = "whylogs_sketching-3.4.1.dev3-cp36-cp36m-musllinux_1_1_x86_64.whl", hash = "sha256:02cac1c87ac42d7fc7e6597862ac50bc035825988d21e8a2d763b416e83e845f"},
@@ -2728,4 +2731,4 @@ torch = "2.2.1"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "5d4e078a66d87de1b7520168cf40ada5ab82804306c19dea3a480956cc28a785"
+content-hash = "3b6dbb613028659e7cd22c6ebd710e4cf2d487f0d76d2c8e89440aeb8a17ced7"

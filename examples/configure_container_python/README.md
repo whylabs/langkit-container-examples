@@ -52,7 +52,7 @@ The validator api does require some knowledge of the metric names right now.
 
 
 ```python
-validators_lib.constraint("prompt.upper_case_char_count", lower_threshold=1),
+validators_lib.constraint(target_metric="prompt.upper_case_char_count", lower_threshold=1),
 ```
 
 If you don't know the name of the metric you want to validate against then you can use any string for the metric name and launch the

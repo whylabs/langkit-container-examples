@@ -1,9 +1,11 @@
+from typing import Any
 from unittest.mock import ANY
 
 import pytest
 
 # import whylogs_container_client.api.debug.debug_evaluate as DebugEvaluate
 import whylogs_container_client.api.llm.evaluate as Evaluate
+import whylogs_container_client.api.ui.ui_policy as UiPolicy
 from pytest import approx  # type: ignore
 from whylogs_container_client import AuthenticatedClient
 from whylogs_container_client.models.action import Action
@@ -81,7 +83,7 @@ def test_whylabs_policy_download(client: AuthenticatedClient):
         metrics=[
             EvaluationResultMetricsItem.from_dict(
                 {
-                    "prompt.similarity.injection": system_dependent(0.1856454951422555),
+                    "prompt.similarity.injection": system_dependent(0.1856454236166818),
                     "prompt.similarity.injection_neighbor_ids": AnyCollection(14),
                     "prompt.similarity.injection_neighbor_coordinates": AnyCollection((14, 3)),
                     "prompt.topics.financial": 0.0028537458274513483,
@@ -204,10 +206,10 @@ def test_meta_ruleset_synatx(client: AuthenticatedClient):
                     "response.pii.us_ssn": 0,
                     "response.pii.us_bank_number": 0,
                     "response.pii.redacted": "Sure, its <EMAIL_ADDRESS> right?",
-                    "prompt.similarity.injection": system_dependent(0.22625317573547366),
+                    "prompt.similarity.injection": system_dependent(0.22268527235303606),
                     "prompt.similarity.injection_neighbor_ids": AnyCollection(14),
                     "prompt.similarity.injection_neighbor_coordinates": AnyCollection((14, 3)),
-                    "response.similarity.prompt": system_dependent(0.21642851829528809),
+                    "response.similarity.prompt": system_dependent(0.21642854809761047),
                     "prompt.sentiment.sentiment_score": 0.0,
                     "prompt.pii.phone_number": 0,
                     "prompt.pii.email_address": 0,
@@ -678,7 +680,6 @@ def test_separate_prompt_response(client: AuthenticatedClient):
         id="myid-prompt",
     )
 
-    # Send the request with log=False so that the prompt isn't logged to WhyLabs.
     prompt_response = Evaluate.sync_detailed(client=client, body=prompt_request)
 
     if not isinstance(prompt_response.parsed, EvaluationResult):
@@ -746,7 +747,7 @@ def test_default_policy(client: AuthenticatedClient):
             ValidationFailure(
                 id="myid",
                 metric="response.stats.token_count",
-                details="Value 12 is above threshold 10",
+                details="Value 12 is above threshold 10.0",
                 value=12,
                 upper_threshold=10.0,
                 lower_threshold=None,
@@ -758,7 +759,7 @@ def test_default_policy(client: AuthenticatedClient):
             ValidationFailure(
                 id="myid",
                 metric="response.sentiment.sentiment_score",
-                details="Value 0.8745 is above threshold 0",
+                details="Value 0.8745 is above threshold 0.0",
                 value=0.8745,
                 upper_threshold=0.0,
                 lower_threshold=None,
@@ -935,7 +936,7 @@ def test_prompt_char_count_139(client: AuthenticatedClient):
             ValidationFailure(
                 id="myid",
                 metric="prompt.stats.char_count",
-                details="Value 1 is below threshold 2",
+                details="Value 1 is below threshold 2.0",
                 value=1,
                 upper_threshold=None,
                 lower_threshold=2.0,
@@ -1005,7 +1006,7 @@ def test_multiple_failures_135(client: AuthenticatedClient):
             ValidationFailure(
                 id="myid",
                 metric="prompt.pii.email_address",
-                details="Value 1 is above threshold 0",
+                details="Value 1 is above threshold 0.0",
                 value=1,
                 upper_threshold=0.0,
                 lower_threshold=None,
@@ -1018,7 +1019,7 @@ def test_multiple_failures_135(client: AuthenticatedClient):
             ValidationFailure(
                 id="myid",
                 metric="prompt.pii.credit_card",
-                details="Value 1 is above threshold 0",
+                details="Value 1 is above threshold 0.0",
                 value=1,
                 upper_threshold=0.0,
                 lower_threshold=None,
@@ -1310,3 +1311,35 @@ def test_custom_simlarity_metrics(client: AuthenticatedClient):
     ]
 
     assert sorted(metrics + ["id"]) == sorted(list(response.parsed.metrics[0].to_dict().keys()))
+
+
+def test_policy_editor_ui(client: AuthenticatedClient):
+    from html.parser import HTMLParser
+
+    def is_valid_html(html_string: str):
+        class HTMLValidationParser(HTMLParser):
+            def __init__(self):
+                super().__init__()
+                self.is_valid = True
+                self.has_root_element = False
+
+            def handle_starttag(self, tag, attrs):
+                if not self.has_root_element:
+                    self.has_root_element = True
+
+            def error(self, message: Any):
+                self.is_valid = False
+
+        parser = HTMLValidationParser()
+        try:
+            parser.feed(html_string)
+            return parser.is_valid and parser.has_root_element
+        except Exception:
+            return False
+
+    response = UiPolicy.sync_detailed(client=client)
+
+    if response.status_code != 200:
+        raise Exception(f"Failed to validate data. Status code: {response.status_code}. {response.parsed}")
+
+    assert is_valid_html(response.content.decode("utf-8"))

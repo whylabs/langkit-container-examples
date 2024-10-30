@@ -24,12 +24,10 @@ huggingface_hub = "0.23.5"
 # torch version, so just pin it here to be safe.
 torch = {version = "2.2.1+cpu", optional = true }
 
-# Just here to work around a runtime bug in a later version of transformers, may not be necessary in the future
-transformers = "4.39.3"
 pandas = "2.2.1"
 whylogs-container-types = "0.4.16"
 langkit = "0.0.28-dev16"
-whylogs-container-client = "2.0.4"
+whylogs-container-client = "2.1.0"
 
 
 # Actual dev dependencies
