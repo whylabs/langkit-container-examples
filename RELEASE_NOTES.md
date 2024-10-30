@@ -33,7 +33,10 @@ child_org_key = "xxxxxxxxxx.xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 result = Evaluate.sync_detailed(client=client, body=request, x_whylabs_api_key=child_org_key)
 ```
 
-There is a new example dedicated to multi tenancy use cases in the examples folder as well.
+There is a new example dedicated to multi tenancy use cases in the examples folder as well. The next step to fully releasing support for
+multiple orgs is to allow specifying the org in policy files and automatically sync policy files from the platform at runtime. For now, the
+policy files that are built into the container are not aware of the org they belong to so you can't have policy files for `model-2` in two
+orgs at once, for example. That will be updated in the next release.
 
 
 ## New Experimental Vector DB Metrics
