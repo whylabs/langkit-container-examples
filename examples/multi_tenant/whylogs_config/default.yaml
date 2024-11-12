@@ -1,0 +1,10 @@
+id: default_policy_id
+policy_version: 1
+schema_version: 0.1.0
+# This is the default for anything that doesn't specify an org because it uses the dataset id "default"
+# and it doesn't specify an org id like the other default yaml files.
+whylabs_dataset_id: default
+org_id: default
+
+metrics:
+  - metric: prompt.toxicity.toxicity_score

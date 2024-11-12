@@ -1,8 +1,9 @@
 # DOCSUB_START default_policy_example
 id: default_policy_id
 policy_version: 1
-schema_version: 0.0.1
+schema_version: 0.1.0
 whylabs_dataset_id: default
+org_id: default
 
 metrics:
   - metric: prompt.stats.token_count

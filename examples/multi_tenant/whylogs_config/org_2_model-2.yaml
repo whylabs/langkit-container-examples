@@ -1,0 +1,14 @@
+id: org-2#model-2 # Unique id that appears in logs for debugging. Format doesn't matter
+policy_version: 1
+schema_version: 0.1.0 # The policy version has to be at least 0.1.0 to allow the use of org_id below
+whylabs_dataset_id: model-2 # this is the default because its dataset id is "default"
+org_id: org-containerIntegChild2 # this is the name of the first org in this test, created on WhyLabs
+
+metrics:
+  - metric: response.pii
+
+validators:
+  - validator: constraint
+    options:
+      target_metric: response.pii.email_address
+      upper_threshold: 1

@@ -44,6 +44,8 @@ class ServerCommands:
             "--env",
             f"WHYLABS_API_KEY={_fake_key}",  # Not uploading anything for these tests, doesn't matter
             "--env",
+            "disable_whylabs_policy_polling=True",  # We don't want to pull down real policies in this test
+            "--env",
             "DEFAULT_MODEL_ID=model-62",
             "--env",
             "CONTAINER_PASSWORD=password",

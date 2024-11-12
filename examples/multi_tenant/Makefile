@@ -14,7 +14,7 @@ install:
 	poetry install --no-root
 
 build:
-	docker tag $(DOCKER_IMAGE) $(CONTAINER_NAME)
+	docker build --platform=linux/amd64 . -t $(CONTAINER_NAME)
 
 test:
 	poetry run pytest -vvv -s ./test

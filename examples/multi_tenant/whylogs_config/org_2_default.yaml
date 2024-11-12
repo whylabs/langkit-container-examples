@@ -1,0 +1,11 @@
+id: org-2-default # Unique id that appears in logs for debugging. Format doesn't matter
+policy_version: 1
+schema_version: 0.1.0 # The policy version has to be at least 0.1.0 to allow the use of org_id below
+whylabs_dataset_id: default # this is the default because its dataset id is "default"
+org_id: org-containerIntegChild2 # this is the name of the first org in this test, created on WhyLabs
+
+rulesets:
+  - ruleset: prompt.score.bad_actors
+    options:
+      behavior: block
+      sensitivity: medium

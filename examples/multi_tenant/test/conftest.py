@@ -39,7 +39,7 @@ class ServerCommands:
             "-p",
             f"127.0.0.1:{port}:8000",
             "--env",
-            f"WHYLABS_API_KEY={os.environ['PARENT_WHYLABS_API_KEY']}",  # Not uploading anything for these tests, doesn't matter
+            f"WHYLABS_API_KEY={os.environ['PARENT_WHYLABS_API_KEY']}",
             "--env",
             "DEFAULT_MODEL_ID=model-62",
             "--env",

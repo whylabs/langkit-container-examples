@@ -34,6 +34,7 @@ class ServerCommands:
     @staticmethod
     def local() -> List[str]:
         os.environ["WHYLOGS_API_KEY"] = _fake_key
+        os.environ["disable_whylabs_policy_polling"] = "True"  # We don't want to pull down real policies in this test
         return ["make", "run"]
 
 

@@ -1,0 +1,14 @@
+id: org-3#model-2
+policy_version: 1
+schema_version: 0.1.0
+whylabs_dataset_id: model-2
+org_id: org-containerIntegChild3
+
+metrics:
+  - metric: prompt.toxicity.toxicity_score
+
+validators:
+  - validator: constraint
+    options:
+      target_metric: prompt.toxicity.toxicity_score
+      upper_threshold: .3

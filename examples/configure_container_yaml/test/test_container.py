@@ -19,6 +19,7 @@ from whylogs_container_client.models.input_context_item import InputContextItem
 from whylogs_container_client.models.input_context_item_metadata import InputContextItemMetadata
 from whylogs_container_client.models.llm_validate_request import LLMValidateRequest
 from whylogs_container_client.models.llm_validate_request_additional_data import LLMValidateRequestAdditionalData
+from whylogs_container_client.models.log_request import LogRequest
 from whylogs_container_client.models.metric_filter_options import MetricFilterOptions
 from whylogs_container_client.models.run_options import RunOptions
 from whylogs_container_client.models.validation_failure import ValidationFailure
@@ -28,6 +29,45 @@ from whylogs_container_client.models.validation_result import ValidationResult
 from test.assert_util import AnyCollection, AnyString, system_dependent
 
 _default_violation_message = "Message has been blocked because of a policy violation"
+
+
+def test_data_logging(client: AuthenticatedClient):
+    # DOCSUB_START data_profile_call
+    import time
+
+    import whylogs_container_client.api.profile.log as Log
+    from whylogs_container_client.models.log_multiple import LogMultiple
+
+    now_ms_epoch = int(time.time() * 1000)
+    request = LogRequest(
+        dataset_id="model-1",
+        timestamp=now_ms_epoch,
+        multiple=LogMultiple(columns=["a", "b", "c"], data=[[1, 2.1, "foo"], [2, 33.3, "bar"]]),
+    )
+
+    Log.sync_detailed(client=client, body=request)
+    # DOCSUB_END
+
+
+def test_data_logging_pandas(client: AuthenticatedClient):
+    # DOCSUB_START data_profile_pandas_call
+    import time
+
+    import pandas as pd
+    import whylogs_container_client.api.profile.log as Log
+    from whylogs_container_client.models.log_multiple import LogMultiple
+
+    df = pd.DataFrame({"a": [1, 2], "b": [2.1, 33.3], "c": ["foo", "bar"]})
+
+    now_ms_epoch = int(time.time() * 1000)
+    request = LogRequest(
+        dataset_id="model-1",
+        timestamp=now_ms_epoch,
+        multiple=LogMultiple.from_dict(df.to_dict(orient="split")),  # pyright: ignore[reportUnknownArgumentType,reportUnknownMemberType]
+    )
+
+    Log.sync_detailed(client=client, body=request)
+    # DOCSUB_END
 
 
 def test_metric_pii(client: AuthenticatedClient):
