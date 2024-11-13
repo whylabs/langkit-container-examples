@@ -710,13 +710,13 @@ viz = ["Pillow (>=10.1.0,<11)", "Pillow (>=9.2.0)", "ipython", "numpy", "numpy (
 
 [[package]]
 name = "whylogs-container-client"
-version = "2.2.0"
+version = "2.2.1"
 description = "A client library for accessing FastAPI"
 optional = false
 python-versions = "<4.0,>=3.8"
 files = [
-    {file = "whylogs_container_client-2.2.0-py3-none-any.whl", hash = "sha256:ff774f62154bea6afe3b3acdb13b7029420b4ea7181e8d7afc87f8a9e7f79343"},
-    {file = "whylogs_container_client-2.2.0.tar.gz", hash = "sha256:9478a3de82aa019f78059cfbd04cf1f75680b1e0661e77871668c6a1546dc18b"},
+    {file = "whylogs_container_client-2.2.1-py3-none-any.whl", hash = "sha256:372c767c54dce119284c9dc60b57ab71782aae5931f6bb124041ae0e4a6dd1bd"},
+    {file = "whylogs_container_client-2.2.1.tar.gz", hash = "sha256:f1262590adcd85400b29d3777371c16483563fa1b4e5c9e88b0fdb942d4bbbf8"},
 ]
 
 [package.dependencies]
@@ -770,4 +770,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "0b1ede437cac1d38f1285b6e4312b0e953373550f7e00d388fb927da4bf69c7a"
+content-hash = "39c3862a65dbc4c485de30b036d13f48c3bef189e0ebeca5632d9ff133b04c45"

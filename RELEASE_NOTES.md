@@ -1,4 +1,8 @@
-# 2.2.0 Release Notes
+# 2.2.1 Release Notes
+
+- Fix a bug in the score calculation logic that causes failures when metrics are `None`, which happens for the hallucination metric when
+  there are service call failures. To date, all other metrics were local to the container so `None` never appeared in the score logic.
+# 2.2.0 Release Notes (yanked)
 
 ## Policy Support for Multi Tenancy Mode
 

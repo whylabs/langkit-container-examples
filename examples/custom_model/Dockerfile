@@ -1,5 +1,5 @@
 # DOCSUB_START docker_dependencies
-FROM registry.gitlab.com/whylabs/langkit-container:2.2.0
+FROM registry.gitlab.com/whylabs/langkit-container:2.2.1
 
 # Force the container to fail if the config is not present. Safeguard for messing up the
 # build in such a way that the config is not included correctly.
