@@ -1,4 +1,67 @@
+# 2.2.2 Release Notes
 
+- Bug fixes from the previous yanked releases. The release notes from 2.2.0 annd 2.2.1 have notes on the new features below.
+# 2.2.1 Release Notes
+
+- Fix a bug in the score calculation logic that causes failures when metrics are `None`, which happens for the hallucination metric when
+  there are service call failures. To date, all other metrics were local to the container so `None` never appeared in the score logic.
+# 2.2.0 Release Notes (yanked)
+
+## Policy Support for Multi Tenancy Mode
+
+This release introduces a new policy schema version, `0.1.0`. Previously, the only schema version that existed was `0.0.1`. The only change
+in this version of the policy format is the addition of a top level `org_id` field, like so.
+
+```yaml
+id: some-id
+policy_version: 1
+schema_version: 0.1.0 # This is the new version
+whylabs_dataset_id: model-1
+org_id: org-132 # This is new
+
+# the rest of the policy...
+```
+
+This field was introduced to support multi tenancy mode because policies now have to apply to both an org and a model, while previously the
+entire container had a single org id so policies didn't have to care. The `org_id` field should be the id of an organization in WhyLabs. The
+`whylabs_dataset_id` can be set to `default` to define the policy that should be used for all of the models in the org without having to
+specify duplicate policies for each model. For example,
+
+```yaml
+id: some-id
+policy_version: 1
+schema_version: 0.1.0
+whylabs_dataset_id: default
+org_id: org-132
+# the rest of the policy...
+```
+
+This policy defines what metrics are run when any requests for `org-132` are run. If both of these policies exist then the one for `model-1`
+is used for `model-1` and other models end up using the default definition.
+
+Currently, these default policies need to be set via the [WhyLabs API](https://api.whylabsapp.com/swagger-ui#/Policy/PutPolicy), they can't
+be set in our UI.
+
+## Auto Policy Syncing
+
+Previously, in order to pull down policy files that are stored in the WhyLabs platform, the env varibale
+`AUTO_PULL_WHYLABS_POLICY_MODEL_IDS` would need to be set to a csv of all of the model ids that should be pulled down. This version of the
+container makes the default behavior of the container to automatically check for all policies defined in the org without any configuration
+required. In the case of a normal org, the latest policy of each model that has a policy will be used. In the case of a multi tenant
+configuration, the container looks up each of the child orgs under the parent org and pulls the policies for them.
+
+If the `AUTO_PULL_WHYLABS_POLICY_MODEL_IDS` env var is set then it will take priority and maintain the original behavior. This is mostly to
+allow you to restrict the set of model policies that you want to download in the container. Typically this shouldn't be required though, its
+safe to just download all model policies and only send data for the modles you care about.
+
+## Local Cache Support
+
+This version of the container has the ability to specify a separate endpoint via the env variable `WHYLABS_API_CACHE_ENDPOINT` for the
+WhyLabs service to use for APIs that can benefit from caching, like policy downloads. The intent here is to integrate with a dedicated nginx
+proxy deployed within a kubernetes cluster that the container pods can use instead of all of them constantly requesting the same information
+from WhyLabs. Internally, the container will attempt to use the cache endpoint if its provided and fall back to using the official WhyLabs
+service if that cache endpoint isn't responding for some reason, which helps mitigate infrastructure configuration issues and makes the
+cluster a bit more resilient if this optimization isn't working for some reason.
 # 2.1.0 Release Notes
 
 ## Preliminary Multi Tenant Support
