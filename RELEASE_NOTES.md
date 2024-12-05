@@ -6,6 +6,8 @@
   the OpenAI SDK. Under some situations, you might need to set the `AZURE_DEPLOYMENT` env variable instead.
 - Dedicated endpoint for LightLLM. Future versions of LightLLM will be able to call our container via this endpoint to block prompts and
   responses.
+- Jitter can now be configured for the requests that hit the WhyLabs platform and the local nginx proxy cache for the platform. The env var
+  is `CONFIG_SYNC_JITTER_SECONDS` and it defaults to `5`.
 
 ## Optional Request Metadata
 
