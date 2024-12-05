@@ -24,7 +24,7 @@ put here will end up in the trace data. Here is an example trace that sent `foo`
     "type": "pass"
   },
   "whylabs.secure.metadata": {
-    "request.foo": "bar" # request metadata shows up here prefixed with `request`
+    "request.foo": "bar" // request metadata shows up here prefixed with `request`
   },
   "whylabs.secure.metrics": {
     "id": "my-id"
