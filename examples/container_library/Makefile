@@ -1,6 +1,6 @@
 .PHONY: install run test lint lint-fix format format-fix fix all clean
 
-version := 2.2.2
+version := 2.2.3
 
 all: install build test
 

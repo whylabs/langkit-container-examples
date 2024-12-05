@@ -27,7 +27,7 @@ torch = {version = "2.2.1+cpu", optional = true }
 pandas = "2.2.1"
 whylogs-container-types = "0.4.16"
 langkit = "0.0.28-dev16"
-whylogs-container-client = "2.2.2"
+whylogs-container-client = "2.2.3"
 
 
 # Actual dev dependencies

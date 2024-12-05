@@ -1,3 +1,39 @@
+# 2.2.3 Release Notes
+
+- Bug fixes for the Azure hallucinations metric. Environment variables and options are now properly respected. Users should set the
+  `AZURE_OPENAI_ENDPOINT` to the endpoint you can find in Azure OpenAI Studio, which looks like `https://your_name.openai.azure.com`, and
+  then use the `model` field in policies to specify which model you want, which ends up mapping to an Azure "deployment" under the hood in
+  the OpenAI SDK. Under some situations, you might need to set the `AZURE_DEPLOYMENT` env variable instead.
+- Dedicated endpoint for LightLLM. Future versions of LightLLM will be able to call our container via this endpoint to block prompts and
+  responses.
+
+## Optional Request Metadata
+
+There is a new field in the evluation request called `metadata` that is plumbed through to the WhyLabs platform traces. Anything that you
+put here will end up in the trace data. Here is an example trace that sent `foo`:`bar` as metadata in the request.
+
+```json
+{
+  "whylabs.api_key-id": "xxxxx",
+  "whylabs.resource_id": "model-177",
+  "whylabs.secure.tags": [],
+  "whylabs.secure.container.version": "2.2.3",
+  "whylabs.secure.action": {
+    "type": "pass"
+  },
+  "whylabs.secure.metadata": {
+    "request.foo": "bar" # request metadata shows up here prefixed with `request`
+  },
+  "whylabs.secure.metrics": {
+    "id": "my-id"
+  },
+  "whylabs.secure.policy": {
+    "version": 9,
+    "schema_version": "0.1.0",
+    "id": "org-xxxxx#model-177#9"
+  }
+}
+```
 # 2.2.2 Release Notes
 
 - Bug fixes from the previous yanked releases. The release notes from 2.2.0 annd 2.2.1 have notes on the new features below.

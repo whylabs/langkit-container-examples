@@ -13,7 +13,7 @@ python = "^3.10"
 # These are all dev dependencies. They're already included in the container and we don't want to
 # overwrite those versions, we just want types and auto completion in this project.
 whylogs-container-types = "^0.4.13"
-whylogs-container-client = "2.2.2"
+whylogs-container-client = "2.2.3"
 whylogs = "^1.5.1"
 
 pandas = "*"
