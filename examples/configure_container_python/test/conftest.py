@@ -50,7 +50,7 @@ class ServerCommands:
             "--env",
             "FAIL_STARTUP_WITHOUT_CONFIG=True",
             "--env",
-            "CONTAINER_PASSWORD=password",
+            "STATIC_SECRET=password",
             "--env",
             "DEFAULT_WHYLABS_DATASET_CADENCE=DAILY",
             "--env",

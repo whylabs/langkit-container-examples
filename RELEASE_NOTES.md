@@ -1,3 +1,42 @@
+# 2.2.4 Release Notes
+
+- Added jitter to various requests from the container to the WhyLabs platform. Containers now sync within a 10 second window instead of
+  exactly on the minute.
+- New `/healthz` endpoint for compatibility with systems that expect it. It just redirects the existing `/health`.
+- Moved the `/debug/policies` endpoint to the correct namespace in the generated python code. It was appearing under the `llm` api but it
+  should have been in the `debug` api.
+
+## [Breaking Change] API Key Based Auth
+
+The container has always used static credentials to authenticate clients. With the recent addition of multi tenant mode which requires that
+we validate api keys regardless, we took this chance to update the container to also be able to use api keys in headers from clients for
+general validation.
+
+There are a few changes to the configuration of the container in this release. The following env variables are no longer supported.
+
+```yaml
+CONTAINER_PASSWORD=
+DISABLE_CONTAINER_PASSWORD=
+```
+
+Instead, the `X-API-Key` header is assumed to be a WhyLabs api key and validated as such. In the previous release, we also introduced a
+somewhat duplicate header `X-Whylabs-API-Key` which is now gone because it would be redundant. It was only used for multitenancy mode
+before.
+
+If static credentials are still preferred then it can be enabled via env variables.
+
+```yaml
+STATIC_SECRET=my-key
+```
+
+And auth can be disabled while testing as well.
+
+```yaml
+DISABLE_CLIENT_AUTH=True
+```
+
+The container still has to be configured with its own `WHYLABS_API_KEY` because it needs to be able to make requests independent of any one
+client, before clients have started making requests. Clients can be configured with different keys than the container (and probably should).
 # 2.2.3 Release Notes
 
 - Bug fixes for the Azure hallucinations metric. Environment variables and options are now properly respected. Users should set the

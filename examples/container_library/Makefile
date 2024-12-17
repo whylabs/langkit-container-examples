@@ -1,6 +1,6 @@
 .PHONY: install run test lint lint-fix format format-fix fix all clean
 
-version := 2.2.3
+version := 2.3.0
 
 all: install build test
 
@@ -39,8 +39,8 @@ fix: lint-fix format-fix ## Fix all linting and formatting issues
 # Installing the wheel alone wouldn't bring in the correct private transitive dependencies.
 ci-install: ## Setup step specific to the CI environment.
 	poetry install
-	poetry run bash -c "cd ../..; poetry install --extras llm"
-	poetry add --group dev $(WHEEL_DIR)/*.whl
+	poetry run bash -c "cd ../..; poetry install --extras llm" # Add the local version of the main project and its dependencies
+	poetry run pip install $(WHEEL_DIR)/*.whl # add the local version of the generated python client
 
 # This step is run before we publish the next version. It ensures that the exported examples reference the most recent version that we're
 # publishing in that CI run.

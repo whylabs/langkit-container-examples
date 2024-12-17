@@ -9,13 +9,13 @@ readme = "README.md"
 python = ">=3.9,<3.12"
 whylogs = "^1.4.4"
 
-whylogs-container = {version = "2.2.3", extras = ["llm"], source = "whylabs_container_gitlab"}
+whylogs-container = {version = "2.3.0", extras = ["llm"], source = "whylabs_container_gitlab"}
 torch = { version = "2.2.1+cpu" }
 
 [tool.poetry.group.dev.dependencies]
 pyright = "^1.1.367"
 ruff = "0.6.2"
-whylogs-container-client = "2.2.3"
+whylogs-container-client = "2.3.0"
 
 [build-system]
 requires = ["poetry-core"]

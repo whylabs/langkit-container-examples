@@ -12,7 +12,7 @@ python = "^3.10"
 [tool.poetry.group.dev.dependencies]
 # These are all dev dependencies. They're already included in the container and we don't want to
 # overwrite those versions, we just want types and auto completion in this project.
-whylogs-container-client = "2.2.3"
+whylogs-container-client = "2.3.0"
 whylogs = "^1.5.1"
 pandas = "*"
 

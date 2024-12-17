@@ -20,7 +20,7 @@ Make sure you have [poetry](https://python-poetry.org/) and docker installed. Cr
 ```
 # Generated at https://hub.whylabsapp.com/settings/access-tokens
 WHYLABS_API_KEY=<api key>
-CONTAINER_PASSWORD=password
+STATIC_SECRET=password
 
 # Set based on your model type in WhyLabs. Daily is the default.
 DEFAULT_WHYLABS_DATASET_CADENCE=DAILY

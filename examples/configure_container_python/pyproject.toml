@@ -11,7 +11,7 @@ python = ">=3.9,<3.12"
 whylogs-container = {version = "2.0.1", extras = ["llm"], source = "whylabs_container_gitlab"}
 
 [tool.poetry.group.dev.dependencies]
-whylogs-container-client = "2.2.3"
+whylogs-container-client = "2.3.0"
 pyright = "^1.1.347"
 ruff = "0.6.2"
 pytest = "^7.4.4"

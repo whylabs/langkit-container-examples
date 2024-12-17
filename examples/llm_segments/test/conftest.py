@@ -48,7 +48,7 @@ class ServerCommands:
             "--env",
             "DEFAULT_MODEL_ID=model-62",
             "--env",
-            "CONTAINER_PASSWORD=password",
+            "STATIC_SECRET=password",
             "--env",
             "DEFAULT_WHYLABS_DATASET_CADENCE=DAILY",
             "--env",
