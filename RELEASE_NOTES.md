@@ -1,4 +1,4 @@
-# 2.2.4 Release Notes
+# 2.3.0 Release Notes
 
 - Added jitter to various requests from the container to the WhyLabs platform. Containers now sync within a 10 second window instead of
   exactly on the minute.
