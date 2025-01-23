@@ -11,15 +11,10 @@ looking for a specific example. Each example either configures or calls a deploy
 
 ## Container Access
 
-We distrubite the container from our private Gitlab repository. We'll generate a user name and password for you to pull the container. Once
-you have those credentials, you can authenticate and pull whichever tag you need. Check our [release notes][release_notes] to see the latest
-version.
+We distrubite the container from Docker Hub.
 
-```bash
-# Manually pulling via Docker
-docker login registry.gitlab.com
-docker pull registry.gitlab.com/whylabs/langkit-container:latest
-```
+- [Docker whylogs Image](https://hub.docker.com/r/whylabs/whylogs/tags)
+- [Docker langkit Image](https://hub.docker.com/r/whylabs/langkit/tags)
 
 If you're deploying through Helm then see our [Helm
 instructions](https://github.com/whylabs/charts/tree/mainline/charts/langkit#credentials) to use these credentials to pull images.
@@ -184,4 +179,3 @@ languages, curl, or generic http then see the [api docs][api_docs] for request f
 [helm_repo]: https://github.com/whylabs/charts
 [helm_llm_file]: https://github.com/whylabs/charts/tree/mainline/charts/langkit
 [release_notes]: https://github.com/whylabs/langkit-container-examples/blob/master/RELEASE_NOTES.md
-
